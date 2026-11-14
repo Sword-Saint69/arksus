@@ -182,7 +182,8 @@ def soil_setup(location_id: str, soilgrids: dict | None, soil_cfg: dict) -> tupl
             "type": sg_awc.get("type", "model"),
             "verified": bool(sg_awc.get("verified", False)),
         }, {}
-    fb = soil_cfg["fallback_awc_mm_per_m"][location_id]   # KeyError for an unknown location
+    fb_cfg = soil_cfg["fallback_awc_mm_per_m"]
+    fb = (fb_cfg.get("overrides") or {}).get(location_id) or fb_cfg["default"]
     return {"value": float(fb["value"]), "unit": fb["unit"], "source": fb["source"],
             "type": "assumption", "verified": False}, {}
 

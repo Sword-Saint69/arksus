@@ -26,7 +26,19 @@ TRIAL_LOCATION_ID = "karapinar"        # the previous-crop trial is in Konya
 EX18 = dict(lat_deg=50.0 + 48.0 / 60.0, elevation_m=100.0, doy=187, tmax_c=21.5, tmin_c=12.3,
             rh_max=84.0, rh_min=63.0, u10_ms=10.0 / 3.6, sun_hours=9.25, expected_mm=3.9)
 
-LOCATION_NAMES = {"karapinar": "Karapınar", "develi": "Develi"}
+_LOCATION_NAMES: dict[str, str] | None = None
+
+
+def location_names() -> dict[str, str]:
+    """{id: display name} from engine/config/locations.yaml (the list is open); read once."""
+    global _LOCATION_NAMES
+    if _LOCATION_NAMES is None:
+        try:
+            from nobetsu import config
+            _LOCATION_NAMES = {l["id"]: l.get("name", l["id"]) for l in config.load("locations")["locations"]}
+        except (ImportError, FileNotFoundError, KeyError, TypeError):
+            _LOCATION_NAMES = {}
+    return _LOCATION_NAMES
 
 
 def _v(node):
@@ -39,7 +51,7 @@ def _check(check_id, status, value, reference, en, tr):
 
 
 def _name(loc):
-    return LOCATION_NAMES.get(loc, loc)
+    return location_names().get(loc, loc)
 
 
 def _rows(outputs, location_id=None, depth_id=REFERENCE_DEPTH_ID, rotation_id=None):
@@ -335,8 +347,8 @@ def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dic
         )
     if not parts:
         return _check("smap_anomaly", "pending", "", "",
-                      "Waiting for NASA SMAP L4 root-zone data for the two points.",
-                      "İki nokta için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
+                      "Waiting for NASA SMAP L4 root-zone data for the points.",
+                      "Noktalar için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
     return _check(
         "smap_anomaly", "info", "; ".join(parts),
         "NASA SMAP L4 SPL4SMGP v8 root-zone wetness, 9 km cell, monthly means",

@@ -145,9 +145,10 @@ def test_awc_from_soilgrids_is_used_and_changes_results(weather, output):
     assert a["fullness_by_month"] != b["fullness_by_month"]
 
 
-def test_unknown_location_without_soilgrids_raises(weather):
-    with pytest.raises(KeyError):
-        runner.run_location("atlantis", weather, None, start_years=[2010])
+def test_new_location_without_soilgrids_uses_default_fallback(weather):
+    # OMER_BAKMALI §6: location ids are an open list, so a missing fallback must not KeyError.
+    out = runner.run_location("atlantis", weather, None, start_years=[2010])
+    assert out["awc_used"]["type"] == "assumption" and out["sequences"]
 
 
 def test_short_weather_raises(weather):
@@ -217,11 +218,22 @@ def test_soilgrids_method_uses_soilgrids_awc():
     assert overrides == {}
 
 
-def test_no_soilgrids_file_uses_location_fallback():
+def test_no_soilgrids_file_uses_default_fallback():
     soil_cfg = load_config("soil")
     awc, overrides = runner.soil_setup("karapinar", None, soil_cfg)
-    assert awc["value"] == soil_cfg["fallback_awc_mm_per_m"]["karapinar"]["value"]
+    assert awc["value"] == soil_cfg["fallback_awc_mm_per_m"]["default"]["value"]
     assert awc["type"] == "assumption" and overrides == {}
+
+
+def test_fallback_works_for_any_location_and_honours_overrides():
+    soil_cfg = load_config("soil")
+    default = soil_cfg["fallback_awc_mm_per_m"]["default"]["value"]
+    awc, _ = runner.soil_setup("some_new_district", None, soil_cfg)   # no KeyError for new ids
+    assert awc["value"] == default
+    cfg = {**soil_cfg, "fallback_awc_mm_per_m": {**soil_cfg["fallback_awc_mm_per_m"],
+           "overrides": {"gemerek": {"value": 120.0, "unit": "mm/m", "source": "test"}}}}
+    assert runner.soil_setup("gemerek", None, cfg)[0]["value"] == 120.0
+    assert runner.soil_setup("develi", None, cfg)[0]["value"] == default
 
 
 def test_unknown_awc_method_raises():
