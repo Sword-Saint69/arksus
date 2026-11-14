@@ -104,7 +104,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [ ] **T+1: AppEEARS'a SMAP L4 nokta isteğini gönder (5 dk)** — sm_rootzone, sm_rootzone_wetness, sm_surface_wetness; iki nokta; 2015-04-01 → bugün
 - [x] **T+1–2: power.py** — iki lokasyon için 2000 → son tarih NASA POWER çekimi + önbellek + `load_weather()`; birimleri başlıktan oku (WS2M_MAX dahil) → **Ömer'e haber ver** — ✅ 16:34 (gumus/power)
 - [x] **T+2–2.75: SoilGrids tek seferlik çekim (45 dk sınır)** → `data/soilgrids/{lokasyon}.json`; olmazsa Muhammet'e "elle oku" de — ✅ 16:45 (gumus/soilgrids)
-- [ ] **T+2.75–4: economics.ts + vitest testleri** — P10/P50/P90, zarar olasılığı, başabaş verimi, flip tablosu, öncelik puanı (§5.9) → M1
+- [x] **T+2.75–4: economics.ts + vitest testleri** — P10/P50/P90, zarar olasılığı, başabaş verimi, flip tablosu, öncelik puanı (§5.9) → M1 — ✅ 16:47 (gumus/economics)
 - [ ] **T+4–7: export.py + build.py** — mock runner ile uçtan uca, şema doğrulama testi
 - [ ] **T+7–9: `make data` → gerçek JSON → Vercel'de görünüyor, `mock:false`** → M2, `v0.1` etiketini at
 - [ ] **T+9–14: Muhammet'in değerlerini defaults.yaml / references.yaml'a, strateji metinlerini rotations.yaml'a geçir (her 2 saatte bir); README teknik kısım** → M3, `v0.2` etiketi
