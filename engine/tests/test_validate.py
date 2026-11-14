@@ -59,6 +59,7 @@ def test_et0_example18_passes(outputs, weathers, refs):
 
 
 def test_pse_is_info_with_model_value_and_literature_range(outputs, weathers, refs):
+    refs["pse_range"]["low"]["value"], refs["pse_range"]["high"]["value"] = 0.08, 0.30
     c = _by_id(validate.run_checks(outputs, weathers, refs))["pse_literature"]
     assert c["status"] == "info"
     assert "%" in c["value"] and "8" in c["reference"] and "30" in c["reference"]
@@ -83,12 +84,15 @@ def test_trial_ratio_pending_without_reference(outputs, weathers, refs):
 
 
 def test_precip_vs_mgm_pending_when_normals_missing(outputs, weathers, refs):
+    for loc in ("karapinar", "develi"):
+        refs["mgm_annual_precip_mm"][loc]["value"] = None
     c = _by_id(validate.run_checks(outputs, weathers, refs))["precip_vs_mgm"]
     assert c["status"] == "pending"
 
 
 def test_precip_vs_mgm_reports_percent_difference(outputs, weathers, refs):
     refs["mgm_annual_precip_mm"]["karapinar"].update(value=300.0, station="Test station")
+    refs["mgm_annual_precip_mm"]["develi"]["value"] = None
     c = _by_id(validate.run_checks(outputs, weathers, refs))["precip_vs_mgm"]
     assert c["status"] == "info"
     assert "Karapınar" in c["value"] and "%" in c["value"]

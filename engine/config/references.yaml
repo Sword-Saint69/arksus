@@ -71,7 +71,7 @@ mgm_annual_precip_mm:            # check: precip_vs_mgm (WMO 1991–2020 climate
 heat_threshold_c:                # T2M_MAX threshold for heat days at wheat flowering (PLAN_MVP §5.8)
   value: 31
   unit: "°C"
-  source: "Porter J.R., Gawith M. 1999. Temperatures and the growth and development of wheat: a review. Eur. J. Agron. 10: 23–36 — çiçeklenmede 31 °C üstü tozlanma başarısını sınırlar (ikincil atıf üzerinden; birincil metin görülmedi)"
+  source: "Jacott C.N., Boden S.A. 2020. J. Exp. Bot. 71(19): 5740–5751 (doi:10.1093/jxb/eraa326): 'temperatures higher than 31 °C limit the success of pollination', Porter ve Gawith 1999 (Eur. J. Agron. 10: 23–36) atfıyla. Kaynak günlük maksimum olduğunu açıkça yazmıyor; motor T2M_MAX'a uyguluyor."
   source_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC7540836"
   type: literature
   verified: false

@@ -48,9 +48,9 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+3 (sadece Gümüş "SoilGrids olmadı" derse): SoilGrids web haritasından iki koordinatın toprak değerleri** — kil/kum/silt, pH, organik karbon, azot, CEC; Q05/Q50/Q95 → `soil.*` — ✅ 17:55 — gümüş yaptı (gerek kalmadı: WCS ile çekildi)
 - [ ] **T+3–5: Maliyetler** — Konya / Kayseri ziraat odası 2026 dekar başı maliyet tabloları (kira hariç); nadas için toprak işleme maliyeti → `cost.*` — ⏳ kalan: Orta Anadolu kuru tarım 2026 dekar maliyeti bulunamadı (gümüş denedi; ziraat odasından elle alınmalı)
 - [ ] **T+3–5: Verimler** — TÜİK ilçe bitkisel üretim: Karapınar ve Develi kuru buğday, nohut, mercimek verimi (kg/da), 2004–2025 → `ym.*` yıllık tablo — ⏳ kalan: TÜİK ilçe verileri otomatik okunamadı (gümüş denedi; TÜİK'ten elle indirilmeli)
-- [ ] **T+5–6: Ekim/hasat takvimi** — TAGEM / GKTAEM / Bahri Dağdaş: Konya ve Kayseri için buğday, nohut, mercimek ekim ve hasat tarihleri → `calendar.*` → **Ömer'e haber ver**
+- [x] **T+5–6: Ekim/hasat takvimi** — TAGEM / GKTAEM / Bahri Dağdaş: Konya ve Kayseri için buğday, nohut, mercimek ekim ve hasat tarihleri → `calendar.*` → **Ömer'e haber ver** — ✅ 17:53 (Ömer yaptı, omer: buğday Gültekin ve ark. 2017, nohut Topalak 2016, mercimek TTAE + FAO-56; Kayseri'ye özel kaynak yok)
 - [x] **T+6–7: Karapınar rüzgâr erozyonu kaynağı** — Konya Toprak Su ve Çölleşme Araştırma Enstitüsü tarih sayfası (nadas–hububat + diskaro, 1960'lar) → `story.erosion` — ✅ 17:55 — gümüş yaptı
-- [x] **T+6–7: Doğrulama kaynakları** — Konya kuru koşul ön bitki denemesi (286 / 249 / 228 kg/da ve yıllar); Orta Anadolu nadas su depolama verimi (%8–30); Karapınar ve Develi'ye en yakın MGM istasyonunun 1991–2020 yıllık yağış normali → `ref.*` — ✅ 17:55 — gümüş yaptı (PSE %11–29, MGM yerine WMO normalleri)
+- [x] **T+6–7: Doğrulama kaynakları** — Konya kuru koşul ön bitki denemesi (286 / 249 / 228 kg/da ve yıllar); Orta Anadolu nadas su depolama verimi (%8–30); Karapınar ve Develi'ye en yakın MGM istasyonunun 1991–2020 yıllık yağış normali → `ref.*` — ✅ 17:55 — gümüş yaptı (PSE %11–29, MGM yerine WMO normalleri); Ömer de bağımsız buldu, aynı değerler — ✅ 17:53 (Ömer yaptı, omer; MGM için WMO değerleri tutuldu)
 - [x] **T+7–9: Strateji açıklamaları + toprak özellikleri + sözlük** — 3 rotasyon × neden / kanıt / faydalar / bilgi boşlukları / yerel uzmana sorulacaklar; azot bağlama, nadas yılındaki toprak işleme sayısı; 12 sözlük terimi → `strategy.*`, `trait.*`, `glossary.*` → Gümüş ve İsmail'e haber ver — ✅ 17:55 — gümüş yaptı (baklagil yılı toprak işleme sayısı bulunamadı)
 - [ ] **T+9–10: Hikâye ve slayt iskeleti (7 slayt)**
 - [ ] **T+10–12: Proje sayfası İngilizce taslak + AI beyanı taslağı + jüri soru-cevap listesi** (PLAN_MVP §8)
@@ -89,7 +89,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+7–7.5: Toprak ve hassasiyet göstergeleri (PLAN_MVP §5.8, §5.10)** — çıplak gün (aylık), rüzgâra açık çıplak gün, aylık stres günü, çiçeklenmede sıcak gün, aylık doluluk (%) — ✅ 16:31 (omer/runner)
 - [x] **T+7.5–9: 2 lokasyon × 3 rotasyon × 3 derinlik tam koşu, Gümüş'ün `build.py`'sine bağla** → M2 — ✅ 17:35 (omer; gerçek JSON'un commit'i ve v0.1 Gümüş'te)
 - [x] **T+9–12: validate.py** — mass_balance, et0_fao56_ex18, pse_literature, trial_ratio, precip_vs_mgm — ✅ 16:42 (omer)
-- [ ] **T+12–14: Muhammet'in TAGEM takvimlerini crops.yaml'a geçir, yeniden koş, sonuçları gözle kontrol et** → M3 (takvim erken gelirse erken geçir)
+- [x] **T+12–14: Muhammet'in TAGEM takvimlerini crops.yaml'a geçir, yeniden koş, sonuçları gözle kontrol et** → M3 (takvim erken gelirse erken geçir) — ✅ 17:53 (omer; takvimleri Ömer buldu, crops.yaml'da kaynaklı)
 - [ ] **T+14–16.5: Genişletme E1 (SMAP anomali karşılaştırması)**
 - [ ] **T+16.5–18.5: Genişletme E2 (kurak/sıcak senaryo koşuları)**
 - [ ] **T+18.5–19: zaman kalırsa E5 (bu sezon) veya E10 başlangıcı — yeşil değilse merge etme**

@@ -1,9 +1,11 @@
-# Crop parameters for the water balance engine (owner: Ömer, Rol A; calendars from Muhammet).
+# Crop parameters for the water balance engine (owner: Ömer, Rol A).
 # Every parameter is a value object (V): value, unit, source, (source_url), type, verified.
 #
-# STATUS (14 Nov): every FAO-56 table value below was checked against the FAO HTML edition
-# (fao.org/4/x0490e) and carries its URL: verified: true. Still assumptions (verified: false):
-# sowing dates, stage lengths and the wheat flowering window, until Muhammet's calendars arrive.
+# STATUS (14 Nov): every FAO-56 table value was checked against the FAO HTML edition
+# (fao.org/4/x0490e) and carries its URL. Sowing dates are now sourced (Ömer did the
+# calendar research that TASKS.md assigns to Muhammet): wheat Gültekin et al. 2017 (Konya),
+# chickpea Topalak 2016 (Konya), lentil TTAE + FAO-56 Table 11. Still assumptions: the wheat
+# and chickpea stage split, the wheat flowering window, and using Konya calendars for Develi.
 # Ky for chick pea and lentil is FAO-56's own default for crops without a Table 24 value.
 #
 # The engine has no crop-specific branches. An entry WITHOUT a `sowing` key means the
@@ -15,33 +17,42 @@ wheat:
   sowing:
     value: 10-15
     unit: MM-DD
-    source: 'PLAN_MVP §5.3 seed calendar (sown ~15 Oct); replace with SOURCES.md calendar.*.wheat. FAO-56 Table 11 checked: no Central Anatolian wheat row, no chick pea row, lentil only for Europe (April,
-      150 d) and arid regions (Oct/Nov). Waiting for Muhammet''s TAGEM / GKTAEM / Bahri Dağdaş calendars (SOURCES.md calendar.*).'
-    type: assumption
-    verified: false
+    source: 'Gültekin et al. 2017, KSÜ Doğa Bil. Derg. 20(Özel Sayı):283–287, doi:10.18016/ksudobil.349258 (Bahri Dağdaş, Konya, dryland): sowing later than October lowers yields in the region (citing Topal
+      1993). Mid-October chosen inside that window. Same date used for Develi (no Kayseri source found)'
+    source_url: https://dergipark.org.tr/en/download/article-file/390551
+    type: literature
+    verified: true
   stage_days:
     ini:
       value: 150
       unit: days
-      source: 'Assumption: winter dormancy to mid-March; total 270 days gives harvest ~12 Jul (PLAN_MVP §5.3). FAO-56 Table 11 winter wheat entries do not match Central Anatolia directly'
+      source: 'Total 270 days = sowing 15 Oct → harvest ~11 Jul. July harvest: Gültekin et al. 2017 (trial field ''harvested in July 2010'', Konya). Split between stages is an assumption: FAO-56 Table 11
+        has no Central Anatolian winter-wheat row'
+      source_url: https://dergipark.org.tr/en/download/article-file/390551
       type: assumption
       verified: false
     dev:
       value: 45
       unit: days
-      source: Assumption, see ini
+      source: 'Total 270 days = sowing 15 Oct → harvest ~11 Jul. July harvest: Gültekin et al. 2017 (trial field ''harvested in July 2010'', Konya). Split between stages is an assumption: FAO-56 Table 11
+        has no Central Anatolian winter-wheat row'
+      source_url: https://dergipark.org.tr/en/download/article-file/390551
       type: assumption
       verified: false
     mid:
       value: 45
       unit: days
-      source: Assumption, see ini
+      source: 'Total 270 days = sowing 15 Oct → harvest ~11 Jul. July harvest: Gültekin et al. 2017 (trial field ''harvested in July 2010'', Konya). Split between stages is an assumption: FAO-56 Table 11
+        has no Central Anatolian winter-wheat row'
+      source_url: https://dergipark.org.tr/en/download/article-file/390551
       type: assumption
       verified: false
     late:
       value: 30
       unit: days
-      source: Assumption, see ini
+      source: 'Total 270 days = sowing 15 Oct → harvest ~11 Jul. July harvest: Gültekin et al. 2017 (trial field ''harvested in July 2010'', Konya). Split between stages is an assumption: FAO-56 Table 11
+        has no Central Anatolian winter-wheat row'
+      source_url: https://dergipark.org.tr/en/download/article-file/390551
       type: assumption
       verified: false
   kcb_ini:
@@ -116,35 +127,44 @@ wheat:
       verified: false
 chickpea:
   sowing:
-    value: 04-01
+    value: 03-25
     unit: MM-DD
-    source: 'PLAN_MVP §5.3 seed calendar (sown ~1 Apr); replace with SOURCES.md calendar.*.chickpea. FAO-56 Table 11 checked: no Central Anatolian wheat row, no chick pea row, lentil only for Europe (April,
-      150 d) and arid regions (Oct/Nov). Waiting for Muhammet''s TAGEM / GKTAEM / Bahri Dağdaş calendars (SOURCES.md calendar.*).'
-    type: assumption
-    verified: false
+    source: 'Topalak C. 2016, MSc thesis, Selçuk Üniv., Konya (Beyşehir, 2014): sowing on 25 March or earlier gave the highest seed yield; chickpea in Konya is sown from March to early May. Same date used
+      for Develi (no Kayseri source found)'
+    source_url: https://acikerisim.selcuk.edu.tr/items/51c9a989-4586-4230-a48d-c57e605cef7b
+    type: literature
+    verified: true
   stage_days:
     ini:
-      value: 20
+      value: 17
       unit: days
-      source: 'Assumption: total 105 days gives harvest ~mid July (PLAN_MVP §5.3)'
+      source: 'Total 129 days = sowing 25 Mar → harvest ~1 Aug: Topalak 2016 harvested 1–15 Aug 2014 (Konya, single wet year). Stage split uses the FAO-56 Table 11 lentil (Europe) proportions 20/30/60/40,
+        since chick pea has no row in Table 11'
+      source_url: https://acikerisim.selcuk.edu.tr/items/51c9a989-4586-4230-a48d-c57e605cef7b
       type: assumption
       verified: false
     dev:
-      value: 30
+      value: 26
       unit: days
-      source: Assumption, see ini
+      source: 'Total 129 days = sowing 25 Mar → harvest ~1 Aug: Topalak 2016 harvested 1–15 Aug 2014 (Konya, single wet year). Stage split uses the FAO-56 Table 11 lentil (Europe) proportions 20/30/60/40,
+        since chick pea has no row in Table 11'
+      source_url: https://acikerisim.selcuk.edu.tr/items/51c9a989-4586-4230-a48d-c57e605cef7b
       type: assumption
       verified: false
     mid:
-      value: 35
+      value: 52
       unit: days
-      source: Assumption, see ini
+      source: 'Total 129 days = sowing 25 Mar → harvest ~1 Aug: Topalak 2016 harvested 1–15 Aug 2014 (Konya, single wet year). Stage split uses the FAO-56 Table 11 lentil (Europe) proportions 20/30/60/40,
+        since chick pea has no row in Table 11'
+      source_url: https://acikerisim.selcuk.edu.tr/items/51c9a989-4586-4230-a48d-c57e605cef7b
       type: assumption
       verified: false
     late:
-      value: 20
+      value: 34
       unit: days
-      source: Assumption, see ini
+      source: 'Total 129 days = sowing 25 Mar → harvest ~1 Aug: Topalak 2016 harvested 1–15 Aug 2014 (Konya, single wet year). Stage split uses the FAO-56 Table 11 lentil (Europe) proportions 20/30/60/40,
+        since chick pea has no row in Table 11'
+      source_url: https://acikerisim.selcuk.edu.tr/items/51c9a989-4586-4230-a48d-c57e605cef7b
       type: assumption
       verified: false
   kcb_ini:
@@ -199,37 +219,42 @@ chickpea:
     verified: true
 lentil:
   sowing:
-    value: 03-15
+    value: 03-01
     unit: MM-DD
-    source: 'PLAN_MVP §5.3 seed calendar (sown ~mid March); replace with SOURCES.md calendar.*.lentil. FAO-56 Table 11 checked: no Central Anatolian wheat row, no chick pea row, lentil only for Europe (April,
-      150 d) and arid regions (Oct/Nov). Waiting for Muhammet''s TAGEM / GKTAEM / Bahri Dağdaş calendars (SOURCES.md calendar.*).'
-    type: assumption
-    verified: false
+    source: 'TTAE (Trakya Tarımsal Araştırma Enstitüsü), ''Mercimek Tarımı'' (S. Süzer): green lentil is spring-sown in Central Anatolia; spring sowing in early spring, end of February to early March. Same
+      date used for both districts'
+    source_url: https://arastirma.tarimorman.gov.tr/ttae/Sayfalar/Detay.aspx?SayfaId=81
+    type: literature
+    verified: true
   stage_days:
     ini:
-      value: 15
+      value: 20
       unit: days
-      source: 'Assumption: FAO-56 Table 11 lentil proportions scaled to 110 days, harvest ~early July (PLAN_MVP §5.3)'
-      type: assumption
-      verified: false
+      source: 'FAO-56 Table 11, lentil, April planting, Europe: 20 / 30 / 60 / 40 = 150 days (→ harvest ~28 Jul). Not a Central Anatolian value; no local harvest date found (TTAE gives only a ripeness rule)'
+      source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
+      type: literature
+      verified: true
     dev:
-      value: 25
+      value: 30
       unit: days
-      source: Assumption, see ini
-      type: assumption
-      verified: false
+      source: 'FAO-56 Table 11, lentil, April planting, Europe: 20 / 30 / 60 / 40 = 150 days (→ harvest ~28 Jul). Not a Central Anatolian value; no local harvest date found (TTAE gives only a ripeness rule)'
+      source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
+      type: literature
+      verified: true
     mid:
-      value: 45
+      value: 60
       unit: days
-      source: Assumption, see ini
-      type: assumption
-      verified: false
+      source: 'FAO-56 Table 11, lentil, April planting, Europe: 20 / 30 / 60 / 40 = 150 days (→ harvest ~28 Jul). Not a Central Anatolian value; no local harvest date found (TTAE gives only a ripeness rule)'
+      source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
+      type: literature
+      verified: true
     late:
-      value: 25
+      value: 40
       unit: days
-      source: Assumption, see ini
-      type: assumption
-      verified: false
+      source: 'FAO-56 Table 11, lentil, April planting, Europe: 20 / 30 / 60 / 40 = 150 days (→ harvest ~28 Jul). Not a Central Anatolian value; no local harvest date found (TTAE gives only a ripeness rule)'
+      source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
+      type: literature
+      verified: true
   kcb_ini:
     value: 0.15
     unit: '-'

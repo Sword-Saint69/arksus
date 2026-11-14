@@ -53,8 +53,10 @@ Muhammet'in `ref.*` işini ben yaptım; `engine/config/references.yaml` artık g
 - `heat_threshold_c`: **30 → 31 °C** (Porter ve Gawith 1999). Isı günleri biraz azalır.
 
 **Kırılan testler (`engine/tests/test_validate.py`)** gerçek `references.yaml`'daki eski yer tutucu değerlere bağlı:
-- [ ] `test_pse_is_info_with_model_value_and_literature_range`: `"8" in reference and "30" in reference` arıyor. Ya testte `refs["pse_range"]`'i açıkça 0.08/0.30'a ayarla, ya da `refs`'teki değerlerden beklenen metni üret.
-- [ ] `test_precip_vs_mgm_pending_when_normals_missing`: MGM'nin boş olduğunu varsayıyor. Testin başında iki lokasyonun `value`'sunu `None` yap.
-- [ ] `test_precip_vs_mgm_reports_percent_difference`: Develi'nin boş olduğunu varsayıyor. Develi `value`'sunu testte `None` yap.
+- [x] `test_pse_is_info_with_model_value_and_literature_range`: `"8" in reference and "30" in reference` arıyor. Ya testte `refs["pse_range"]`'i açıkça 0.08/0.30'a ayarla, ya da `refs`'teki değerlerden beklenen metni üret.
+- [x] `test_precip_vs_mgm_pending_when_normals_missing`: MGM'nin boş olduğunu varsayıyor. Testin başında iki lokasyonun `value`'sunu `None` yap.
+- [x] `test_precip_vs_mgm_reports_percent_difference`: Develi'nin boş olduğunu varsayıyor. Develi `value`'sunu testte `None` yap.
 
 Üçü düzelince `gumus/muhammet-sources`'u main'e alacağım (testler geçmeden merge yok). Diğer 152 test geçiyor.
+
+Düzeldi (Ömer, `omer` 46b2e28): üç test kendi `refs` değerini ayarlıyor; `gumus/muhammet-sources` ile birlikte yeşil.
