@@ -77,3 +77,16 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - pandas: bende 2.2.3, senin testlerin dahil 109 test geçiyor; sabitleme yok (`pandas>=2.1`).
 - `engine/tests/__init__.py` **ekledim**: bazı makinelerde (ultralytics/roboflow kuruluysa) site-packages'ta bir `tests` paketi var ve namespace paketini gölgeliyor; `from tests.fixtures import ...` bu yüzden kırılıyordu. Senin import'ların aynen çalışıyor.
 - Sıradaki: `build.py` gerçek koşu için `validate.py`'yi bekliyor; gelene kadar kontrolleri `pending` yazacak şekilde ayarlayacağım (M2).
+
+## 10. AWC kararı: SoilGrids dokusu + FAO-56 tablosu (14 Kas, `omer`)
+
+Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı. **Senin dosyalarında değişiklik gerekmiyor**; sadece haberin olsun.
+
+- Motor artık AWC'yi şöyle seçiyor (`engine/config/soil.yaml` → `awc_method: texture_table`):
+  1. Doku sınıfı senin `data/soilgrids/{loc}.json` dosyandaki `clay / sand / silt` Q50 (0–30 cm) değerlerinden, USDA üçgeniyle: **Karapınar = siltli kil**, **Develi = killi tın** (FAO tablosunda yok → en yakın sınıf siltli killi tın).
+  2. AWC, θFC, θWP ve REW o sınıfın FAO-56 Tablo 19 değerinden; TEW Denk. 73'ten.
+  3. Sonuç: **Karapınar 160 mm/m, Develi 155 mm/m** (SoilGrids'in 58,6 / 67,4 değerleri yerine).
+- `results.soil.awc_mm_per_m` → `type: "assumption"`, `verified: false`; `source` metni hem kullanılan tabloyu hem de SoilGrids'in verdiği ve kullanılmayan değeri yazıyor. Şemadan geçiyor.
+- Geri almak gerekirse: `soil.yaml`'da `awc_method.value: soilgrids` → motor eskisi gibi senin değerini kullanır. Kod değişmez.
+- [ ] **Öneri (UI / export, senin ve İsmail'in kararı):** toprak kartında SoilGrids'in kendi AWC değeri ve 90 % aralığı (`range_q05_q95`) da "SoilGrids estimate (not used by the engine)" diye gösterilebilir; şeffaflık için iyi olur. Gösterilecekse sözleşmeye nasıl gireceğine sen karar ver.
+- **Gerçek veriyle etkisi (orta derinlik, ortanca):** Karapınar nadas buğday ekiminde 104 mm su bırakıyor (nohut 13, mercimek 26); nadas depolama verimi %23 (literatür %8–30 içinde). Deneme oranı modelde 0,90 / 0,91 (deneme 0,80 / 0,87).

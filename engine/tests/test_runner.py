@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from nobetsu import runner
-from tests.fixtures import synthetic_weather
+from tests.fixtures import load_config, synthetic_weather
 
 SEQUENCE_KEYS = [
     "start_year", "rotation_id", "depth_id", "pre_sowing_precip_mm", "water_at_wheat_sowing_mm",
@@ -153,3 +153,85 @@ def test_unknown_location_without_soilgrids_raises(weather):
 def test_short_weather_raises(weather):
     with pytest.raises(ValueError):
         runner.run_location("karapinar", weather.loc["2005-01-01":], None, start_years=[2001])
+
+
+# --- AWC from soil texture (soil.yaml awc_method) -----------------------------------------
+
+def _sg(clay, sand, silt, awc=58.6):
+    props = [{"id": k, "depth": "0-30 cm", "q05": 0.0, "q50": v, "q95": 100.0, "unit": "%"}
+             for k, v in (("clay", clay), ("sand", sand), ("silt", silt))]
+    return {"location_id": "karapinar", "how_obtained": "wcs", "properties": props,
+            "awc_mm_per_m": {"value": awc, "unit": "mm/m", "source": "SoilGrids 2.0 test", "type": "model",
+                             "verified": False}}
+
+
+@pytest.mark.parametrize("clay, sand, silt, expected", [
+    (5, 92, 3, "sand"),
+    (5, 82, 13, "loamy_sand"),
+    (10, 65, 25, "sandy_loam"),
+    (20, 40, 40, "loam"),
+    (15, 20, 65, "silt_loam"),
+    (5, 5, 90, "silt"),
+    (30, 35, 35, "clay_loam"),
+    (33, 10, 57, "silty_clay_loam"),
+    (25, 60, 15, "sandy_clay_loam"),
+    (40, 50, 10, "sandy_clay"),
+    (45, 10, 45, "silty_clay"),
+    (60, 20, 20, "clay"),
+])
+def test_usda_texture_class(clay, sand, silt, expected):
+    assert runner.usda_texture_class(clay, sand, silt) == expected
+
+
+def test_texture_class_normalises_fractions_that_do_not_sum_to_100():
+    # SoilGrids Q50 at Karapınar: 43.75 / 11.03 / 41.27 % (sum 96 %) → silty clay
+    assert runner.usda_texture_class(43.75, 11.03, 41.27) == "silty_clay"
+    # Develi: 36.2 / 26.9 / 29.12 % (sum 92 %) → clay loam
+    assert runner.usda_texture_class(36.2, 26.9, 29.12) == "clay_loam"
+
+
+def test_texture_table_awc_replaces_soilgrids_awc():
+    soil_cfg = load_config("soil")
+    awc, overrides = runner.soil_setup("karapinar", _sg(43.75, 11.03, 41.27), soil_cfg)
+    row = soil_cfg["texture_table"]["silty_clay"]
+    assert awc["value"] == row["awc_mm_per_m"]["value"]
+    assert awc["type"] == "assumption" and awc["verified"] is False
+    assert "silty clay" in awc["source"] and "58.6" in awc["source"]
+    ze = soil_cfg["evaporation"]["ze_m"]["value"]
+    assert overrides["tew_mm"] == pytest.approx(1000 * (row["theta_fc"]["value"] - 0.5 * row["theta_wp"]["value"]) * ze)
+    assert overrides["rew_mm"] == row["rew_mm"]["value"]
+
+
+def test_texture_alias_for_classes_missing_from_fao_table():
+    soil_cfg = load_config("soil")
+    awc, _ = runner.soil_setup("develi", _sg(36.2, 26.9, 29.12, awc=67.4), soil_cfg)
+    assert awc["value"] == soil_cfg["texture_table"]["silty_clay_loam"]["awc_mm_per_m"]["value"]
+    assert "clay loam" in awc["source"]
+
+
+def test_soilgrids_method_uses_soilgrids_awc():
+    soil_cfg = load_config("soil")
+    soil_cfg["awc_method"]["value"] = "soilgrids"
+    awc, overrides = runner.soil_setup("karapinar", _sg(43.75, 11.03, 41.27), soil_cfg)
+    assert awc["value"] == 58.6 and awc["type"] == "model"
+    assert overrides == {}
+
+
+def test_no_soilgrids_file_uses_location_fallback():
+    soil_cfg = load_config("soil")
+    awc, overrides = runner.soil_setup("karapinar", None, soil_cfg)
+    assert awc["value"] == soil_cfg["fallback_awc_mm_per_m"]["karapinar"]["value"]
+    assert awc["type"] == "assumption" and overrides == {}
+
+
+def test_unknown_awc_method_raises():
+    soil_cfg = load_config("soil")
+    soil_cfg["awc_method"]["value"] = "guess"
+    with pytest.raises(ValueError):
+        runner.soil_setup("karapinar", _sg(43.75, 11.03, 41.27), soil_cfg)
+
+
+def test_run_location_with_texture_uses_table_awc(weather):
+    out = runner.run_location("karapinar", weather, _sg(43.75, 11.03, 41.27), start_years=[2010])
+    assert out["awc_used"]["value"] == load_config("soil")["texture_table"]["silty_clay"]["awc_mm_per_m"]["value"]
+    assert out["diagnostics"]["max_mass_balance_error_mm"] < 0.01

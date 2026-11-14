@@ -65,19 +65,101 @@ def _heat_threshold_c() -> float:
     return _PLAN_SEED_HEAT_THRESHOLD_C
 
 
-def _awc_used(location_id: str, soilgrids: dict | None, soil_cfg: dict) -> dict:
-    node = (soilgrids or {}).get("awc_mm_per_m")
-    if isinstance(node, dict) and node.get("value"):
-        return {
-            "value": float(node["value"]),
-            "unit": node.get("unit", "mm/m"),
-            "source": node.get("source", "SoilGrids 2.0"),
-            "type": node.get("type", "model"),
-            "verified": bool(node.get("verified", False)),
+def usda_texture_class(clay_pct: float, sand_pct: float, silt_pct: float) -> str:
+    """USDA soil texture triangle. Fractions are normalised to sum to 100 % first."""
+    total = clay_pct + sand_pct + silt_pct
+    if total <= 0:
+        raise ValueError("clay + sand + silt must be positive")
+    clay, sand, silt = (100.0 * x / total for x in (clay_pct, sand_pct, silt_pct))
+    if silt + 1.5 * clay < 15:
+        return "sand"
+    if silt + 2 * clay < 30:
+        return "loamy_sand"
+    if clay >= 40 and silt >= 40:
+        return "silty_clay"
+    if clay >= 35 and sand > 45:
+        return "sandy_clay"
+    if clay >= 40:
+        return "clay"
+    if clay >= 27:
+        return "silty_clay_loam" if sand <= 20 else ("clay_loam" if sand <= 45 else "sandy_clay_loam")
+    if clay >= 20 and silt < 28 and sand > 45:
+        return "sandy_clay_loam"
+    if silt >= 80 and clay < 12:
+        return "silt"
+    if silt >= 50:
+        return "silt_loam"
+    if clay >= 7 and silt >= 28 and sand <= 52:
+        return "loam"
+    return "sandy_loam"
+
+
+def _soilgrids_texture(soilgrids: dict | None) -> dict | None:
+    """Q50 clay / sand / silt (%) from the SoilGrids card, or None if any is missing."""
+    props = {p.get("id"): p for p in (soilgrids or {}).get("properties", [])}
+    try:
+        return {k: float(props[k]["q50"]) for k in ("clay", "sand", "silt")}
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def soil_setup(location_id: str, soilgrids: dict | None, soil_cfg: dict) -> tuple[dict, dict]:
+    """Which available water capacity the engine uses, and any evaporation-layer overrides.
+
+    soil.yaml `awc_method`:
+      texture_table — texture class from SoilGrids Q50 clay/sand/silt, AWC / θFC / θWP / REW
+                      from FAO-56 Table 19 for that class (TEW from Eq. 73);
+      soilgrids     — SoilGrids wv0033 − wv1500 as delivered in data/soilgrids/{loc}.json.
+    Either way: without a SoilGrids file → soil.yaml fallback for the location (assumption);
+    texture_table without texture in the file → SoilGrids AWC.
+    Returns (awc_used V object, {"tew_mm", "rew_mm"} or {}).
+    """
+    method = str((soil_cfg.get("awc_method") or {}).get("value", "soilgrids"))
+    if method not in ("texture_table", "soilgrids"):
+        raise ValueError(f"soil.yaml awc_method must be texture_table or soilgrids, not {method!r}")
+
+    sg_awc = (soilgrids or {}).get("awc_mm_per_m")
+    texture = _soilgrids_texture(soilgrids)
+
+    if method == "texture_table" and texture is not None:
+        cls = usda_texture_class(texture["clay"], texture["sand"], texture["silt"])
+        table_cls = cls
+        alias = (soil_cfg.get("texture_table_aliases") or {}).get(cls)
+        if cls not in soil_cfg["texture_table"]:
+            if alias is None:
+                raise KeyError(f"soil.yaml texture_table has no row or alias for {cls}")
+            table_cls = alias["value"]
+        row = soil_cfg["texture_table"][table_cls]
+        ze = float(soil_cfg["evaporation"]["ze_m"]["value"])
+        fc, wp = float(row["theta_fc"]["value"]), float(row["theta_wp"]["value"])
+        total = sum(texture.values())
+        frac = ", ".join(f"{k} {100 * v / total:.0f} %" for k, v in texture.items())
+        note = "" if table_cls == cls else f" ({cls.replace('_', ' ')} is not in Table 19; used {table_cls.replace('_', ' ')})"
+        dropped = ""
+        if isinstance(sg_awc, dict) and sg_awc.get("value") is not None:
+            dropped = (f". SoilGrids wv0033−wv1500 gave {sg_awc['value']:g} mm/m, not used: "
+                       "implausibly low for this texture class")
+        awc = {
+            "value": float(row["awc_mm_per_m"]["value"]),
+            "unit": "mm/m",
+            "source": (f"FAO-56 Table 19, {cls.replace('_', ' ')}{note}: θFC − θWP range midpoint; "
+                       f"texture class from SoilGrids 2.0 Q50 0–30 cm ({frac}){dropped}"),
+            "type": "assumption",
+            "verified": False,
         }
+        return awc, {"tew_mm": 1000.0 * (fc - 0.5 * wp) * ze, "rew_mm": float(row["rew_mm"]["value"])}
+
+    if isinstance(sg_awc, dict) and sg_awc.get("value"):
+        return {
+            "value": float(sg_awc["value"]),
+            "unit": sg_awc.get("unit", "mm/m"),
+            "source": sg_awc.get("source", "SoilGrids 2.0"),
+            "type": sg_awc.get("type", "model"),
+            "verified": bool(sg_awc.get("verified", False)),
+        }, {}
     fb = soil_cfg["fallback_awc_mm_per_m"][location_id]   # KeyError for an unknown location
     return {"value": float(fb["value"]), "unit": fb["unit"], "source": fb["source"],
-            "type": "assumption", "verified": False}
+            "type": "assumption", "verified": False}, {}
 
 
 def _ledger_weeks(out: pd.DataFrame, labels: pd.Series, window_start: pd.Timestamp) -> list[dict]:
@@ -101,10 +183,12 @@ def _ledger_weeks(out: pd.DataFrame, labels: pd.Series, window_start: pd.Timesta
 
 def run_sequence(weather: pd.DataFrame, start_year: int, rotation: dict, depth: dict, *,
                  crops_cfg: dict, soil_cfg: dict, awc_mm_per_m: float,
-                 wind_threshold_ms: float, heat_threshold_c: float) -> tuple[dict, dict, float]:
+                 wind_threshold_ms: float, heat_threshold_c: float,
+                 soil_overrides: dict | None = None) -> tuple[dict, dict, float]:
     """One sequence → (sequences row, ledger series, mass-balance error in mm)."""
     first_id, main_id = rotation["crops"]
-    soil = wb.SoilProfile.from_config(soil_cfg, awc_mm_per_m=awc_mm_per_m, depth_m=depth["depth_m"])
+    soil = wb.SoilProfile.from_config(soil_cfg, awc_mm_per_m=awc_mm_per_m, depth_m=depth["depth_m"],
+                                      **(soil_overrides or {}))
     sched = rotations.build_schedule(start_year, rotation["crops"], crops_cfg, depth["depth_m"], weather)
     out = wb.simulate(wb.daily_inputs(weather, sched), soil,
                       init_fraction=float(soil_cfg["initial_fill_fraction"]["value"]))
@@ -181,7 +265,7 @@ def run_location(location_id: str, weather: pd.DataFrame, soilgrids: dict | None
     crops_cfg = _load_config("crops")
     soil_cfg = _load_config("soil")
     rotation_list = _rotation_list()
-    awc = _awc_used(location_id, soilgrids, soil_cfg)
+    awc, soil_overrides = soil_setup(location_id, soilgrids, soil_cfg)
     wind_thr = ind.wind_threshold(weather, float(soil_cfg["wind_exposure_percentile"]["value"]))
     heat_thr = _heat_threshold_c()
     years = list(START_YEARS if start_years is None else start_years)
@@ -193,6 +277,7 @@ def run_location(location_id: str, weather: pd.DataFrame, soilgrids: dict | None
                 row, series, err = run_sequence(
                     weather, year, rotation, depth, crops_cfg=crops_cfg, soil_cfg=soil_cfg,
                     awc_mm_per_m=awc["value"], wind_threshold_ms=wind_thr, heat_threshold_c=heat_thr,
+                    soil_overrides=soil_overrides,
                 )
                 sequences.append(row)
                 ledger.append(series)
