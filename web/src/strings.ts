@@ -146,6 +146,14 @@ export const S = {
   wheatYieldPct: { en: 'Wheat yield (% of water-limited)', tr: 'Buğday verimi (su sınırlı verimin %)' },
 
   // Shell
+  navMap: { en: 'Map', tr: 'Harita' },
+  seeOnMap: { en: 'See on the map', tr: 'Haritada gör' },
+  mapTitle: { en: 'Map of Turkey: districts, fields and the 3D process', tr: 'Türkiye haritası: ilçeler, tarlalar ve 3B süreç' },
+  mapHint: {
+    en: 'Pick a district on the map, then “Watch the process in 3D” to see two years of water in the three fields.',
+    tr: 'Haritada bir ilçe seçin, sonra “Süreci 3B izle” ile üç tarlada iki yılın suyunu izleyin.',
+  },
+  mapOpenFull: { en: 'Open full screen', tr: 'Tam ekran aç' },
   navHome: { en: 'Home', tr: 'Ana sayfa' },
   navAnalysis: { en: 'Detailed analysis', tr: 'Ayrıntılı analiz' },
   navPanel: { en: 'My fields', tr: 'Tarlalarım' },

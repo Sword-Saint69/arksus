@@ -10,7 +10,8 @@ export type Route =
   | { name: 'field'; id: string }
   | { name: 'field-edit'; id: string }
   | { name: 'profile' }
-  | { name: 'analysis'; query: URLSearchParams };
+  | { name: 'analysis'; query: URLSearchParams }
+  | { name: 'map'; query: URLSearchParams };
 
 export function parseRoute(hash: string): Route {
   const [path, qs = ''] = hash.replace(/^#/, '').split('?');
@@ -21,6 +22,7 @@ export function parseRoute(hash: string): Route {
     case 'panel': return { name: 'panel' };
     case 'profil': return { name: 'profile' };
     case 'analiz': return { name: 'analysis', query: new URLSearchParams(qs) };
+    case 'harita': return { name: 'map', query: new URLSearchParams(qs) };
     case 'tarla':
       if (parts[1] === 'yeni') return { name: 'field-new' };
       if (parts[1] && parts[2] === 'duzenle') return { name: 'field-edit', id: parts[1] };

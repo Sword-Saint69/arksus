@@ -4,7 +4,7 @@ import { t, type Lang } from '@/strings';
 import { cn } from '@/utils/cn';
 import type { Route } from '@/router';
 
-type Props = { lang: Lang; onLang: (l: Lang) => void; route: Route; children: ReactNode };
+type Props = { lang: Lang; onLang: (l: Lang) => void; route: Route; children: ReactNode; bare?: boolean };
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -16,7 +16,7 @@ export function Logo({ className }: { className?: string }) {
   );
 }
 
-export function AppShell({ lang, onLang, route, children }: Props) {
+export function AppShell({ lang, onLang, route, children, bare }: Props) {
   const { farmer, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const link = (href: string, label: string, active: boolean) => (
@@ -28,6 +28,7 @@ export function AppShell({ lang, onLang, route, children }: Props) {
   const nav = (
     <>
       {link('#/', t(lang, 'navHome'), route.name === 'home')}
+      {link('#/harita', t(lang, 'navMap'), route.name === 'map')}
       {link('#/analiz', t(lang, 'navAnalysis'), route.name === 'analysis')}
       {farmer && link('#/panel', t(lang, 'navPanel'), ['panel', 'field', 'field-new', 'field-edit'].includes(route.name))}
       {farmer && link('#/profil', t(lang, 'navProfile'), route.name === 'profile')}
@@ -69,12 +70,12 @@ export function AppShell({ lang, onLang, route, children }: Props) {
         )}
       </header>
       <div className="flex-1">{children}</div>
-      <footer className="border-t border-line bg-paper">
+      {!bare && <footer className="border-t border-line bg-paper">
         <div className="mx-auto grid max-w-5xl gap-1 px-4 py-6 text-xs text-muted sm:px-6">
           <p>{t(lang, 'sources')}</p>
           <p>{t(lang, 'supports')}</p>
         </div>
-      </footer>
+      </footer>}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { FieldForm } from '@/pages/FieldForm';
 import { FieldDetail } from '@/pages/FieldDetail';
 import { Profile } from '@/pages/Profile';
 import { Analysis } from '@/pages/Analysis';
+import { MapView } from '@/pages/MapView';
 
 export default function App() {
   return (
@@ -54,13 +55,14 @@ function Site() {
       case 'profile': body = <Profile data={data} lang={lang} />; break;
       // Keyed by the query so opening it from a different field starts from that field's settings.
       case 'analysis': body = <Analysis key={route.query.toString()} data={data} lang={lang} query={route.query} />; break;
+      case 'map': body = <MapView data={data} lang={lang} query={route.query} />; break;
       default: body = <Home data={data} lang={lang} />;
     }
   }
   const anyMock = site.status === 'ready' && (site.data.site.mock || site.data.defaults.mock || site.data.validation.mock);
 
   return (
-    <AppShell lang={lang} onLang={setLang} route={route}>
+    <AppShell lang={lang} onLang={setLang} route={route} bare={route.name === 'map'}>
       <MockBanner show={anyMock} lang={lang} />
       {body}
     </AppShell>

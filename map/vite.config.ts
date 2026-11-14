@@ -22,6 +22,7 @@ function nobetsuData(): Plugin {
       });
     },
     writeBundle(options) {
+      if (process.env.VITE_NOBETSU_DATA) return; // the host site serves the data (see pilots.ts)
       const out = join(options.dir ?? 'dist', 'data/nobetsu');
       for (const f of FILES) cpSync(join(DATA, f), join(out, f), { recursive: true });
     },

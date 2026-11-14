@@ -419,3 +419,6 @@ input[type=range] { width: 100%; accent-color: var(--primary); height: 28px; }
   .sim-label { width: 112px; font-size: 10.5px; padding: 6px 8px; }
   .sim-label small { display: none; }
 }
+
+/* Embedded in the farmer site: its header already shows the brand. */
+.embedded .brand { display: none; }

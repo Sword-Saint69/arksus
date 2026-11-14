@@ -23,6 +23,7 @@ export function Home({ data, lang }: { data: SiteData; lang: Lang }) {
                 <>
                   <a href="#/kayit" className="inline-flex min-h-12 items-center rounded-xl bg-primary px-5 text-base font-semibold text-white">{t(lang, 'heroStart')}</a>
                   <a href="#/analiz" className="inline-flex min-h-12 items-center rounded-xl border border-line bg-white px-5 text-base font-semibold text-primary">{t(lang, 'heroTry')}</a>
+                  <a href="#/harita" className="inline-flex min-h-12 items-center rounded-xl border border-line bg-white px-5 text-base font-semibold text-primary">{t(lang, 'navMap')} →</a>
                 </>
               )}
             </div>

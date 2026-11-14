@@ -257,6 +257,9 @@ const S = {
 export type Key = keyof typeof S;
 
 let lang: Lang = ((): Lang => {
+  // The farmer site opens the map with &lang= so both speak the same language.
+  const fromLink = new URLSearchParams(location.hash.slice(1)).get('lang');
+  if (fromLink === 'tr' || fromLink === 'en') return fromLink;
   try {
     const saved = localStorage.getItem('terrashift.lang');
     if (saved === 'tr' || saved === 'en') return saved;

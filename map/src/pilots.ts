@@ -13,7 +13,10 @@ import {
 import { pilotFeature, type Feature } from './vector/features';
 import type { PilotData } from './ui/inspector';
 
-const base = `${import.meta.env.BASE_URL}data/nobetsu`;
+// Standalone, the map serves the contract data itself under data/nobetsu. Built into the
+// farmer site (/harita/), VITE_NOBETSU_DATA points at the site's own /data so the ~30 MB
+// of results and ledgers is deployed once.
+const base = (import.meta.env.VITE_NOBETSU_DATA as string | undefined) ?? `${import.meta.env.BASE_URL}data/nobetsu`;
 const getJSON = <T>(path: string) => fetch(`${base}/${path}`).then((r) => {
   if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
   return r.json() as Promise<T>;

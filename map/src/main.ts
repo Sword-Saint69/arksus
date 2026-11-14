@@ -35,6 +35,8 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
 
 const params = new URLSearchParams(location.hash.slice(1));
+// Inside the farmer site (iframe) the site's own header carries the brand.
+if (params.get('embed') === '1') document.body.classList.add('embedded');
 const terrain = new Terrain(renderer, BASEMAPS.find((b) => b.id === params.get('b')) ?? BASEMAPS[0]);
 scene.add(terrain.group);
 // The map is limited to Turkey (15 Nov): no tiles beyond this box, the camera

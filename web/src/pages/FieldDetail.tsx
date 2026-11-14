@@ -81,7 +81,10 @@ export function FieldDetail({ data, lang, id }: { data: SiteData; lang: Lang; id
 
       <p className="rounded-lg border border-line bg-paper px-3 py-2 text-xs text-muted">{t(lang, 'honest')}</p>
       {field.note && <p className="text-sm text-muted">“{field.note}”</p>}
-      <a href={`#/analiz?${q}`} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-primary px-5 font-semibold text-primary">{t(lang, 'openAnalysis')} →</a>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <a href={`#/harita?ilce=${field.locationId}`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-primary px-5 font-semibold text-white">{t(lang, 'seeOnMap')} →</a>
+        <a href={`#/analiz?${q}`} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-primary px-5 font-semibold text-primary">{t(lang, 'openAnalysis')} →</a>
+      </div>
     </main>
   );
 }
