@@ -55,11 +55,11 @@ def _rotation_list() -> list[dict]:
 
 def _heat_threshold_c() -> float:
     refs = _load_config("references") or {}
-    node = refs.get("heat_threshold_flowering_c") if isinstance(refs, dict) else None
+    node = refs.get("heat_threshold_c") if isinstance(refs, dict) else None
     if isinstance(node, dict) and node.get("value") is not None:
         return float(node["value"])
     warnings.warn(
-        "references.yaml has no heat_threshold_flowering_c; using the PLAN_MVP §5.8 seed of 30 °C (unverified)",
+        "references.yaml has no heat_threshold_c; using the PLAN_MVP §5.8 seed of 30 °C (unverified)",
         stacklevel=2,
     )
     return _PLAN_SEED_HEAT_THRESHOLD_C
