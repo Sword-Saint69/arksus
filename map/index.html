@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <title>NöbetSu · TerraShift arazi haritası</title>
+    <meta name="description" content="Türkiye'nin üç boyutlu arazisinde pilot ilçe, il, ada, tarla ve parsel seçimi. NASA Space Apps 2026 · Field Shift." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232f5d46'/%3E%3Cpath d='M5 22c4-1 7-6 11-6s7 5 11 6' fill='none' stroke='%23f3c45c' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M16 6c3 4 4 6 4 8a4 4 0 01-8 0c0-2 1-4 4-8z' fill='%23cfe8f5'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="map" data-i18n-aria-label="mapAria" tabindex="0"></canvas>
+      <div class="pins" aria-label="Pilot ilçeler"></div>
+
+      <header class="topbar">
+        <a class="brand" href="#" data-action="home" data-i18n-aria-label="home">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" class="brand-bg"/><path d="M5 22c4-1 7-6 11-6s7 5 11 6" class="brand-field"/><path d="M16 6c3 4 4 6 4 8a4 4 0 01-8 0c0-2 1-4 4-8z" class="brand-drop"/></svg>
+          <span class="brand-text"><strong>NöbetSu</strong><small><span class="brand-repo">TerraShift</span> · <span data-i18n="appTagline"></span></small></span>
+        </a>
+
+        <form class="search" role="search" autocomplete="off">
+          <label class="sr-only" for="search-input" data-i18n="searchLabel"></label>
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <input id="search-input" type="search" data-i18n-placeholder="searchPh" aria-controls="search-results" aria-expanded="false" />
+          <kbd aria-hidden="true">/</kbd>
+          <ul id="search-results" class="search-results" role="listbox" hidden></ul>
+        </form>
+
+        <button class="ps-open" aria-expanded="false" aria-controls="parcel-search"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg><span data-i18n="psButton"></span></button>
+
+        <div class="modes" role="radiogroup" data-i18n-aria-label="selectKind">
+          <span class="modes-label" data-i18n="select"></span>
+          <button role="radio" aria-checked="true" data-mode="auto" data-i18n="auto"></button>
+          <button role="radio" aria-checked="false" data-mode="pilot"><i class="dot dot-pilot"></i><span data-i18n="kind_pilot"></span></button>
+          <button role="radio" aria-checked="false" data-mode="province"><i class="dot dot-province"></i><span data-i18n="kind_province"></span></button>
+          <button role="radio" aria-checked="false" data-mode="island"><i class="dot dot-island"></i><span data-i18n="kind_island"></span></button>
+          <button role="radio" aria-checked="false" data-mode="field"><i class="dot dot-field"></i><span data-i18n="kind_field"></span></button>
+          <button role="radio" aria-checked="false" data-mode="parcel"><i class="dot dot-parcel"></i><span data-i18n="kind_parcel"></span></button>
+        </div>
+
+        <div class="lang" role="group" aria-label="Dil / Language">
+          <button data-lang="tr" aria-pressed="true">TR</button>
+          <button data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </header>
+
+      <section id="parcel-search" class="panel ps" hidden aria-labelledby="ps-title">
+        <form class="ps-form" novalidate>
+          <div class="ps-head">
+            <h2 id="ps-title" data-i18n="psTitle"></h2>
+            <button type="button" class="ps-x" data-i18n-aria-label="psClose"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+          <p class="ps-sub" data-i18n="psSub"></p>
+          <label><span data-i18n="psIl"></span><select name="il" required></select></label>
+          <label><span data-i18n="psIlce"></span><select name="ilce" required disabled></select></label>
+          <label class="wide"><span data-i18n="psMahalle"></span><select name="mahalle" required disabled></select></label>
+          <label><span data-i18n="psAda"></span><input name="ada" inputmode="numeric" pattern="[0-9]+" required autocomplete="off" /></label>
+          <label><span data-i18n="psParsel"></span><input name="parsel" inputmode="numeric" pattern="[0-9]+" required autocomplete="off" /></label>
+          <small class="ps-hint wide" data-i18n="psAdaHint"></small>
+          <p class="ps-msg wide" role="status" hidden></p>
+          <button type="button" class="btn ps-here"><svg class="icon"><use href="#i-target"/></svg><span data-i18n="psHere"></span></button>
+          <button type="submit" class="btn primary ps-go"><svg class="icon"><use href="#i-search"/></svg><span data-i18n="psFind"></span></button>
+          <small class="ps-hint wide" data-i18n="psClickHint"></small>
+        </form>
+      </section>
+
+      <div class="mock-banner" role="status" hidden data-i18n="mockBanner"></div>
+
+      <aside class="panel layers" data-i18n-aria-label="layers">
+        <button class="panel-head" aria-expanded="true" aria-controls="layers-body">
+          <svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>
+          <span data-i18n="layers"></span>
+          <svg class="icon chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button>
+        <div id="layers-body" class="panel-body">
+          <fieldset class="basemaps">
+            <legend data-i18n="basemap"></legend>
+            <div class="basemap-grid"></div>
+          </fieldset>
+          <fieldset class="toggles">
+            <legend data-i18n="selectable"></legend>
+            <label class="toggle"><input type="checkbox" data-layer="pilots" checked /><i class="dot dot-pilot"></i><span data-i18n="lyrPilots"></span><small>NöbetSu</small></label>
+            <label class="toggle"><input type="checkbox" data-layer="provinces" checked /><i class="dot dot-province"></i><span data-i18n="lyrProvinces"></span><small>81</small></label>
+            <label class="toggle"><input type="checkbox" data-layer="islands" checked /><i class="dot dot-island"></i><span data-i18n="lyrIslands"></span><small id="island-count">OSM</small></label>
+            <label class="toggle"><input type="checkbox" data-layer="fields" checked /><i class="dot dot-field"></i><span data-i18n="lyrFields"></span><small>z13+ · OSM</small></label>
+            <label class="toggle"><input type="checkbox" data-layer="parcels" checked /><i class="dot dot-parcel"></i><span data-i18n="lyrParcels"></span><small>z14+ · TKGM</small></label>
+            <label class="toggle"><input type="checkbox" data-layer="labels" checked /><i class="dot dot-label"></i><span data-i18n="lyrLabels"></span><small>Esri</small></label>
+          </fieldset>
+          <fieldset class="slider">
+            <legend data-i18n="terrain"></legend>
+            <label for="exag"><span data-i18n="exaggeration"></span> <output id="exag-out">1,6×</output></label>
+            <input id="exag" type="range" min="1" max="4" step="0.1" value="1.6" />
+          </fieldset>
+          <fieldset class="legend-uses">
+            <legend data-i18n="fieldColors"></legend>
+            <ul class="uses"></ul>
+          </fieldset>
+        </div>
+      </aside>
+
+      <aside class="panel inspector" data-i18n-aria-label="location" aria-live="polite">
+        <div class="inspector-body"></div>
+      </aside>
+
+      <nav class="places" data-i18n-aria-label="explore"></nav>
+
+      <div class="navctl" role="toolbar" data-i18n-aria-label="mapControls">
+        <button data-action="zoom-in" data-i18n-aria-label="zoomIn" data-i18n-title="zoomIn"><svg class="icon"><use href="#i-plus"/></svg></button>
+        <button data-action="zoom-out" data-i18n-aria-label="zoomOut" data-i18n-title="zoomOut"><svg class="icon"><use href="#i-minus"/></svg></button>
+        <button data-action="north" data-i18n-aria-label="north" data-i18n-title="north" class="compass"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l3.5 9h-7z" fill="#c4572f"/><path d="M12 21l-3.5-9h7z" fill="currentColor" opacity=".45"/></svg></button>
+        <button data-action="pitch" data-i18n-aria-label="pitch" data-i18n-title="pitch" class="pitch-btn">3B</button>
+        <button data-action="home" data-i18n-aria-label="home" data-i18n-title="home"><svg class="icon"><use href="#i-home"/></svg></button>
+      </div>
+
+      <div class="hint" role="status" hidden></div>
+      <div class="tooltip" role="tooltip" hidden></div>
+      <div class="toast" role="status" aria-live="polite" hidden></div>
+
+      <footer class="statusbar">
+        <span class="sb-coord" data-i18n-title="cursorPos"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span id="sb-lat">–</span><span id="sb-lon">–</span></span>
+        <span class="sb-elev" data-i18n-title="cursorElev"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg><span id="sb-elev">–</span></span>
+        <span class="sb-zoom" data-i18n-title="zoomLevel">z<span id="sb-zoom">–</span></span>
+        <span class="sb-load" id="sb-load" hidden><span class="spinner" aria-hidden="true"></span><span id="sb-load-text"></span></span>
+        <span class="sb-attr" id="sb-attr"></span>
+      </footer>
+
+      <div class="boot" aria-hidden="true">
+        <div class="boot-mark"><svg viewBox="0 0 32 32"><path d="M5 22c4-1 7-6 11-6s7 5 11 6" fill="none" stroke="#c98a1c" stroke-width="2.4" stroke-linecap="round"/><path d="M16 6c3 4 4 6 4 8a4 4 0 01-8 0c0-2 1-4 4-8z" fill="#3d7ea6"/></svg></div>
+        <p data-i18n="booting"></p>
+      </div>
+    </div>
+
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3 13l9 5 9-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9" r="2.5" fill="currentColor"/></symbol>
+        <symbol id="i-mountain" viewBox="0 0 24 24"><path d="M3 20l6.5-11 4 6.5L16 12l5 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a1 1 0 011-1h10" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-plus-sq" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M5 3l14 7-6 2-2 6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3c4 5 6 8 6 11a6 6 0 01-12 0c0-3 2-6 6-11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 10-3-3M3 16h15a3 3 0 11-3 3M3 12h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+        <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 10h16M10 4v16M15 10v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      </defs>
+    </svg>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
