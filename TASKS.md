@@ -90,8 +90,8 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+7.5–9: 2 lokasyon × 3 rotasyon × 3 derinlik tam koşu, Gümüş'ün `build.py`'sine bağla** → M2 — ✅ 17:35 (omer; gerçek JSON'un commit'i ve v0.1 Gümüş'te)
 - [x] **T+9–12: validate.py** — mass_balance, et0_fao56_ex18, pse_literature, trial_ratio, precip_vs_mgm — ✅ 16:42 (omer)
 - [x] **T+12–14: Muhammet'in TAGEM takvimlerini crops.yaml'a geçir, yeniden koş, sonuçları gözle kontrol et** → M3 (takvim erken gelirse erken geçir) — ✅ 17:53 (omer; takvimleri Ömer buldu, crops.yaml'da kaynaklı)
-- [ ] **T+14–16.5: Genişletme E1 (SMAP anomali karşılaştırması)**
-- [ ] **T+16.5–18.5: Genişletme E2 (kurak/sıcak senaryo koşuları)**
+- [ ] **T+14–16.5: Genişletme E1 (SMAP anomali karşılaştırması)** — ⏳ kalan: motor tarafı hazır (exp/E1-smap); SMAP verisi ve 6. kontrol için sözleşme Gümüş'te
+- [ ] **T+16.5–18.5: Genişletme E2 (kurak/sıcak senaryo koşuları)** — ⏳ kalan: motor tarafı hazır (exp/E2-scenarios); sözleşme, build.py ve UI Gümüş/İsmail'de
 - [ ] **T+18.5–19: zaman kalırsa E5 (bu sezon) veya E10 başlangıcı — yeşil değilse merge etme**
 
 ---

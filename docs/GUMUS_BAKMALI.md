@@ -122,3 +122,44 @@ Bulunamayan: Kayseri'ye özel ekim/hasat takvimi (Develi'de Konya takvimi kullan
 - §4 senin branch'inde olduğu için orada işaretleyemedim; birleştirince `[x]` sayabilirsin.
 - [x] **Dikkat, TASKS.md çakışacak:** ikimiz de Muhammet bölümündeki "takvim" ve "doğrulama kaynakları" satırlarını işaretledik (`omer`: "Ömer yaptı", senin branch: "gümüş yaptı"). Takvimleri ben `crops.yaml`'a kaynaklı geçirdim; doğrulama referanslarını ikimiz de bulduk (senin MGM değerin daha iyi: WMO Karapınar istasyonu). Birleştirirken iki notu da tutabilirsin.
 - Bu notun §13'ündeki referans değerleri artık senin branch'inde var; §13'ü kapatabilirsin (MGM için senin WMO değerlerin geçerli).
+
+## 15. E1 SMAP karşılaştırması — motor tarafı hazır (14 Kas, branch `exp/E1-smap`)
+
+Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi olmadan sitede görünmez; **senden 3 şey lazım**:
+
+- [ ] **SMAP verisi.** `smap/{loc}.json` (sözleşmedeki biçim) `available: true` ve `monthly_series[].rootzone_wetness` dolu olmalı; motor yalnızca bunu okuyor. AppEEARS / Earth Engine Earthdata girişi istiyor, ben yapamam. En az **24 ay** örtüşme yoksa kontrol `pending` kalır.
+- [ ] **Sözleşme: 6. kontrol `smap_anomaly`.** `validation.schema.json`'da `checks` şu an tam 5 eleman ve `id` enum'unda `smap_anomaly` yok. PLAN_EXPANSION E1 bunu istiyor. Kabul edersen: enum'a `smap_anomaly` ekle, `maxItems` 6, `types.ts` + mock. Format diğer kontrollerle aynı (`id, status, value, reference, note{en,tr}`), durum `info` ya da `pending`.
+- [ ] **`build.py` bağlantısı** (sözleşme değişince):
+
+  ```python
+  from .runner import run_landscape
+  from .validate import check_smap_anomaly
+  lands = {loc: run_landscape(loc, weathers[loc], _soilgrids(loc)) for loc in locations}
+  smaps = {loc: <smap/{loc}.json dict'i> for loc in locations}
+  checks.append(check_smap_anomaly(lands, smaps))
+  ```
+
+  `run_landscape` iki lokasyon için ~2 sn sürüyor.
+- **Yöntem (bilgi):** Model tarafı bir "arazi": iki parsel, biri nadas yılındayken öteki buğdayda (her yıl arazinin yarısı nadas), orta derinlik, 2013-10 → son POWER tarihi, aylık ortalama doluluk. İki seri de takvim ayına göre standart anomaliye çevrilip **Spearman ρ** hesaplanıyor; ayrıca en ıslak / en kuru ay karşılaştırılıyor. Mutlak uyum iddiası yok (not metninde yazıyor).
+- **Gerçek havayla model tarafı:** Karapınar aylık doluluk en yüksek Şubat (%64), en düşük Ağustos–Eylül (%28); Develi Şubat–Mart (%57) / Temmuz–Eylül (%26).
+- (İsteğe bağlı) Kanıt panelinde küçük grafik istenirse aylık anomali serisini (`validate.smap_comparison` içindeki iki seri) dışa vermek kolay; sözleşmede yer açarsan yazarım.
+
+## 16. E2 kurak / sıcak senaryolar — motor tarafı hazır (14 Kas, branch `exp/E2-scenarios`)
+
+- **Senaryolar:** `engine/config/scenarios.yaml` (yeni dosya, motor parametresi; id'leri sözleşmede sen onayla): `baseline`, `dry10` (yağış ×0,9), `dry20` (×0,8), `warm1` (+1 °C), `warm2` (+2 °C), `dry10_warm1`. Her birinde `label {en, tr}` ve V biçiminde `precip_factor`, `temp_shift_c`. Sıcaklık kayması Tmax, Tmin ve Tdew'e birlikte uygulanıyor (bağıl nem yaklaşık sabit), ET₀ kaydırılmış havadan yeniden hesaplanıyor.
+- **Motor API:** `runner.run_scenarios(location_id, weather, soilgrids, scenario_ids=None) -> {scenario_id: EngineOutput}` (her biri `run_location` ile aynı biçim). Tek senaryo için `runner.apply_scenario(weather, scenario)` + `run_location`. 6 senaryo × 2 lokasyon ≈ 2 dk.
+- [ ] **Sözleşme (sende, PLAN_EXPANSION E2):** `results/{loc}__{scenario_id}.json` (aynı şema) + `site_index.scenarios: [{id, label}]` (`scenarios.yaml`'dan). `baseline` için mevcut `results/{loc}.json` kalabilir. Ledger senaryo başına gerekirse söyle (dosyalar büyük: 2,1 MB × 12).
+- [ ] **`build.py`:** `for sid, out in run_scenarios(loc, w, sg).items(): ...` ile yazdır; `validation.json` sadece baseline'dan.
+- **Gerçek veriyle sonuç (orta derinlik, ortanca, nadas / nohut / mercimek):**
+  - Karapınar buğday oranı: baseline 0,54 / 0,48 / 0,49 → dry20 0,46 / 0,39 / 0,40 → warm2 0,52 / 0,46 / 0,47. Nadas ekimde su 104 → 59 mm (dry20).
+  - Develi: baseline 0,55 / 0,50 / 0,50 → dry20 0,44 / 0,40 / 0,40.
+  - Kuraklıkta nadas avantajı (nadas − nohut buğday oranı) 0,06'dan 0,07'ye çıkıyor: kuru iklimde nadasın su değeri biraz artıyor.
+- **Sınır (UI notuna ekle):** ısınma bitki gelişimini hızlandırır, ama takvimler sabit (ekim/hasat tarihi değişmiyor). Bu yüzden `warm` senaryolarının etkisi muhtemelen olduğundan küçük görünüyor. "Projeksiyon değil, duyarlılık testi" etiketi şart.
+
+## 17. NASA GPM IMERG yağış karşılaştırması (14 Kas, branch `omer`)
+
+- **Ne:** `engine/nobetsu/imerg.py` (yeni) GPM IMERG Final aylık V07'yi (0,1°) NSF NCAR GDEX aynasından (d736000, CC BY 4.0) **Earthdata girişi olmadan** çeker → `data/imerg/{id}.json` (aylık mm, 2000-06 → 2025-09, 13 konum, toplam 260 KB). `python -m nobetsu.imerg`.
+- **Sahiplik sorusu:** veri çekme modülleri ve `data/**` sende. Kabul edersen `imerg.py` ve `data/imerg/` senin olsun (AGENTS tablosuna ekle); ben yalnız `validate.py` tarafını tutarım.
+- **`build.py` değişikliği gerekmiyor:** `run_checks(..., imerg=None)` önbellek varsa kendisi okur. `make data` sonrası `precip_vs_mgm` değerine IMERG sütunu eklenir. Kontrol id'si ve şema aynı (value/reference zaten string).
+- **Sonuç (2001–2024 ortak yıllar, MGM 1991–2020 normaline göre):** IMERG 13 noktanın 12'sinde istasyondan yağışlı (+1 … +71 %); ortalama mutlak sapma IMERG ~%29, POWER ~%18. Yalnız Karapınar (+38 → +28) ve Karaman (+85 → +33) noktalarında IMERG daha yakın. **Bu yüzden motor girdisi POWER kalıyor;** IMERG sadece kanıt panelinde ikinci uydu kaynağı.
+- [ ] `make data` çalıştırıp `validation.json`'u yenile (web/public/data senin).
