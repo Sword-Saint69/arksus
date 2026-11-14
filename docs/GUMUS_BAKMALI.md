@@ -48,5 +48,26 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [ ] **`site_index.depth_classes`** → `engine/config/soil.yaml` içindeki `depth_classes` listesinden oku (id, depth_m, label sözleşmedekiyle aynı yazıldı).
 - [ ] **`load_weather()` aralığı** → her sekans 1 Ekim `y−1`'de başlıyor ve son buğday hasadına kadar sürüyor. 2001 sekansı için **2000-10-01**, 2024 sekansı için **2026-07-12**'ye kadar veri şart (şu anki takvimle). Eksikse `daily_inputs` `ValueError` verir.
 - [ ] **`data/soilgrids/{loc}.json`** → `awc_mm_per_m.value` gelmezse motor `soil.yaml`'daki yedek değeri (150 mm/m, `assumption`) kullanacak.
-- [ ] **Soru (sözleşme netleştirmesi, değişiklik değil):** `ledger.weeks` 1 Temmuz `y`'den başlıyor; **kaç hafta** olacak? Önerim: 30 Haziran `y+2`'yi içeren haftaya kadar, yani **105 hafta** (son hafta 6 gün yerine tam 7 gün, 1–5 Temmuz `y+2`'ye taşar). Farklı istiyorsan Ömer'e yaz; `runner.py` buna göre yazılacak.
+- [ ] **Bilgi (sözleşme netleştirmesi, değişiklik değil):** `ledger.weeks` her seride **104 hafta** (1 Temmuz `y`'den başlayan, 24 aylık pencerenin içine tam sığan 7 günlük bloklar; Haziran `y+2`'nin son 2–3 günü dışarıda kalır). Şemada `weeks` uzunluğunu 104 olarak sabitleyebilirsin. Farklı istiyorsan Ömer'e yaz.
 - [ ] **Bilgi:** aylık listeler (24 eleman) 1 Temmuz `y` → 30 Haziran `y+2` penceresini kapsıyor; buğday hasadı ~12 Temmuz `y+2` olduğu için buğdayın `eta_mm / etc_mm / stress_days` toplamları pencerenin 12 gün dışına taşıyor (sezonun tamamı sayılıyor). Sözleşmede buna aykırı bir şey yok, haberin olsun.
+
+## 8. `runner.run_location()` hazır (14 Kas, `omer/runner`)
+
+- [ ] **`build.py`** → `from nobetsu.runner import run_location`; imza ARAYUZLER §5 ile aynı: `run_location(location_id, weather, soilgrids)`. (Ek, isteğe bağlı `start_years=[...]` parametresi sadece test/kısmi koşu için; verme.) Bir lokasyon ~9 sn sürüyor.
+- [ ] **`references.yaml`** → sıcak gün eşiği şu anahtarla, V biçiminde olmalı:
+
+  ```yaml
+  heat_threshold_flowering_c:
+    value: 30
+    unit: "°C"
+    source: "..."        # SOURCES.md ref.heat_threshold_flowering
+    type: literature
+    verified: false
+  ```
+
+  Anahtar yoksa motor plandaki 30 °C ile devam eder ve uyarı (`UserWarning`) basar.
+- [ ] **`rotations.yaml`** → motor şu üç biçimden birini okur: en üstte liste `[{id, crops, ...}]`, ya da `rotations: [...]`, ya da `{fallow_wheat: {crops: [...]}, ...}`. Dosya yoksa üç sözleşme id'siyle devam eder ve uyarı basar.
+- [ ] **`config.py`** → `nobetsu.config.load(name)` gelince runner otomatik onu kullanır; yoksa YAML'ı kendisi okur. `load` dosya yoksa `FileNotFoundError` versin.
+- [ ] **`mock.fake_run_location()`** için biçim örneği: `engine/tests/test_runner.py` içindeki `SEQUENCE_KEYS`, `FIRST_CROP_KEYS`, `WHEAT_KEYS`, `WEEK_KEYS` listeleri gerçek çıktının anahtar sırası. Tipler: gün sayıları `int`, diğerleri `float`; `fallow_wheat` → `first_crop: None`, diğerleri → `fallow_storage_efficiency: None`.
+- [ ] **Bilgi:** `stress_by_month` pencere içindeki **tüm ürün günlerini** sayıyor (spin-up buğdayının Temmuz `y` başındaki son günleri ve ilk yıl baklagili dahil), sadece 2. yıl buğdayını değil. `wheat.stress_days` ise sadece 2. yıl buğdayı.
+- [ ] **Bilgi:** `crops.yaml`'daki tüm değerler şu an `verified: false`. `site_index` ya da UI'da ürün parametresi gösterilecekse rozet "assumption" olmalı.

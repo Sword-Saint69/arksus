@@ -92,6 +92,19 @@ wheat:
     source: "FAO Irrigation and Drainage Paper 33 / FAO-56 Table 24, winter wheat seasonal yield response factor"
     type: literature
     verified: false
+  flowering:   # window used for heat_days_flowering (PLAN_MVP §5.8)
+    offset_from_mid_start_days:
+      value: 25
+      unit: "days after the start of mid-season"
+      source: "Assumption: with the seed calendar mid-season starts ~28 Apr, so the window opens ~23 May; replace with a TAGEM / Bahri Dağdaş heading–flowering date"
+      type: assumption
+      verified: false
+    length_days:
+      value: 15
+      unit: "days"
+      source: "Assumption: flowering and early grain set, ~23 May – 6 Jun with the seed calendar"
+      type: assumption
+      verified: false
 
 chickpea:
   sowing:

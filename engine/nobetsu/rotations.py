@@ -110,7 +110,8 @@ def build_schedule(start_year: int, crop_ids: list[str], crops_cfg: dict, depth_
     "bare"), stage ("ini" | "dev" | "mid" | "late" | ""), is_crop.
     attrs: start_year, window_start, window_end, spinup_sowing, spinup_harvest,
     first_crop_id, first_crop_sowing, first_crop_harvest, main_crop_id, main_sowing,
-    main_harvest (ISO dates; "harvest" = last day the crop is on the field).
+    main_harvest, main_flowering_start, main_flowering_end
+    (ISO dates; "harvest" = last day the crop is on the field).
     """
     if len(crop_ids) != 2:
         raise ValueError("a rotation is [first, main]")
@@ -158,11 +159,18 @@ def build_schedule(start_year: int, crop_ids: list[str], crops_cfg: dict, depth_
             s.loc[curve.index, col] = curve[col]
         s.loc[curve.index, ["crop", "phase", "is_crop"]] = [crop_id, phase, True]
 
+    flower_start = flower_end = None
+    if "flowering" in main_cfg:
+        mid_start = main_sow + pd.Timedelta(days=int(_v(main_cfg["stage_days"]["ini"])) + int(_v(main_cfg["stage_days"]["dev"])))
+        flower_start = mid_start + pd.Timedelta(days=int(_v(main_cfg["flowering"]["offset_from_mid_start_days"])))
+        flower_end = min(flower_start + pd.Timedelta(days=int(_v(main_cfg["flowering"]["length_days"])) - 1), main_end)
+
     iso = lambda t: None if t is None else t.date().isoformat()  # noqa: E731
     s.attrs.update(
         start_year=y, window_start=iso(window_start), window_end=iso(window_end),
         spinup_sowing=iso(spin_sow), spinup_harvest=iso(spin_end),
         first_crop_id=first_id, first_crop_sowing=iso(first_sow), first_crop_harvest=iso(first_end),
         main_crop_id=main_id, main_sowing=iso(main_sow), main_harvest=iso(main_end),
+        main_flowering_start=iso(flower_start), main_flowering_end=iso(flower_end),
     )
     return s
