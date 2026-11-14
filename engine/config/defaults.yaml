@@ -1,0 +1,238 @@
+# Owner: Gümüş (Rol B); values from Muhammet via docs/SOURCES.md (price.*, cost.*, support.*, ym.*).
+# Every value is a V object (ARAYUZLER §4). value: null = pending (not yet sourced) -> UI shows "pending", economics treats it as 0.
+# Never fill a value without a source. Unfound values at M3 stay type: assumption with an honest note.
+values:
+  karapinar:
+    wheat:
+      ym_kg_per_da:
+        value: null
+        unit: kg/da
+        source: 'pending: SOURCES.md ym.karapinar.wheat (TÜİK ilçe kuru verimi, yüksek yüzdelik)'
+        source_url: ''
+        type: statistic
+        verified: false
+        as_of: ''
+      price_tl_per_kg:
+        value: 16.5
+        unit: TL/kg
+        source: TMO 2026 hububat alım fiyatı, raporlanan 16.500 TL/ton (PLAN_MVP §5.6) — TMO sitesinden doğrulanacak
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.karapinar.wheat'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.karapinar.wheat'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+    chickpea:
+      ym_kg_per_da:
+        value: null
+        unit: kg/da
+        source: 'pending: SOURCES.md ym.karapinar.chickpea (TÜİK ilçe kuru verimi, yüksek yüzdelik)'
+        source_url: ''
+        type: statistic
+        verified: false
+        as_of: ''
+      price_tl_per_kg:
+        value: null
+        unit: TL/kg
+        source: 'pending: SOURCES.md price.chickpea'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.karapinar.chickpea'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.karapinar.chickpea'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+    lentil:
+      ym_kg_per_da:
+        value: null
+        unit: kg/da
+        source: 'pending: SOURCES.md ym.karapinar.lentil (TÜİK ilçe kuru verimi, yüksek yüzdelik)'
+        source_url: ''
+        type: statistic
+        verified: false
+        as_of: ''
+      price_tl_per_kg:
+        value: null
+        unit: TL/kg
+        source: 'pending: SOURCES.md price.lentil'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.karapinar.lentil'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.karapinar.lentil'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+    fallow:
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.karapinar.fallow'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.karapinar.fallow'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+  develi:
+    wheat:
+      ym_kg_per_da:
+        value: null
+        unit: kg/da
+        source: 'pending: SOURCES.md ym.develi.wheat (TÜİK ilçe kuru verimi, yüksek yüzdelik)'
+        source_url: ''
+        type: statistic
+        verified: false
+        as_of: ''
+      price_tl_per_kg:
+        value: 16.5
+        unit: TL/kg
+        source: TMO 2026 hububat alım fiyatı, raporlanan 16.500 TL/ton (PLAN_MVP §5.6) — TMO sitesinden doğrulanacak
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.develi.wheat'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.develi.wheat'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+    chickpea:
+      ym_kg_per_da:
+        value: null
+        unit: kg/da
+        source: 'pending: SOURCES.md ym.develi.chickpea (TÜİK ilçe kuru verimi, yüksek yüzdelik)'
+        source_url: ''
+        type: statistic
+        verified: false
+        as_of: ''
+      price_tl_per_kg:
+        value: null
+        unit: TL/kg
+        source: 'pending: SOURCES.md price.chickpea'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.develi.chickpea'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.develi.chickpea'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+    lentil:
+      ym_kg_per_da:
+        value: null
+        unit: kg/da
+        source: 'pending: SOURCES.md ym.develi.lentil (TÜİK ilçe kuru verimi, yüksek yüzdelik)'
+        source_url: ''
+        type: statistic
+        verified: false
+        as_of: ''
+      price_tl_per_kg:
+        value: null
+        unit: TL/kg
+        source: 'pending: SOURCES.md price.lentil'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.develi.lentil'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.develi.lentil'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''
+    fallow:
+      cost_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md cost.develi.fallow'
+        source_url: ''
+        type: literature
+        verified: false
+        as_of: ''
+      support_tl_per_da:
+        value: null
+        unit: TL/da
+        source: 'pending: SOURCES.md support.develi.fallow'
+        source_url: ''
+        type: official
+        verified: false
+        as_of: ''

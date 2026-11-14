@@ -1,0 +1,70 @@
+# Owner: Gümüş (Rol B); texts and tillage values come from Muhammet (docs/SOURCES.md: strategy.*, trait.*).
+# Rotation ids are fixed: fallow_wheat (baseline, always first), chickpea_wheat, lentil_wheat.
+# V objects with value: null = not yet sourced ("pending"); the UI shows them as pending, never as a number.
+# "[text pending]" strings are placeholders until Muhammet's texts arrive (T+9).
+rotations:
+  - id: fallow_wheat
+    is_baseline: true
+    crops: [fallow, wheat]
+    label: { en: "Fallow → Wheat", tr: "Nadas → Buğday" }
+    soil_traits:
+      n_fixing: false
+      tillage_passes:
+        value: null
+        unit: "passes/year"
+        source: "pending: docs/SOURCES.md trait.tillage_fallow"
+        source_url: ""
+        type: assumption
+        verified: false
+        as_of: ""
+      note: { en: "[text pending]", tr: "[metin bekleniyor]" }
+    strategy:
+      why: { en: "[text pending]", tr: "[metin bekleniyor]" }
+      evidence: []
+      benefits: []
+      gaps: []
+      local_review: []
+
+  - id: chickpea_wheat
+    is_baseline: false
+    crops: [chickpea, wheat]
+    label: { en: "Chickpea → Wheat", tr: "Nohut → Buğday" }
+    soil_traits:
+      n_fixing: true
+      tillage_passes:
+        value: null
+        unit: "passes/year"
+        source: "pending: docs/SOURCES.md trait.tillage_legume"
+        source_url: ""
+        type: assumption
+        verified: false
+        as_of: ""
+      note: { en: "[text pending]", tr: "[metin bekleniyor]" }
+    strategy:
+      why: { en: "[text pending]", tr: "[metin bekleniyor]" }
+      evidence: []
+      benefits: []
+      gaps: []
+      local_review: []
+
+  - id: lentil_wheat
+    is_baseline: false
+    crops: [lentil, wheat]
+    label: { en: "Lentil → Wheat", tr: "Mercimek → Buğday" }
+    soil_traits:
+      n_fixing: true
+      tillage_passes:
+        value: null
+        unit: "passes/year"
+        source: "pending: docs/SOURCES.md trait.tillage_legume"
+        source_url: ""
+        type: assumption
+        verified: false
+        as_of: ""
+      note: { en: "[text pending]", tr: "[metin bekleniyor]" }
+    strategy:
+      why: { en: "[text pending]", tr: "[metin bekleniyor]" }
+      evidence: []
+      benefits: []
+      gaps: []
+      local_review: []

@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/results.schema.json",
+  "title": "results",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "location_id": {
+      "enum": [
+        "karapinar",
+        "develi"
+      ]
+    },
+    "soil": {
+      "type": "object",
+      "properties": {
+        "awc_mm_per_m": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "measured",
+                "model",
+                "official",
+                "statistic",
+                "literature",
+                "assumption",
+                "user"
+              ]
+            },
+            "verified": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "value",
+            "source",
+            "type",
+            "verified"
+          ],
+          "additionalProperties": false
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "enum": [
+                  "clay",
+                  "sand",
+                  "silt",
+                  "phh2o",
+                  "soc",
+                  "nitrogen",
+                  "cec",
+                  "bdod",
+                  "cfvo"
+                ]
+              },
+              "label": {
+                "type": "object",
+                "properties": {
+                  "en": {
+                    "type": "string"
+                  },
+                  "tr": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "en",
+                  "tr"
+                ],
+                "additionalProperties": false
+              },
+              "depth": {
+                "type": "string"
+              },
+              "q05": {
+                "type": "number"
+              },
+              "q50": {
+                "type": "number"
+              },
+              "q95": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "measured",
+                  "model",
+                  "official",
+                  "statistic",
+                  "literature",
+                  "assumption",
+                  "user"
+                ]
+              },
+              "how_obtained": {
+                "enum": [
+                  "wcs",
+                  "gee",
+                  "manual_viewer"
+                ]
+              },
+              "meaning": {
+                "type": "object",
+                "properties": {
+                  "en": {
+                    "type": "string"
+                  },
+                  "tr": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "en",
+                  "tr"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "depth",
+              "q05",
+              "q50",
+              "q95",
+              "unit",
+              "source",
+              "type",
+              "how_obtained",
+              "meaning"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "not_available_remotely": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "awc_mm_per_m",
+        "properties",
+        "not_available_remotely"
+      ],
+      "additionalProperties": false
+    },
+    "sequences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "start_year": {
+            "type": "integer",
+            "minimum": 2001,
+            "maximum": 2024
+          },
+          "rotation_id": {
+            "enum": [
+              "fallow_wheat",
+              "chickpea_wheat",
+              "lentil_wheat"
+            ]
+          },
+          "depth_id": {
+            "enum": [
+              "shallow",
+              "medium",
+              "deep"
+            ]
+          },
+          "pre_sowing_precip_mm": {
+            "type": "number"
+          },
+          "water_at_wheat_sowing_mm": {
+            "type": "number"
+          },
+          "fallow_storage_efficiency": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "bare_days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "wind_exposed_bare_days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bare_by_month": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 31
+            },
+            "minItems": 24,
+            "maxItems": 24
+          },
+          "stress_by_month": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 31
+            },
+            "minItems": 24,
+            "maxItems": 24
+          },
+          "fullness_by_month": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "minItems": 24,
+            "maxItems": 24
+          },
+          "first_crop": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "crop_id": {
+                    "enum": [
+                      "chickpea",
+                      "lentil"
+                    ]
+                  },
+                  "eta_mm": {
+                    "type": "number"
+                  },
+                  "etc_mm": {
+                    "type": "number"
+                  },
+                  "stress_days": {
+                    "type": "integer"
+                  },
+                  "yield_ratio": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "crop_id",
+                  "eta_mm",
+                  "etc_mm",
+                  "stress_days",
+                  "yield_ratio"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "wheat": {
+            "type": "object",
+            "properties": {
+              "eta_mm": {
+                "type": "number"
+              },
+              "etc_mm": {
+                "type": "number"
+              },
+              "stress_days": {
+                "type": "integer"
+              },
+              "heat_days_flowering": {
+                "type": "integer"
+              },
+              "yield_ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "eta_mm",
+              "etc_mm",
+              "stress_days",
+              "heat_days_flowering",
+              "yield_ratio"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "start_year",
+          "rotation_id",
+          "depth_id",
+          "pre_sowing_precip_mm",
+          "water_at_wheat_sowing_mm",
+          "fallow_storage_efficiency",
+          "bare_days",
+          "wind_exposed_bare_days",
+          "bare_by_month",
+          "stress_by_month",
+          "fullness_by_month",
+          "first_crop",
+          "wheat"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 216,
+      "maxItems": 216
+    }
+  },
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "location_id",
+    "soil",
+    "sequences"
+  ],
+  "additionalProperties": false
+}
