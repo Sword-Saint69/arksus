@@ -88,7 +88,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+6–7: yieldmodel.py** — sadece Ya/Ym oranı (önceki ürün çarpanı YOK) — ✅ 16:31 (omer/runner)
 - [x] **T+7–7.5: Toprak ve hassasiyet göstergeleri (PLAN_MVP §5.8, §5.10)** — çıplak gün (aylık), rüzgâra açık çıplak gün, aylık stres günü, çiçeklenmede sıcak gün, aylık doluluk (%) — ✅ 16:31 (omer/runner)
 - [ ] **T+7.5–9: 2 lokasyon × 3 rotasyon × 3 derinlik tam koşu, Gümüş'ün `build.py`'sine bağla** → M2
-- [ ] **T+9–12: validate.py** — mass_balance, et0_fao56_ex18, pse_literature, trial_ratio, precip_vs_mgm
+- [x] **T+9–12: validate.py** — mass_balance, et0_fao56_ex18, pse_literature, trial_ratio, precip_vs_mgm — ✅ 16:42 (omer)
 - [ ] **T+12–14: Muhammet'in TAGEM takvimlerini crops.yaml'a geçir, yeniden koş, sonuçları gözle kontrol et** → M3 (takvim erken gelirse erken geçir)
 - [ ] **T+14–16.5: Genişletme E1 (SMAP anomali karşılaştırması)**
 - [ ] **T+16.5–18.5: Genişletme E2 (kurak/sıcak senaryo koşuları)**

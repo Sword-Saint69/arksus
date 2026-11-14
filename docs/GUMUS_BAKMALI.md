@@ -62,3 +62,9 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [ ] **`mock.fake_run_location()`** için biçim örneği: `engine/tests/test_runner.py` içindeki `SEQUENCE_KEYS`, `FIRST_CROP_KEYS`, `WHEAT_KEYS`, `WEEK_KEYS` listeleri gerçek çıktının anahtar sırası. Tipler: gün sayıları `int`, diğerleri `float`; `fallow_wheat` → `first_crop: None`, diğerleri → `fallow_storage_efficiency: None`.
 - [ ] **Bilgi:** `stress_by_month` pencere içindeki **tüm ürün günlerini** sayıyor (spin-up buğdayının Temmuz `y` başındaki son günleri ve ilk yıl baklagili dahil), sadece 2. yıl buğdayını değil. `wheat.stress_days` ise sadece 2. yıl buğdayı.
 - [ ] **Bilgi:** `crops.yaml`'daki tüm değerler şu an `verified: false`. `site_index` ya da UI'da ürün parametresi gösterilecekse rozet "assumption" olmalı.
+
+## 9. `validate.run_checks()` hazır (14 Kas, `omer`)
+
+- [ ] **`make data` artık senin `power.load_weather()`'ına bağlı.** `build.build(mock=False)` sentetik havayla baştan sona çalıştı; 9 dosyanın hepsi şemadan geçti. POWER gelince başka bir şey gerekmiyor.
+- [ ] **`references.yaml`** → `precip_vs_mgm` iki lokasyonda da `value: null` olduğu için `pending`. Muhammet'in MGM normalleri gelince `value` ve `station` doldur; biri gelirse o lokasyon için `info` olur.
+- [ ] **Bilgi:** `pse_range` oran (0–1) olarak okunuyor, `trial_yields_kg_per_da` kg/da, `years` metni referans satırında görünüyor. Muhammet farklı yıl bulursa `years`'ı güncelle.
