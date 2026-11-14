@@ -218,3 +218,12 @@ Senin ölçütün (OMER_BAKMALI §11): aylık ortalama NDVI zirvesi Temmuz–Eyl
 
 - [ ] **8 ilçe taşınacak:** Karaman, Karapınar, Eskişehir, Niğde, Nevşehir, Gemerek, Boğazlıyan, Aksaray. Kalan 5 (Develi, Polatlı, Kaman, Kırıkkale, Çankırı) kuru tarım deseni. Yeni koordinatları yazınca NDVI'lerini çekip aynı tabloyla kontrol ederim (beklenen: zirve Nisan–Mayıs, Temmuz < 0,30).
 - **Takvim notu (bende):** temiz kuru tarım noktalarında zirve Nisan–Mayıs; en yüksek temiz nokta Develi (1577 m) Mayıs zirvesi ama kuruma Ağustos, alçak ilçelerde Haziran–Temmuz. Yani yükseklikte ~1 ay gecikme işareti var, ama tek nokta. Gemerek ve Boğazlıyan taşınınca 3 soğuk nokta olur; ikinci takvime o zaman karar veririm.
+
+## 22. SMAP yerine NASA MERRA-2 toprak ıslaklığı (15 Kas, ekip kararı: mock yok)
+
+AppEEARS SMAP isteği gelmediği için E1 kontrolü artık **SMAP yoksa MERRA-2'ye düşüyor**. SMAP gelirse kendiliğinden SMAP kullanılır.
+- **Veri:** `engine/nobetsu/merra2.py` (yeni) POWER aylık API'sinden `GWETROOT` (kök bölgesi ıslaklığı, ~1 m, 0–1) ve `GWETTOP` çeker; yanıt başlığı `sources: ["MERRA2"]`; girişsiz. Önbellek `data/merra2/{id}.json`, 13 ilçe, 2000-01 → 2026-09, 364 KB. `monthly_series` biçimi `smap/{id}.json` ile aynı. Sahiplik: IMERG'deki gibi sende olsun istersen.
+- **Kontrol:** `check_smap_anomaly(lands, smaps, fallback=None)` → `None` ise `data/merra2/` önbelleğini okur. **`build.py` değişikliği gerekmiyor**; `make data` sonrası 6. kontrol `pending` → `info` olur. Her ilçe satırında kaynak yazıyor (`Karapınar [MERRA-2]: …`). Not metni MERRA-2'nin model olduğunu ve **motorla bağımsız olmadığını** (POWER havası da MERRA-2) söylüyor.
+- **Sonuç (scratch, 2013-10 → 2026-09, 147 ay):** mevsim döngüsü ρ 0,88–0,99; aylık anomali ρ 0,25–0,57; en ıslak/kuru ay model ile MERRA-2 arasında en çok 1 ay fark (en kuru hep Ağustos).
+- [ ] **Sözleşme önerisi:** kontrol id'si `smap_anomaly` olarak kaldı (sözleşme bozulmasın diye). İstersen `soil_wetness_anomaly`'ye çevir; ben fonksiyon adını ona göre değiştiririm.
+- [ ] **Harita nem kutusu (isteğe bağlı):** kutu şu an "SMAP gelmedi, MERRA-2 ile karşılaştırılıyor, kanıt bölümüne bak" diyor. Kutuda grafik istersen `smap/{id}.json`'u MERRA-2'den üretebilirsin (`product` alanına MERRA-2 adını yaz, `cell_km` yerine 0,5° × 0,625°); `map` metnini ben güncelledim.

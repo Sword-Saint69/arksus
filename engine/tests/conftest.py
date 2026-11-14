@@ -13,3 +13,13 @@ def _no_precip_correction_by_default():
     mp.setattr(runner, "_precip_correction_enabled", lambda: False)
     yield
     mp.undo()
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _no_real_merra2_cache():
+    """E1 tests build their own SMAP/MERRA-2 series; do not read data/merra2/*.json implicitly."""
+    from nobetsu import merra2
+    mp = pytest.MonkeyPatch()
+    mp.setattr(merra2, "load_cached", lambda ids: {})
+    yield
+    mp.undo()
