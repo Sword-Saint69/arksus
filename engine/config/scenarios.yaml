@@ -11,25 +11,25 @@
 scenarios:
   - id: baseline
     label: { en: "Past climate (2001–2026)", tr: "Geçmiş iklim (2001–2026)" }
-    precip_factor: { value: 1.0, unit: "-", source: "No change", type: assumption, verified: true }
-    temp_shift_c: { value: 0.0, unit: "°C", source: "No change", type: assumption, verified: true }
+    precip_factor: { value: 1.0, unit: "-", source: "No change", type: assumption, verified: false }
+    temp_shift_c: { value: 0.0, unit: "°C", source: "No change", type: assumption, verified: false }
   - id: dry10
     label: { en: "10 % less rain", tr: "%10 daha az yağış" }
-    precip_factor: { value: 0.9, unit: "-", source: "PLAN_EXPANSION E2: precipitation × 0.9 (sensitivity step, not a projection)", type: assumption, verified: true }
-    temp_shift_c: { value: 0.0, unit: "°C", source: "No change", type: assumption, verified: true }
+    precip_factor: { value: 0.9, unit: "-", source: "PLAN_EXPANSION E2: precipitation × 0.9 (sensitivity step, not a projection)", type: assumption, verified: false }
+    temp_shift_c: { value: 0.0, unit: "°C", source: "No change", type: assumption, verified: false }
   - id: dry20
     label: { en: "20 % less rain", tr: "%20 daha az yağış" }
-    precip_factor: { value: 0.8, unit: "-", source: "PLAN_EXPANSION E2: precipitation × 0.8 (sensitivity step, not a projection)", type: assumption, verified: true }
-    temp_shift_c: { value: 0.0, unit: "°C", source: "No change", type: assumption, verified: true }
+    precip_factor: { value: 0.8, unit: "-", source: "PLAN_EXPANSION E2: precipitation × 0.8 (sensitivity step, not a projection)", type: assumption, verified: false }
+    temp_shift_c: { value: 0.0, unit: "°C", source: "No change", type: assumption, verified: false }
   - id: warm1
     label: { en: "1 °C warmer", tr: "1 °C daha sıcak" }
-    precip_factor: { value: 1.0, unit: "-", source: "No change", type: assumption, verified: true }
-    temp_shift_c: { value: 1.0, unit: "°C", source: "PLAN_EXPANSION E2: +1 °C on Tmax, Tmin and Tdew (sensitivity step, not a projection)", type: assumption, verified: true }
+    precip_factor: { value: 1.0, unit: "-", source: "No change", type: assumption, verified: false }
+    temp_shift_c: { value: 1.0, unit: "°C", source: "PLAN_EXPANSION E2: +1 °C on Tmax, Tmin and Tdew (sensitivity step, not a projection)", type: assumption, verified: false }
   - id: warm2
     label: { en: "2 °C warmer", tr: "2 °C daha sıcak" }
-    precip_factor: { value: 1.0, unit: "-", source: "No change", type: assumption, verified: true }
-    temp_shift_c: { value: 2.0, unit: "°C", source: "PLAN_EXPANSION E2: +2 °C on Tmax, Tmin and Tdew (sensitivity step, not a projection)", type: assumption, verified: true }
+    precip_factor: { value: 1.0, unit: "-", source: "No change", type: assumption, verified: false }
+    temp_shift_c: { value: 2.0, unit: "°C", source: "PLAN_EXPANSION E2: +2 °C on Tmax, Tmin and Tdew (sensitivity step, not a projection)", type: assumption, verified: false }
   - id: dry10_warm1
     label: { en: "10 % less rain and 1 °C warmer", tr: "%10 daha az yağış ve 1 °C daha sıcak" }
-    precip_factor: { value: 0.9, unit: "-", source: "PLAN_EXPANSION E2 combined case: precipitation × 0.9", type: assumption, verified: true }
-    temp_shift_c: { value: 1.0, unit: "°C", source: "PLAN_EXPANSION E2 combined case: +1 °C", type: assumption, verified: true }
+    precip_factor: { value: 0.9, unit: "-", source: "PLAN_EXPANSION E2 combined case: precipitation × 0.9", type: assumption, verified: false }
+    temp_shift_c: { value: 1.0, unit: "°C", source: "PLAN_EXPANSION E2 combined case: +1 °C", type: assumption, verified: false }

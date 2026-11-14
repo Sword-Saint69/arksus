@@ -95,12 +95,6 @@ Senin tarafında yapılması gerekenler:
 
 Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları puanlayıp öneri veriyor; senin çıktılarından `wheat.yield_ratio`, `first_crop.yield_ratio`, `water_at_wheat_sowing_mm`, `wind_exposed_bare_days` kullanılıyor. Engeller: ortanca buğday oranı < 0,85 × nadas sonrası buğday ya da ilk yıl ürünü ortanca oranı < 0,30 → öneri dışı. Bu yüzden **verim oranlarının ve takvimin doğruluğu artık önerinin kendisini belirliyor**; soğuk ilçeler için takvim (§6) önceliğini artırıyor.
 
-Ömer yanıtı (15 Kas, `omer` 5736d13 / 8b6664d):
-- §5 sıcak gün = 0 hata değil: pencere ~23 May–6 Haz; POWER `T2M_MAX` > 31 °C bu pencerede 24 yılın ortancasında 0 (Karapınar en çok 8, Develi 3 gün); Haziran tamamında Karapınar ortanca 3,5, Temmuz 17. Yani eşik/pencere doğru eşleşiyor, sıcak stres çiçeklenmeden sonra başlıyor.
-- §5 nohut sonrası su ≈ 0 makul: P10/P50/P90 Karapınar 0 / 0,1 / 3,4 mm, Develi 0 / 0 / 4,8. 15 Tem–14 Eki yağışı Karapınar ortanca 26, P90 48 mm; küçük yaz yağışları çıplak toprakta buharlaşıyor (anız malçı yok varsayımı bunu biraz artırır).
-- §6 isimler `locations.yaml`'dan; SMAP metni "noktalar"; yedek AWC `default` + `overrides` (yeni id'de KeyError yok). `precip_vs_mgm` satırını kısaltmadım (IMERG sütunu da eklendi); İsmail uzun bulursa söylesin.
-- §6 takvim: kaynak bulunamadı (Sivas/Yozgat/Çankırı); 13 ilçe tek takvim, `crops.yaml`'da açıkça assumption. MODIS NDVI 13 ilçe inince kuruma ayı farkına bakıp ikinci takvime karar vereceğim.
-
 ## 8. E1, E2 ve IMERG sözleşmeleri kabul edildi (15 Kas)
 
 `omer` main'e alındı (204 test yeşil). Senin §15–§17 isteklerin:
@@ -114,7 +108,7 @@ Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları pu
 - [x] `validate.py:29` `LOCATION_NAMES` hâlâ 2 ilçe → 11 ilçe kontrollerde id olarak görünüyor (`polatli` gibi). İsimleri `config.load("locations")`'tan al (§6).
 - [x] `validate.py` `check_smap_anomaly` pending metni "two points / İki nokta" → 13 nokta (§8).
 - [x] `soil.yaml` `fallback_awc_mm_per_m` sadece karapinar/develi → SoilGrids dosyası olmayan bir ilçede `runner.py:185` `KeyError` (§6).
-- [ ] `scenarios.yaml`: `dry10`/`dry20` vb. `type: assumption` ama `verified: true`; AGENTS kuralında assumption = `verified: false`. Tanım oldukları için savunulabilir; kararını not et.
+- [x] `scenarios.yaml`: `dry10`/`dry20` vb. `type: assumption` ama `verified: true`; AGENTS kuralında assumption = `verified: false`. Tanım oldukları için savunulabilir; kararını not et.
 - Bilgi: AGENTS tablosunda `test_scenarios.py`, `test_smapcheck.py` ve `scenarios.yaml` artık senin satırında; `map/**` Biar'a yazıldı.
 
 ## 10. Kim ne yaptı — 15 Kas itibarıyla özet (karışmasın diye)
@@ -142,6 +136,15 @@ Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları pu
 - **MODIS NDVI için:** çekme kodunu sen yaz; sitede gösterilecekse JSON alanını ve şemayı ben açayım (bana bu dosyada değil `GUMUS_BAKMALI.md`'de yaz: hangi alan, hangi biçim).
 
 **Sende açık kalanlar:** §6 (ilçe isimleri `validate.py`'de, `soil.yaml` yedek AWC, soğuk ilçeler için takvim), §8 (smap pending metni), §9 (denetim maddeleri). **Bende açık kalanlar:** SMAP verisi gelince `smap.py` + `make data`; İsmail başlayınca site ve `v0.2`.
+
+## Ömer yanıtı — §5, §6, §8, §9 (15 Kas)
+
+Commit'ler `omer` 5736d13 / 8b6664d:
+- §5 sıcak gün = 0 hata değil: pencere ~23 May–6 Haz; POWER `T2M_MAX` > 31 °C bu pencerede 24 yılın ortancasında 0 (Karapınar en çok 8, Develi 3 gün); Haziran tamamında Karapınar ortanca 3,5, Temmuz 17. Yani eşik/pencere doğru eşleşiyor, sıcak stres çiçeklenmeden sonra başlıyor.
+- §5 nohut sonrası su ≈ 0 makul: P10/P50/P90 Karapınar 0 / 0,1 / 3,4 mm, Develi 0 / 0 / 4,8. 15 Tem–14 Eki yağışı Karapınar ortanca 26, P90 48 mm; küçük yaz yağışları çıplak toprakta buharlaşıyor (anız malçı yok varsayımı bunu biraz artırır).
+- §6 isimler `locations.yaml`'dan; SMAP metni "noktalar"; yedek AWC `default` + `overrides` (yeni id'de KeyError yok). `precip_vs_mgm` satırını kısaltmadım (IMERG sütunu da eklendi); İsmail uzun bulursa söylesin.
+- §6 takvim: kaynak bulunamadı (Sivas/Yozgat/Çankırı); 13 ilçe tek takvim, `crops.yaml`'da açıkça assumption. MODIS NDVI 13 ilçe inince kuruma ayı farkına bakıp ikinci takvime karar vereceğim.
+- §9 `scenarios.yaml`: tüm adımlar `verified: false` yapıldı (AGENTS kuralı: assumption = doğrulanmamış; tanım olmaları değişmiyor).
 
 ## 11. NDVI: sulu görünen noktaları taşıyacağım — 13 ilçe bitince haber ver (15 Kas)
 

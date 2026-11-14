@@ -2,8 +2,8 @@ import { formatLat, formatLon, mercToLonLat, polygonCentroid, polygonPerimeterM 
 import type { Feature } from '../vector/features';
 import { esc, fmtArea, fmtDonum, fmtLen, fmtNum } from './format';
 import { t, tx, getLang, type Key } from '../strings';
-import type { Badge, DepthId, Location, ResultsFile, SiteIndex, SmapFile, V } from '../../../web/src/lib/types';
-import type { RotationSummary } from '../../../web/src/lib/economics';
+import type { Badge, DepthId, Location, ResultsFile, SiteIndex, SmapFile, V, ValidationFile } from '../../../web/src/lib/types';
+import type { Decision, FlipCell, PriceRobustness, RotationSummary, Weights } from '../../../web/src/lib/economics';
 
 export type PilotData = {
   site: SiteIndex;
@@ -14,6 +14,12 @@ export type PilotData = {
   depth: DepthId;
   /** True when cost or Ym is still null: money and kg/da must not be shown. */
   moneyPending: boolean;
+  scenario: string;
+  weights: Weights;
+  decision: Decision | null;
+  robustness: PriceRobustness | null;
+  flip: FlipCell[] | null;
+  validation: ValidationFile | null;
 };
 
 export type InspectorContext = {
@@ -35,6 +41,9 @@ export type InspectorActions = {
   copy: (text: string) => void;
   select: (f: Feature) => void;
   setDepth: (d: DepthId) => void;
+  setScenario: (id: string) => void;
+  setWeight: (k: keyof Weights, v: number) => void;
+  resetWeights: () => void;
 };
 
 const icon = (id: string) => `<svg class="icon" aria-hidden="true"><use href="#${id}"/></svg>`;
@@ -175,8 +184,10 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
       <p class="sec-sub">${t('soilCardSub', { d: esc(depth) })}</p>
       <table class="soil"><tbody>
         ${props.map((p) => `<tr><th>${esc(tx(p.label))}</th><td>${fmtNum(p.q50, 1)} <small>${esc(p.unit)} · ${fmtNum(p.q05, 1)}–${fmtNum(p.q95, 1)}</small></td></tr>`).join('')}
+        ${results.soil.texture_class ? `<tr><th>${t('textureClass')} ${badge('model')}</th><td>${esc(results.soil.texture_class)}</td></tr>` : ''}
         <tr><th>${t('awc')} ${badge(awc.type, awc.verified)}</th><td>${awc.value === null ? '…' : fmtNum(awc.value, 0)} <small>${esc(awc.unit)}</small></td></tr>
       </tbody></table>
+      ${altHtml(results)}
       <h3 class="sec-title">${t('notRemote')}</h3>
       <p class="sec-sub">${t('notRemoteBody')}</p>
       <div class="chips">${results.soil.not_available_remotely.map((k) => `<span>${t((k in { phosphorus: 1, potassium: 1, micronutrients: 1, compaction: 1 } ? k : 'compaction') as Key)}</span>`).join('')}</div>`;
@@ -196,16 +207,123 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     <div class="seg" role="group" aria-label="${t('depth')}">
       ${site.depth_classes.map((c) => `<button data-depth="${c.id}" aria-pressed="${c.id === d.depth}">${esc(tx(c.label))}</button>`).join('')}
     </div>
+    ${scenarioHtml(d)}
+    ${prioritiesHtml(d)}
+    ${rankingHtml(d)}
     ${d.moneyPending ? `<div class="note warn">${icon('i-info')}<span>${t('moneyPending')}</span></div>` : ''}
     ${rotHtml || `<p class="sec-sub">…</p>`}
+    ${flipHtml(d)}
     ${soilHtml}
     <h3 class="sec-title">${t('smap')}</h3>
     <p class="sec-sub">${d.smap && d.smap.available ? 'SMAP' : t('smapComing')}</p>
+    ${evidenceHtml(d)}
     <div class="actions" style="margin-top:14px">
       <button class="btn" data-act="focus">${icon('i-target')}${t('focus')}</button>
       <button class="btn" data-act="copy" data-ll="${loc.lat}, ${loc.lon}">${icon('i-copy')}${t('coords')}</button>
     </div>
     <p class="foot-note">${t('weatherSource', { a: site.power_range.start, b: site.power_range.end })}<br>${t('supportNote')}</p>`;
+}
+
+const WEIGHT_KEYS: (keyof Weights)[] = ['value', 'yield', 'soil', 'water'];
+const rotLabel = (site: SiteIndex, id: string | null) => {
+  const r = id ? site.rotations.find((x) => x.id === id) : null;
+  return r ? esc(tx(r.label)) : '–';
+};
+
+function scenarioHtml(d: PilotData) {
+  const sc = d.site.scenarios ?? [];
+  if (sc.length < 2) return '';
+  return `
+    <label class="field-row"><span>${t('scenario')}</span>
+      <select data-scenario>${sc.map((s) => `<option value="${esc(s.id)}" ${s.id === d.scenario ? 'selected' : ''}>${esc(tx(s.label))}</option>`).join('')}</select>
+    </label>
+    ${d.scenario !== 'baseline' ? `<p class="sec-sub">${t('scenarioSub')}</p>` : ''}`;
+}
+
+function prioritiesHtml(d: PilotData) {
+  const total = WEIGHT_KEYS.reduce((s, k) => s + d.weights[k], 0) || 1;
+  return `
+    <h3 class="sec-title">${t('priorities')}</h3>
+    <p class="sec-sub">${t('prioritiesSub')}</p>
+    <div class="weights">
+      ${WEIGHT_KEYS.map((k) => `
+        <label class="w-row"><span>${t(`w_${k}` as Key)}</span>
+          <input type="range" min="0" max="100" step="5" value="${Math.round((d.weights[k] / total) * 100)}" data-weight="${k}" aria-label="${t(`w_${k}` as Key)}">
+          <output>${Math.round((d.weights[k] / total) * 100)} %</output></label>`).join('')}
+      <button class="btn" data-act="reset-weights">${t('reset')}</button>
+    </div>`;
+}
+
+function rankingHtml(d: PilotData) {
+  const dec = d.decision;
+  if (!dec) return '';
+  const depthLabel = tx(d.site.depth_classes.find((c) => c.id === d.depth)?.label);
+  let rank = 0;
+  const rows = dec.ranking.map((r) => {
+    const n = r.eligible ? ++rank : null;
+    const pct = Math.round(r.score * 100);
+    return `
+      <li class="rank ${r.eligible ? '' : 'blocked'}">
+        <div class="rank-head"><b>${n ? t('rankN', { n }) : t('outOfRanking')}</b><span>${rotLabel(d.site, r.rotation_id)}</span>
+          <span class="v">${t('score')} ${fmtNum(r.score, 2)}</span></div>
+        <div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div>
+        <small>${r.eligible ? t('driver', { k: t(`w_${r.driver}` as Key) }) : r.blocked.map((b) => t(`block_${b}` as Key)).join(' · ')}</small>
+      </li>`;
+  }).join('');
+  const rb = d.robustness;
+  let priceNote = '';
+  if (rb) {
+    const p = Math.round(Math.max(...rb.tested_changes.map(Math.abs)) * 100);
+    priceNote = rb.stable
+      ? t('priceStable', { p })
+      : t('priceSensitive', { list: rb.sensitive_to.map((s) => `${t(`crop_${s.crop}` as Key)} ${s.change > 0 ? '+' : '−'}${Math.round(Math.abs(s.change) * 100)} %`).join(', ') });
+  }
+  return `
+    <h3 class="sec-title">${t('ranking')} ${badge('model')}</h3>
+    <p class="sec-sub">${t('rankingSub', { depth: esc(depthLabel) })}</p>
+    <ol class="ranking">${rows}</ol>
+    ${dec.close_call ? `<div class="note warn">${icon('i-info')}<span>${t('closeCall')}</span></div>` : ''}
+    ${priceNote ? `<p class="sec-sub">${priceNote}</p>` : ''}`;
+}
+
+function flipHtml(d: PilotData) {
+  if (!d.flip) return '';
+  const terc = ['dry', 'normal', 'wet'] as const;
+  return `
+    <h3 class="sec-title">${t('flipTitle')} ${badge('model')}</h3>
+    <p class="sec-sub">${t('flipSub')}</p>
+    <table class="flip"><thead><tr><th></th>${terc.map((x) => `<th>${t(`t_${x}` as Key)}</th>`).join('')}</tr></thead><tbody>
+      ${d.site.depth_classes.map((c) => `<tr><th>${esc(tx(c.label))}</th>${terc.map((x) => {
+        const cell = d.flip!.find((f) => f.depth_id === c.id && f.tercile === x);
+        return `<td>${cell ? `${rotLabel(d.site, cell.rotation_id)}${cell.close_call ? ' ≈' : ''}` : '–'}</td>`;
+      }).join('')}</tr>`).join('')}
+    </tbody></table>`;
+}
+
+function evidenceHtml(d: PilotData) {
+  const v = d.validation;
+  if (!v) return '';
+  return `
+    <details class="evidence">
+      <summary>${t('evidencePanel')}</summary>
+      <p class="sec-sub">${t('evidenceSub')}</p>
+      <ul>${v.checks.map((c) => `
+        <li><span class="st st-${c.status}">${t(`st_${c.status}` as Key)}</span> <b>${t(`chk_${c.id}` as Key)}</b>
+          ${c.value ? `<p>${esc(c.value)}</p>` : ''}
+          ${c.reference ? `<small>${esc(c.reference)}</small>` : ''}
+          <p class="sec-sub">${esc(tx(c.note))}</p></li>`).join('')}
+      </ul>
+    </details>`;
+}
+
+function altHtml(results: ResultsFile) {
+  const alt = results.soil.awc_alternatives;
+  if (!alt || !Object.keys(alt).length) return '';
+  return `
+    <p class="sec-sub">${t('awcAlt')}</p>
+    <table class="soil"><tbody>${Object.values(alt).map((a) => `
+      <tr><th><small>${esc(a.source)}</small> ${badge(a.type, a.verified)}</th><td>${fmtNum(a.value, 0)} <small>${esc(a.unit)}${a.range_q05_q95 ? ` · ${fmtNum(a.range_q05_q95[0], 0)}–${fmtNum(a.range_q05_q95[1], 0)}` : ''}</small></td></tr>`).join('')}
+    </tbody></table>`;
 }
 
 function vValue(v: V) {
@@ -249,8 +367,15 @@ function wire(root: HTMLElement, ctx: InspectorContext, act: InspectorActions) {
       case 'geojson': act.exportGeoJSON([f!]); break;
       case 'export-all': act.exportGeoJSON(ctx.selection.filter((s) => s.kind !== 'pilot')); break;
       case 'clear': act.clear(); break;
+      case 'reset-weights': act.resetWeights(); break;
     }
   }));
+  root.querySelectorAll<HTMLSelectElement>('[data-scenario]').forEach((s) => s.addEventListener('change', () => act.setScenario(s.value)));
+  root.querySelectorAll<HTMLInputElement>('[data-weight]').forEach((r) => {
+    const out = r.parentElement?.querySelector('output');
+    r.addEventListener('input', () => { if (out) out.textContent = `${r.value} %`; });
+    r.addEventListener('change', () => act.setWeight(r.dataset.weight as keyof Weights, Number(r.value)));
+  });
   if (f) {
     const anc = ctx.ancestors(f);
     root.querySelectorAll<HTMLButtonElement>('[data-anc]').forEach((b) => b.addEventListener('click', () => act.select(anc[+b.dataset.anc!])));
