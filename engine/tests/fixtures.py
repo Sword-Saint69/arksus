@@ -73,3 +73,25 @@ def synthetic_weather(
         source="synthetic test weather (not data)",
     )
     return df
+
+
+def load_config(name: str) -> dict:
+    """Read engine/config/{name}.yaml as a plain dict (same result as nobetsu.config.load)."""
+    from pathlib import Path
+
+    import yaml
+
+    path = Path(__file__).resolve().parents[1] / "config" / f"{name}.yaml"
+    with open(path, encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def constant_daily(n: int, *, start: str = "2010-01-01", **overrides) -> pd.DataFrame:
+    """Constant daily engine inputs (waterbalance.simulate format); override any column."""
+    base = {
+        "precip_mm": 0.0, "et0_mm": 5.0, "u2_ms": 2.0, "rhmin_pct": 45.0,
+        "kcb": 0.0, "zr_m": 0.0, "h_m": 0.0, "p": 0.5,
+    }
+    base.update(overrides)
+    idx = pd.date_range(start, periods=n, freq="D", name="date")
+    return pd.DataFrame({k: np.broadcast_to(np.asarray(v, dtype=float), (n,)).copy() for k, v in base.items()}, index=idx)
