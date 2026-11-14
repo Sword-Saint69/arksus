@@ -24,7 +24,8 @@
               "et0_fao56_ex18",
               "pse_literature",
               "trial_ratio",
-              "precip_vs_mgm"
+              "precip_vs_mgm",
+              "smap_anomaly"
             ]
           },
           "status": {
@@ -67,8 +68,8 @@
         ],
         "additionalProperties": false
       },
-      "minItems": 5,
-      "maxItems": 5
+      "minItems": 6,
+      "maxItems": 6
     }
   },
   "required": [

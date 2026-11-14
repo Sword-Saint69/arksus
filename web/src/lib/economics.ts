@@ -226,6 +226,46 @@ export function decide(
   };
 }
 
+export type PricedCrop = 'wheat' | 'chickpea' | 'lentil';
+export interface PriceRobustness {
+  depth_id: string;
+  recommended: string | null;   // decide() with the given inputs
+  stable: boolean;              // true if every tested price change keeps the same recommendation
+  sensitive_to: { crop: PricedCrop; change: number; recommended: string | null }[]; // the cases that flip it
+  tested_changes: number[];     // fractions, e.g. [-0.2, 0.2]
+}
+
+/**
+ * Does the recommendation survive price changes? For each crop (wheat, chickpea, lentil) and each change, only that
+ * crop's internal price is multiplied by (1 + change) and decide() is re-run; cases whose recommendation differs from
+ * the base one are listed in `sensitive_to`.
+ *
+ * The default ±20 % is a sensitivity step chosen by the team (type: assumption), NOT a price forecast. The least
+ * certain input is the chickpea price (one exchange, Feb 2026). A crop without a numeric price is skipped.
+ * Pure: `inp` is not mutated. The output carries no TL amounts or prices — only crop ids, change fractions and
+ * rotation ids.
+ */
+export function priceRobustness(
+  results: ResultsFile, site: SiteIndex, depthId: string, inp: DecisionInputs,
+  weights: Weights = inp.weights, changes: number[] = [-0.2, 0.2],
+): PriceRobustness {
+  const base = decide(results, site, depthId, inp, weights).recommended;
+  const sensitive_to: PriceRobustness['sensitive_to'] = [];
+  for (const crop of ['wheat', 'chickpea', 'lentil'] as const) {
+    const c = inp.crops[crop];
+    if (!c || typeof c.price_tl_per_kg !== 'number') continue;
+    for (const change of changes) {
+      const shifted: DecisionInputs = {
+        ...inp,
+        crops: { ...inp.crops, [crop]: { ...c, price_tl_per_kg: c.price_tl_per_kg * (1 + change) } },
+      };
+      const rec = decide(results, site, depthId, shifted, weights).recommended;
+      if (rec !== base) sensitive_to.push({ crop, change, recommended: rec });
+    }
+  }
+  return { depth_id: depthId, recommended: base, stable: sensitive_to.length === 0, sensitive_to, tested_changes: [...changes] };
+}
+
 export type Tercile = 'dry' | 'normal' | 'wet';
 export interface FlipCell { depth_id: string; tercile: Tercile; rotation_id: string | null; close_call: boolean; n_years: number }
 

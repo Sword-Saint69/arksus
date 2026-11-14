@@ -79,7 +79,7 @@ Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı.
   3. Sonuç: **Karapınar 160 mm/m, Develi 155 mm/m** (SoilGrids'in 58,6 / 67,4 değerleri yerine).
 - `results.soil.awc_mm_per_m` → `type: "assumption"`, `verified: false`; `source` metni hem kullanılan tabloyu hem de SoilGrids'in verdiği ve kullanılmayan değeri yazıyor. Şemadan geçiyor.
 - Geri almak gerekirse: `soil.yaml`'da `awc_method.value: soilgrids` → motor eskisi gibi senin değerini kullanır. Kod değişmez.
-- [ ] **Öneri (UI / export, senin ve İsmail'in kararı):** toprak kartında SoilGrids'in kendi AWC değeri ve 90 % aralığı (`range_q05_q95`) da "SoilGrids estimate (not used by the engine)" diye gösterilebilir; şeffaflık için iyi olur. Gösterilecekse sözleşmeye nasıl gireceğine sen karar ver.
+- [x] **Öneri (UI / export, senin ve İsmail'in kararı):** *(15 Kas: yapıldı — `results.soil.awc_alternatives` + `texture_class`, ISMAIL_BAKMALI §13)* toprak kartında SoilGrids'in kendi AWC değeri ve 90 % aralığı (`range_q05_q95`) da "SoilGrids estimate (not used by the engine)" diye gösterilebilir; şeffaflık için iyi olur. Gösterilecekse sözleşmeye nasıl gireceğine sen karar ver.
 - **Gerçek veriyle etkisi (orta derinlik, ortanca):** Karapınar nadas buğday ekiminde 104 mm su bırakıyor (nohut 13, mercimek 26); nadas depolama verimi %23 (literatür %8–30 içinde). Deneme oranı modelde 0,90 / 0,91 (deneme 0,80 / 0,87).
 
 ## 11. `make data` kontrolü (14 Kas, `omer`)
@@ -128,8 +128,8 @@ Bulunamayan: Kayseri'ye özel ekim/hasat takvimi (Develi'de Konya takvimi kullan
 Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi olmadan sitede görünmez; **senden 3 şey lazım**:
 
 - [ ] **SMAP verisi.** `smap/{loc}.json` (sözleşmedeki biçim) `available: true` ve `monthly_series[].rootzone_wetness` dolu olmalı; motor yalnızca bunu okuyor. AppEEARS / Earth Engine Earthdata girişi istiyor, ben yapamam. En az **24 ay** örtüşme yoksa kontrol `pending` kalır.
-- [ ] **Sözleşme: 6. kontrol `smap_anomaly`.** `validation.schema.json`'da `checks` şu an tam 5 eleman ve `id` enum'unda `smap_anomaly` yok. PLAN_EXPANSION E1 bunu istiyor. Kabul edersen: enum'a `smap_anomaly` ekle, `maxItems` 6, `types.ts` + mock. Format diğer kontrollerle aynı (`id, status, value, reference, note{en,tr}`), durum `info` ya da `pending`.
-- [ ] **`build.py` bağlantısı** (sözleşme değişince):
+- [x] **Sözleşme: 6. kontrol `smap_anomaly`.** `validation.schema.json`'da `checks` şu an tam 5 eleman ve `id` enum'unda `smap_anomaly` yok. PLAN_EXPANSION E1 bunu istiyor. Kabul edersen: enum'a `smap_anomaly` ekle, `maxItems` 6, `types.ts` + mock. Format diğer kontrollerle aynı (`id, status, value, reference, note{en,tr}`), durum `info` ya da `pending`.
+- [x] **`build.py` bağlantısı** (sözleşme değişince):
 
   ```python
   from .runner import run_landscape
@@ -148,8 +148,8 @@ Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi 
 
 - **Senaryolar:** `engine/config/scenarios.yaml` (yeni dosya, motor parametresi; id'leri sözleşmede sen onayla): `baseline`, `dry10` (yağış ×0,9), `dry20` (×0,8), `warm1` (+1 °C), `warm2` (+2 °C), `dry10_warm1`. Her birinde `label {en, tr}` ve V biçiminde `precip_factor`, `temp_shift_c`. Sıcaklık kayması Tmax, Tmin ve Tdew'e birlikte uygulanıyor (bağıl nem yaklaşık sabit), ET₀ kaydırılmış havadan yeniden hesaplanıyor.
 - **Motor API:** `runner.run_scenarios(location_id, weather, soilgrids, scenario_ids=None) -> {scenario_id: EngineOutput}` (her biri `run_location` ile aynı biçim). Tek senaryo için `runner.apply_scenario(weather, scenario)` + `run_location`. 6 senaryo × 2 lokasyon ≈ 2 dk.
-- [ ] **Sözleşme (sende, PLAN_EXPANSION E2):** `results/{loc}__{scenario_id}.json` (aynı şema) + `site_index.scenarios: [{id, label}]` (`scenarios.yaml`'dan). `baseline` için mevcut `results/{loc}.json` kalabilir. Ledger senaryo başına gerekirse söyle (dosyalar büyük: 2,1 MB × 12).
-- [ ] **`build.py`:** `for sid, out in run_scenarios(loc, w, sg).items(): ...` ile yazdır; `validation.json` sadece baseline'dan.
+- [x] **Sözleşme (sende, PLAN_EXPANSION E2):** `results/{loc}__{scenario_id}.json` (aynı şema) + `site_index.scenarios: [{id, label}]` (`scenarios.yaml`'dan). `baseline` için mevcut `results/{loc}.json` kalabilir. Ledger senaryo başına gerekirse söyle (dosyalar büyük: 2,1 MB × 12).
+- [x] **`build.py`:** `for sid, out in run_scenarios(loc, w, sg).items(): ...` ile yazdır; `validation.json` sadece baseline'dan.
 - **Gerçek veriyle sonuç (orta derinlik, ortanca, nadas / nohut / mercimek):**
   - Karapınar buğday oranı: baseline 0,54 / 0,48 / 0,49 → dry20 0,46 / 0,39 / 0,40 → warm2 0,52 / 0,46 / 0,47. Nadas ekimde su 104 → 59 mm (dry20).
   - Develi: baseline 0,55 / 0,50 / 0,50 → dry20 0,44 / 0,40 / 0,40.
@@ -162,4 +162,4 @@ Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi 
 - **Sahiplik sorusu:** veri çekme modülleri ve `data/**` sende. Kabul edersen `imerg.py` ve `data/imerg/` senin olsun (AGENTS tablosuna ekle); ben yalnız `validate.py` tarafını tutarım.
 - **`build.py` değişikliği gerekmiyor:** `run_checks(..., imerg=None)` önbellek varsa kendisi okur. `make data` sonrası `precip_vs_mgm` değerine IMERG sütunu eklenir. Kontrol id'si ve şema aynı (value/reference zaten string).
 - **Sonuç (2001–2024 ortak yıllar, MGM 1991–2020 normaline göre):** IMERG 13 noktanın 12'sinde istasyondan yağışlı (+1 … +71 %); ortalama mutlak sapma IMERG ~%29, POWER ~%18. Yalnız Karapınar (+38 → +28) ve Karaman (+85 → +33) noktalarında IMERG daha yakın. **Bu yüzden motor girdisi POWER kalıyor;** IMERG sadece kanıt panelinde ikinci uydu kaynağı.
-- [ ] `make data` çalıştırıp `validation.json`'u yenile (web/public/data senin).
+- [x] `make data` çalıştırıp `validation.json`'u yenile (web/public/data senin).

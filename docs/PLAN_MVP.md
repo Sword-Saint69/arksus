@@ -51,7 +51,7 @@ All three start on the same day after a simulated wheat harvest and end at the n
 2. Real (non-mock) results for 13 locations × 3 rotations × 3 depth classes × 24 sequences, including the soil indicators (§5.8), the regional soil card and the soil-fullness curve (§5.10). SMAP wetness is shown if its data arrived by T+12; otherwise it moves to E1 and the card says "coming".
 3. A recommendation per location and depth with its main reason, blocked options and close-call flag; priority sliders that re-rank live. **No money displayed.** Every displayed number carries a source badge.
 4. A strategy explanation (why / evidence / benefits / gaps / local review) for each rotation.
-5. Evidence panel with the five MVP checks (§5.7) and a short "satellite and model data vs ground stations" note.
+5. Evidence panel with the six checks (§5.7; the sixth, SMAP, stays "pending" until SMAP data arrives) and a short "satellite and model data vs ground stations" note.
 6. Public GitHub repo with README, AI-use disclosure and a one-command rebuild (`make data`).
 
 ---
@@ -62,7 +62,7 @@ All three start on the same day after a simulated wheat harvest and end at the n
 2. **Contract first.** The JSON contract in §4 is frozen at M0. A change needs agreement from the contract owner (Dev B) and a same-hour update to `web/src/lib/types.ts` and the mock files.
 3. **Mock flag.** Every JSON file has `"mock": true|false`. The site shows a visible banner while any loaded file is mock.
 4. **Honest wording.** Results are "for a typical field in the district, under 24 years of past climate, not your field's measured yield". The recommendation reads "Most suitable for this land under your priorities" and always shows its main reason, blocked options and close calls. **No TL, price, income, cost or profit is shown anywhere.** Never write "profit guaranteed", "certain" or "banned".
-5. **Badges.** Every displayed number has one of five types: `measured`, `model`, `official`, `literature`, `assumption`, plus `user` once edited.
+5. **Badges.** Every displayed number has one of these types: `measured`, `model`, `official`, `statistic`, `literature`, `assumption`, plus `user` once edited.
 6. **Small PRs, green main.** `main` always builds and deploys. Each person works on their own branch and merges at least every 2 hours. Tests must pass before merge.
 7. **File ownership** (§3.3) prevents merge conflicts. Edit another person's files only after asking.
 8. **AI use is declared.** Keep a running list of which AI tools wrote what in `docs/AI_USE.md`.
@@ -257,7 +257,7 @@ Size: 3 rotations × 3 depths × 24 years = 216 rows per location.
 {
   "schema_version": "1.0", "mock": true,
   "checks": [
-    { "id": "mass_balance" | "et0_fao56_ex18" | "pse_literature" | "trial_ratio" | "precip_vs_mgm",
+    { "id": "mass_balance" | "et0_fao56_ex18" | "pse_literature" | "trial_ratio" | "precip_vs_mgm" | "smap_anomaly",
       "status": "pass" | "fail" | "info" | "pending",
       "value": "...", "reference": "...", "note": { "en": "...", "tr": "..." } }
   ]
@@ -368,7 +368,8 @@ Production costs are **not used** (not sourced, and no money is shown). All valu
 | `et0_fao56_ex18` | ET₀ against FAO-56 Example 18 | ±0.1 mm/day |
 | `pse_literature` | modelled fallow storage efficiency vs Central Anatolian literature range (report cites ~8–30 %; Person D verifies the papers) | `info`: show value and range, no pass/fail |
 | `trial_ratio` | modelled median wheat yield ratio after chickpea and after lentil, relative to after fallow, vs the Konya dryland trial (report: 228 / 249 / 286 kg/da after chickpea / lentil / fallow, 2011–2014; Person D verifies the paper) | `info`: show both side by side |
-| `precip_vs_mgm` | POWER mean annual precipitation vs MGM 1991–2020 normals at the nearest station | `info`: show the difference in % |
+| `precip_vs_mgm` | POWER and NASA GPM IMERG mean annual precipitation vs WMO/MGM 1991–2020 normals at the nearest station | `info`: show the difference in % |
+| `smap_anomaly` (15 Nov, E1) | month-by-month anomalies of model soil-water fullness vs NASA SMAP L4 root-zone wetness (Spearman) | `info`; `pending` until SMAP data arrives |
 
 Honest framing: these are consistency checks, not field validation.
 
@@ -402,7 +403,7 @@ The challenge is about soil health as much as water. These indicators come from 
 
 **Soil fullness (Dev A, engine):** `fullness = available water in profile / available-water capacity of profile × 100`, recorded at each month end (`fullness_by_month`). This is not saturation: 100 % means field capacity. The glossary explains the difference: saturation = all pores full of water (it drains within days); field capacity = what the soil holds after draining; plants use water between field capacity and wilting point.
 
-**SMAP wetness (Dev B data, Dev C UI):** at T+1 Dev B submits a NASA AppEEARS point request for `SPL4SMGP` v8 layers `sm_rootzone`, `sm_rootzone_wetness`, `sm_surface_wetness` at both points, 2015-04-01 → latest (needs an Earthdata login; takes minutes to submit, results usually arrive within hours). Earth Engine `NASA/SMAP/SPL4SMGP/008` is the backup. When the data arrives, build `smap/{location_id}.json`: monthly climatology (P10 / P50 / P90 of root-zone wetness), monthly series and the latest value with its percentile for that calendar month. If the data has not arrived by T+12, set `available: false` and continue; it becomes part of E1.
+**SMAP wetness (Dev B data, Dev C UI):** at T+1 Dev B submits a NASA AppEEARS point request for `SPL4SMGP` v8 layers `sm_rootzone`, `sm_rootzone_wetness`, `sm_surface_wetness` at all 13 points (submitted 14 Nov; plus `sm_rootzone_pctl`), 2015-04-01 → latest (needs an Earthdata login; takes minutes to submit, results usually arrive within hours). Earth Engine `NASA/SMAP/SPL4SMGP/008` is the backup. When the data arrives, build `smap/{location_id}.json`: monthly climatology (P10 / P50 / P90 of root-zone wetness), monthly series and the latest value with its percentile for that calendar month. If the data has not arrived by T+12, set `available: false` and continue; it becomes part of E1.
 
 **Soil-health effects of each rotation** (qualitative, with sources from Person D, in `rotations.yaml`): nitrogen fixation (legumes yes, no kg N number), ground cover and bare days (from the engine), tillage passes in the fallow year (more passes → more exposure and faster organic-matter loss), and the wind-exposure count. No composite "soil health score": every indicator is shown separately so nothing is hidden inside a made-up number.
 
@@ -436,7 +437,7 @@ The challenge is about soil health as much as water. These indicators come from 
 6. **Chart C — field calendar:** for each rotation, 24 month cells. Cell shade = share of years the field is bare that month; a marker shows months where wheat is under water stress in most years. Answers "when is the field bare, when is the crop vulnerable".
 7. **Where it flips:** a 3 × 3 grid (depth × dry/normal/wet) showing the recommended rotation in each cell under the current priorities, close calls marked.
 8. *(removed 14 Nov: no price/cost input panel; no money is shown.)*
-9. **Evidence:** the five checks with status chips and short notes, plus the satellite vs ground note.
+9. **Evidence:** the six checks with status chips and short notes, plus the satellite vs ground note.
 10. **Footer:** data sources (NASA POWER first), assumptions list (§5.3, §5.8), "this tool supports, it does not replace, farmer judgment and local expertise", AI-use link, GitHub link.
 
 **Glossary tooltips** (text from Person D, short and plain): evapotranspiration (ET, ET₀), water balance, available water, field capacity vs saturation, soil moisture anomaly, pH, organic carbon, CEC, P10/P50/P90, fallow storage efficiency, nitrogen fixation, wind exposure.
@@ -527,7 +528,7 @@ Import the decision module from src/lib/economics.ts (decide, summarize, flipTab
 **Dev B (after M0, second task):**
 ```
 Read docs/PLAN_MVP.md §5.1, §5.5, §5.6 and §5.9. Implement power.py with caching, then economics.ts (decision module) with the unit tests
-listed in §5.5 and §5.9, then export.py that writes all five contract files from engine outputs. Validate every written file
+listed in §5.5 and §5.9, then export.py that writes all contract files from engine outputs. Validate every written file
 against web/src/lib/types.ts (a small zod or JSON-schema check in tests).
 Also: submit the AppEEARS SMAP request (§5.10) at T+1, and do the SoilGrids pull (§5.10) with a 45-minute timebox.
 ```

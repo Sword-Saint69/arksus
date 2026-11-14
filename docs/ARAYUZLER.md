@@ -78,6 +78,7 @@ Gümüş her lokasyon için `data/soilgrids/{location_id}.json` yazar:
   `AWC = FAO-56 Tablo 19 [texture_0_100cm.usda_class] orta değeri × (1 − cfvo_0_100cm_fraction)`, `type: "assumption"`, `verified: false`, kaynakta "SoilGrids dokusu → FAO-56 Tablo 19, taş düzeltmeli" (Ömer uyguladı; taş düzeltmesi OMER_BAKMALI §3). Tablo değerleri ve sınıf eşlemesi `soil.yaml`'da (Ömer). Tabloda olmayan sınıf (ör. killi tın) için hangi sınıfın kullanıldığı kaynakta yazılır.
 - Dosyadaki ek alanlar (Gümüş yazar): `texture_0_100cm {clay, sand, silt, usda_class, source}` (ortalama haritalar, 100'e ölçekli), `cfvo_0_100cm_fraction` (V), `awc_alternatives {soilgrids_wv0033_wv1500, saxton_rawls_2006}` (V). `awc_mm_per_m` = SoilGrids doğrudan değeri, **sadece bilgi amaçlı** (kanıt panelinde karşılaştırma için).
 - **Dosya yoksa** motor `soil.yaml`'daki yedek değeri kullanır ve `type: "assumption"` yapar.
+- **15 Kas (şeffaflık):** export, `results.soil` altına isteğe bağlı `awc_alternatives` (motorun kullanmadığı AWC tahminleri: `soilgrids_wv0033_wv1500`, `saxton_rawls_2006`; V benzeri nesne, `range_q05_q95` olabilir) ve `texture_class` (USDA, 0–100 cm) ekler. Toprak kartı "SoilGrids'in kendi tahmini … (kullanılmadı)" diye gösterebilir.
 - Motorun **gerçekte kullandığı** AWC, `run_location` çıktısında `awc_used` olarak döner (§5); export bunu `results.soil.awc_mm_per_m`'ye yazar.
 
 ---
@@ -153,7 +154,7 @@ def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs:
 ```
 
 - `outputs`: `{location_id: EngineOutput}`; `refs`: `config.load("references")`.
-- Dönüş: PLAN_MVP §4.5 `checks` listesi (5 kontrol, bu sırayla): `mass_balance`, `et0_fao56_ex18`, `pse_literature`, `trial_ratio`, `precip_vs_mgm`.
+- Dönüş: PLAN_MVP §4.5 `checks` listesi; `run_checks` 5 kontrolü bu sırayla verir: `mass_balance`, `et0_fao56_ex18`, `pse_literature`, `trial_ratio`, `precip_vs_mgm`; `validation.json` toplam **6** kontrol (6. `smap_anomaly`, aşağıda). **15 Kas (E1, SÖZLEŞME DEĞİŞTİ):** `build.py` 6. kontrolü ekler: `smap_anomaly` = `validate.check_smap_anomaly(run_landscape(...), smap)`; SMAP verisi yoksa `pending`. `validation.json` artık tam **6** kontrol. `precip_vs_mgm` değerinde NASA GPM IMERG sütunu da var (`data/imerg/`, `imerg.py`, sahibi Gümüş).
 - Referans değeri henüz yoksa (`refs` içinde boş) o kontrol `status: "pending"` döner, hata vermez.
 
 ---
@@ -183,7 +184,8 @@ Biçim: PLAN_MVP §4. Dosyalar `web/public/data/` altında:
 | Dosya | Ne zaman yüklenir |
 |---|---|
 | `site_index.json` | sayfa açılınca |
-| `results/{location_id}.json` | lokasyon seçilince |
+| `results/{location_id}.json` | lokasyon seçilince (`scenario_id: "baseline"`) |
+| `results/{location_id}__{scenario_id}.json` | **E2 (15 Kas):** senaryo seçilince; aynı şema, `scenario_id` dolu. Senaryolar `site_index.scenarios` (`id, label, precip_factor, temp_shift_c`; baseline ilk). Ledger ve validation sadece baseline'dan. |
 | `defaults.json` | sayfa açılınca — karar parametreleri; **fiyat/destek asla ekranda gösterilmez** |
 | `validation.json` | sayfa açılınca |
 | `smap/{location_id}.json` | lokasyon seçilince (**her zaman vardır**; veri yoksa `available: false`, `latest: null`, listeler boş). Mock'ta Karapınar `available: true`, Develi `false` (iki UI durumu da denenebilsin) |
@@ -247,6 +249,15 @@ export function decide(results: ResultsFile, site: SiteIndex, depthId: string, i
 export type Tercile = 'dry' | 'normal' | 'wet';
 export interface FlipCell { depth_id: string; tercile: Tercile; rotation_id: string | null; close_call: boolean; n_years: number }
 export function flipTable(results: ResultsFile, site: SiteIndex, inp: DecisionInputs, weights?: Weights): FlipCell[]; // 9 hücre
+
+/** 15 Kas: öneri fiyatlar ±%20 değişince de aynı kalıyor mu? (±%20 ekip seçimi, fiyat tahmini değil) */
+export interface PriceRobustness {
+  depth_id: string; recommended: string | null; stable: boolean;
+  sensitive_to: { crop: 'wheat' | 'chickpea' | 'lentil'; change: number; recommended: string | null }[];
+  tested_changes: number[];
+}
+export function priceRobustness(results: ResultsFile, site: SiteIndex, depthId: string, inp: DecisionInputs,
+  weights?: Weights, changes?: number[]): PriceRobustness;     // TL içermez
 ```
 
 Puan kuralı: her ölçüt 24 yılın ortancası; `value` = ortanca `sequenceValue` (Σ oran × referans verim × fiyat + Σ destek; **maliyet yok**), `yield` = ortanca buğday verim oranı, `water` = ortanca ekimde su, `soil` = ortanca rüzgâra açık çıplak gün (az olan iyi). Her ölçüt en iyi rotasyona oranlanır (`x / en iyi`; toprakta `en iyi / x`), ağırlıklarla toplanır.

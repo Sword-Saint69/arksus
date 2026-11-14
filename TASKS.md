@@ -108,8 +108,8 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+4–7: export.py + build.py** — mock runner ile uçtan uca, şema doğrulama testi — ✅ 16:29 (gumus/m0; düzeltmeler gumus/economics öncesi main'de)
 - [ ] **T+7–9: `make data` → gerçek JSON → Vercel'de görünüyor, `mock:false`** → M2, `v0.1` etiketini at — ⏳ kalan: sadece Vercel'de görünmesi (İsmail'in web iskeleti yok). Gerçek JSON `mock:false` main'de, `v0.1` etiketi atıldı — 18:28 (gumus/m2)
 - [ ] **T+9–14: Muhammet'in değerlerini defaults.yaml / references.yaml'a, strateji metinlerini rotations.yaml'a geçir (her 2 saatte bir); README teknik kısım** → M3, `v0.2` etiketi — ⏳ kalan: sadece `v0.2` (site çalışınca). Yapıldı: değer/metin aktarımı, README, karar modülü 23:27 (gumus/karar-sistemi)
-- [ ] **SMAP verisi geldiğinde: `smap/{lokasyon}.json` üret** — T+12'ye kadar gelmezse `available:false`, E1'e kalır
-- [ ] **T+14–16: Genişletme E1 veri tarafı + E2 için sözleşme (tipler, `scenarios` listesi)**
+- [ ] **SMAP verisi geldiğinde: `smap/{lokasyon}.json` üret** — T+12'ye kadar gelmezse `available:false`, E1'e kalır — ⏳ kalan: AppEEARS sonucu (%25, kuyrukta). `smap.py` hazır ve test edildi 00:17; veri gelince `python -m nobetsu.smap <csv>` + `make data`
+- [ ] **T+14–16: Genişletme E1 veri tarafı + E2 için sözleşme (tipler, `scenarios` listesi)** — ⏳ kalan: E1 için SMAP verisi (AppEEARS). Yapıldı 00:10 (gumus/omer-imerg-e1-e2): E2 sözleşmesi + 5 senaryo × 13 ilçe veri, E1 `smap_anomaly` sözleşmesi ve build bağlantısı, IMERG devralındı
 - [ ] **T+16–18: Genişletme E3 (GRACE havza su trendi)**
 - [ ] **T+18–19: Genişletme E6 (kısıtlar) veya E9 (fiyat belirsizliği) — yeşil değilse merge etme**
 - [ ] **T+19–22: Son build, link kontrolleri, repo temizliği, AI_USE.md**

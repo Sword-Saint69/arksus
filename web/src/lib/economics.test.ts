@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import type { DefaultsFile, ResultsFile, Rotation, SequenceRow, SiteIndex, V } from './types';
 import {
-  decide, flipTable, inputsFromDefaults, percentile, range, sequenceValue, summarize,
+  decide, flipTable, inputsFromDefaults, percentile, priceRobustness, range, sequenceValue, summarize,
   type DecisionInputs,
 } from './economics';
 
@@ -35,7 +35,7 @@ const SITE = {
   schema_version: '1.0', mock: true, generated_at: '', power_range: { start: '', end: '' }, locations: [],
   rotations: ROTATIONS,
   depth_classes: (['shallow', 'medium', 'deep'] as const).map((id) => ({ id, depth_m: 1, label: text })),
-  start_years: [2001, 2024],
+  start_years: [2001, 2024], scenarios: [],
 } as SiteIndex;
 
 function row(p: Partial<SequenceRow> & Pick<SequenceRow, 'start_year' | 'rotation_id' | 'depth_id'>, wheatRatio: number, firstRatio: number | null): SequenceRow {
@@ -64,7 +64,7 @@ function toyResults(): ResultsFile {
       sequences.push(row({ ...base, rotation_id: 'lentil_wheat', water_at_wheat_sowing_mm: 70, bare_days: 390, wind_exposed_bare_days: 65 }, 0.75, 0.5));
     }
   }
-  return { schema_version: '1.0', mock: true, generated_at: '', location_id: 'karapinar',
+  return { schema_version: '1.0', mock: true, generated_at: '', location_id: 'karapinar', scenario_id: 'baseline',
     soil: { awc_mm_per_m: { value: 1, source: '', type: 'model', verified: false }, properties: [], not_available_remotely: [] },
     sequences };
 }
@@ -188,5 +188,68 @@ describe('flipTable', () => {
       const by = Object.fromEntries(cells.filter((c) => c.depth_id === depth).map((c) => [c.tercile, c.rotation_id]));
       expect(by).toEqual({ dry: 'lentil_wheat', normal: 'lentil_wheat', wet: 'chickpea_wheat' });
     }
+  });
+});
+
+describe('priceRobustness (±20 % price sensitivity, assumption step)', () => {
+  it('toy data: lentil survives every ±20 % price change (hand-computed)', () => {
+    // Medium depth, default weights. Chickpea is blocked at any price (wheat 0.5 < 0.85 × 0.8), so it only moves the
+    // value denominator. Non-value score parts: fallow 0.3 + 0.2·60/90 + 0.1 = 0.5333; lentil 0.28125 + 0.2·60/65
+    // + 0.1·70/120 = 0.5242. Lentil wins iff 0.4·(v_lentil − v_fallow) > 0.0091, i.e. v_l − v_f > 0.0228.
+    // Values (p50, TL/da internal): fallow = 0.8·300·Pw + 400; lentil = 0.75·300·Pw + 300 + 0.5·100·Pl + 200;
+    // chickpea = 0.5·(300·Pw + 100·Pc) + 500.
+    //   wheat 12: fallow 3280, lentil 5200, chick 4800 → v_l − v_f = 1 − 3280/5200 = 0.369 → lentil
+    //   wheat 18: fallow 4720, lentil 6550, chick 5700 → 1 − 4720/6550 = 0.279 → lentil
+    //   chickpea 40 / 60: chick 4750 / 5750 < lentil 5875 → unchanged (1 − 4000/5875 = 0.319) → lentil
+    //   lentil 32: lentil 5475 (best), fallow 4000 → 1 − 4000/5475 = 0.269 → lentil
+    //   lentil 48: lentil 6275 → 1 − 4000/6275 = 0.363 → lentil
+    const r = priceRobustness(RES, SITE, 'medium', INP);
+    expect(r.depth_id).toBe('medium');
+    expect(r.recommended).toBe('lentil_wheat');
+    expect(r.tested_changes).toEqual([-0.2, 0.2]);
+    expect(r.sensitive_to).toEqual([]);
+    expect(r.stable).toBe(true);
+  });
+
+  // Value-only weights, wheat guardrail off (chickpea eligible), lentil price 36:
+  //   base: lentil 3375 + 300 + 0.5·100·36 + 200 = 5675 > chickpea 0.5·(4500 + 5000) + 500 = 5250 > fallow 4000 → lentil
+  //   chickpea 60: chickpea 0.5·(4500 + 6000) + 500 = 5750 > 5675 → chickpea_wheat  (the only flip)
+  //   chickpea 40: 4750 → lentil;  lentil 28.8: 5315 > 5250 → lentil;  lentil 43.2: 6035 → lentil
+  //   wheat 12: lentil 5000 > chickpea 4800 > fallow 3280;  wheat 18: lentil 6350 > chickpea 5700 → lentil
+  const CLOSE: DecisionInputs = {
+    ...INP,
+    crops: { ...INP.crops, lentil: { ref_yield_kg_per_da: 100, price_tl_per_kg: 36, support_tl_per_da: 200 } },
+    guardrails: { min_wheat_ratio_vs_baseline: 0, min_first_crop_ratio: 0.3 },
+  };
+  const VALUE_ONLY = { value: 1, yield: 0, soil: 0, water: 0 };
+
+  it('not stable when two eligible rotations are close on value: +20 % chickpea price flips it', () => {
+    const r = priceRobustness(RES, SITE, 'medium', CLOSE, VALUE_ONLY);
+    expect(r.recommended).toBe('lentil_wheat');
+    expect(r.stable).toBe(false);
+    expect(r.sensitive_to).toEqual([{ crop: 'chickpea', change: 0.2, recommended: 'chickpea_wheat' }]);
+  });
+
+  it('does not mutate the inputs', () => {
+    const before = JSON.stringify(CLOSE);
+    const beforeInp = JSON.stringify(INP);
+    priceRobustness(RES, SITE, 'medium', CLOSE, VALUE_ONLY, [-0.3, -0.1, 0.1, 0.3]);
+    priceRobustness(RES, SITE, 'medium', INP);
+    expect(JSON.stringify(CLOSE)).toBe(before);
+    expect(JSON.stringify(INP)).toBe(beforeInp);
+  });
+
+  it('exposes no money: no money-named keys, numbers are only the tested change fractions', () => {
+    const r = priceRobustness(RES, SITE, 'medium', CLOSE, VALUE_ONLY);
+    const keys: string[] = [];
+    const nums: number[] = [];
+    const walk = (x: unknown): void => {
+      if (typeof x === 'number') nums.push(x);
+      else if (Array.isArray(x)) x.forEach(walk);
+      else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) { keys.push(k); walk(v); }
+    };
+    walk(r);
+    expect(keys.filter((k) => /tl|price|income|cost|net|money/i.test(k))).toEqual([]);
+    expect(nums.every((v) => r.tested_changes.includes(v))).toBe(true);
   });
 });

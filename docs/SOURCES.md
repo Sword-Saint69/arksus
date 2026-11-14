@@ -17,6 +17,8 @@ Gümüş koda geçirdiğinde "Kodda" sütununa ✅ koyar.
 
 ## 2. Destekler (kuru, TL/da)
 
+> **15 Kas:** `defaults.yaml` artık ulusal: `crops.<ürün>.support_tl_per_da` (ilçe ayrımı yok). Aşağıdaki `support.<ilçe>.*` satırları arşiv; değerler ilçeden bağımsız aynı.
+
 > **14 Kas kararı:** sitede para gösterilmez. Bu değerler sadece `economics.ts` içinde "hangi rotasyon daha çok kazandırır" tahmini için **iç parametre** olarak kullanılır (`engine/config/defaults.yaml` → `crops`).
 
 | ID | Değer | Birim | Kaynak adı | Link | Erişim tarihi | Tür | Not (hangi kalemler) | Kodda |
@@ -120,7 +122,7 @@ Not (kuru/sulu ayrımı nasıl yapıldı, eksik yıllar): tablo doldurulamadı (
 
 ## 8. Toprak — SADECE Gümüş "SoilGrids olmadı" derse (manual_viewer)
 
-**Gerek kalmadı:** SoilGrids WCS ile çekildi → `data/soilgrids/{karapinar,develi}.json` (Gümüş, 14 Kas).
+**Gerek kalmadı:** SoilGrids WCS ile çekildi → `data/soilgrids/{13 lokasyon}.json` (Gümüş, 14 Kas).
 
 Koordinat Karapınar: 37.72, 33.48 · Develi: 38.43, 35.47
 

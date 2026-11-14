@@ -70,7 +70,25 @@ def _depth_classes() -> list[dict]:
     return copy.deepcopy(_FALLBACK_DEPTH_CLASSES)
 
 
-def _site_index(mock: bool, ts: str, weather_meta: dict[str, dict]) -> dict:
+BASELINE_SCENARIO = "baseline"
+
+
+def _scenarios(scenario_ids: list[str]) -> list[dict]:
+    """site_index.scenarios (E2): id, label, precip_factor, temp_shift_c; baseline first. Only the written ones."""
+    defined = {s["id"]: s for s in config.load("scenarios")["scenarios"]} if config.exists("scenarios") else {}
+    out = []
+    for sid in [BASELINE_SCENARIO] + [i for i in scenario_ids if i != BASELINE_SCENARIO]:
+        sc = defined.get(sid, {})
+        out.append({
+            "id": sid,
+            "label": sc.get("label", {"en": "Past climate", "tr": "Geçmiş iklim"}),
+            "precip_factor": float(sc.get("precip_factor", {}).get("value", 1.0)),
+            "temp_shift_c": float(sc.get("temp_shift_c", {}).get("value", 0.0)),
+        })
+    return out
+
+
+def _site_index(mock: bool, ts: str, weather_meta: dict[str, dict], scenario_ids: list[str] | None = None) -> dict:
     locs = []
     for loc in config.load("locations")["locations"]:
         meta = weather_meta.get(loc["id"], {})
@@ -88,6 +106,7 @@ def _site_index(mock: bool, ts: str, weather_meta: dict[str, dict]) -> dict:
         "rotations": rotations,
         "depth_classes": _depth_classes(),
         "start_years": list(START_YEARS),
+        "scenarios": _scenarios(scenario_ids or []),
     }
 
 
@@ -99,6 +118,29 @@ def _soil_properties(location_id: str, mock: bool) -> list[dict]:
     return mockmod.fake_soil_properties() if mock else []
 
 
+def _soil_extras(location_id: str) -> dict:
+    """Optional soil-card transparency (15 Nov): AWC estimates the engine did NOT use, and the texture class.
+    Lets the card say "SoilGrids' own estimate: 58.6 mm/m (not used, see note)"."""
+    path = config.DATA_DIR / "soilgrids" / f"{location_id}.json"
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8") as f:
+        rec = json.load(f)
+    extras = {}
+    alts = rec.get("awc_alternatives")
+    if alts:
+        extras["awc_alternatives"] = {
+            k: {"value": round(float(v["value"]), 1), "unit": v.get("unit", "mm/m"), "source": v["source"],
+                "type": v.get("type", "model"), "verified": bool(v.get("verified", False)),
+                **({"range_q05_q95": v["range_q05_q95"]} if "range_q05_q95" in v else {})}
+            for k, v in alts.items()
+        }
+    tex = rec.get("texture_0_100cm")
+    if tex and tex.get("usda_class"):
+        extras["texture_class"] = tex["usda_class"]
+    return extras
+
+
 def _awc(node: dict) -> dict:
     """AWC is mm per m of soil: 1 decimal, like other mm values (ARAYUZLER §10)."""
     node = dict(node)
@@ -107,14 +149,16 @@ def _awc(node: dict) -> dict:
     return node
 
 
-def _results(out: dict, mock: bool, ts: str) -> dict:
+def _results(out: dict, mock: bool, ts: str, scenario_id: str = BASELINE_SCENARIO) -> dict:
     return {
         **_header(mock, ts),
         "location_id": out["location_id"],
+        "scenario_id": scenario_id,
         "soil": {
             "awc_mm_per_m": _awc(out["awc_used"]),
             "properties": _soil_properties(out["location_id"], mock),
             "not_available_remotely": list(NOT_AVAILABLE_REMOTELY),
+            **_soil_extras(out["location_id"]),
         },
         "sequences": _round(out["sequences"]),
     }
@@ -146,19 +190,35 @@ def _smap(location_id: str, mock: bool, ts: str) -> dict:
 
 
 def write_all(outputs: dict[str, dict], checks: list[dict], mock: bool, out_dir: str = "web/public/data",
-              weather_meta: dict[str, dict] | None = None) -> None:
+              weather_meta: dict[str, dict] | None = None,
+              scenario_outputs: dict[str, dict[str, dict]] | None = None) -> None:
     """Write site_index, defaults, validation, results/*, ledger/*, smap/* under out_dir.
 
     weather_meta: optional {location_id: weather.attrs} for elevation_m and power_range.
+    scenario_outputs: optional {location_id: {scenario_id: EngineOutput}} (E2) -> results/{loc}__{scenario}.json;
+    the baseline stays in results/{loc}.json. Ledger and validation come from the baseline only.
     """
     # The default means the repo's web/public/data from any cwd; any other relative path is relative to cwd.
     out = config.WEB_DATA_DIR if out_dir == "web/public/data" else Path(out_dir).resolve()
     ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     meta = weather_meta or {}
-    _write(out / "site_index.json", _site_index(mock, ts, meta))
+    scen = scenario_outputs or {}
+    scenario_ids = sorted({sid for per in scen.values() for sid in per if sid != BASELINE_SCENARIO},
+                          key=lambda sid: _scenario_order(sid))
+    _write(out / "site_index.json", _site_index(mock, ts, meta, scenario_ids))
     _write(out / "defaults.json", _defaults(mock, ts))
     _write(out / "validation.json", {**_header(mock, ts), "checks": checks})
     for loc_id, o in outputs.items():
         _write(out / "results" / f"{loc_id}.json", _results(o, mock, ts))
         _write(out / "ledger" / f"{loc_id}.json", _ledger(o, mock, ts))
         _write(out / "smap" / f"{loc_id}.json", _smap(loc_id, mock, ts))
+        for sid in scenario_ids:
+            so = scen.get(loc_id, {}).get(sid)
+            if so is None:
+                raise ValueError(f"scenario {sid} missing for {loc_id}: every location needs every scenario")
+            _write(out / "results" / f"{loc_id}__{sid}.json", _results(so, mock, ts, scenario_id=sid))
+
+
+def _scenario_order(sid: str) -> int:
+    ids = [s["id"] for s in config.load("scenarios")["scenarios"]] if config.exists("scenarios") else []
+    return ids.index(sid) if sid in ids else len(ids)

@@ -25,6 +25,8 @@ Web tarafına başlarken `main`'i çek; aşağıdakiler hazır. Gümüş'ün dos
 
 ## 3. Veriyi yükleme
 
+> **Eskidi (14–15 Kas):** lokasyonlar artık 13 (§10), `defaults.json` karar parametreleri (§11), kontrol sayısı 6 (§12). Bu bölümdeki listeyi değil, onları kullan.
+
 | Dosya | Ne zaman | Not |
 |---|---|---|
 | `/data/site_index.json` | açılışta | lokasyonlar, 3 rotasyon (**baz senaryo her zaman ilk**), derinlik sınıfları, strateji metinleri |
@@ -37,6 +39,8 @@ Web tarafına başlarken `main`'i çek; aşağıdakiler hazır. Gümüş'ün dos
 Tipler: `fetch(...).then(r => r.json()) as Promise<SiteIndex>` vb. (`types.ts`). Lokasyon id'leri `karapinar`, `develi`; rotasyon `fallow_wheat`, `chickpea_wheat`, `lentil_wheat`; derinlik `shallow`, `medium`, `deep`.
 
 ## 4. Para hesabı: sadece `economics.ts`'i çağır
+
+> **Eskidi (14 Kas):** aşağıdaki kod örneği eski para API'si. Geçerli olan §11 (`decide`, `summarize(results, site, depthId)`, `flipTable`) ve §14 (`priceRobustness`). Bu bloğu kopyalama.
 
 ```ts
 import { inputsFromDefaults, summarize, flipTable, rankByPriority } from './lib/economics';
@@ -113,3 +117,21 @@ Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **
 - [ ] **Rotasyon kartları:** `summarize(results, site, depthId)` → su (mm ve m³/da), **buğday verimi yüzde olarak** ("su yeterli olsaydı alınabilecek verimin %54'ü"), ilk yıl ürünü yüzdesi, 2 yılda hasat sayısı (nadas 1, baklagil 2), çıplak / rüzgâra açık gün, azot bağlama. Para satırı yok.
 - [ ] **Flip ızgarası:** `flipTable(...)` artık her hücrede **önerilen rotasyonu** verir (`rotation_id` null olabilir), `close_call` hücrede işaretlenir.
 - [ ] `economics.ts`'te `sequenceMoney`, `breakEvenYield`, `rankByPriority` ve `Priorities` **yok**; yerine `decide`, `sequenceValue` (iç, gösterme) var. Tam imzalar: ARAYUZLER §9.
+
+## 12. SÖZLEŞME DEĞİŞTİ: senaryolar, 6. kontrol, toprak açıklamaları (15 Kas)
+
+- [ ] **Senaryo seçici (E2):** `site_index.scenarios` → `[{id, label, precip_factor, temp_shift_c}]`, ilk eleman `baseline`. Kullanıcı başka bir senaryo seçerse `results/{loc}__{id}.json`'ı yükle (aynı biçim) ve aynı `decide / summarize / flipTable` fonksiyonlarına ver. Başlık: "Aynı 24 yıl daha kurak ya da sıcak olsaydı?" / "What if the same 24 years were drier or warmer?". Mutlaka not: **"Projeksiyon değil, duyarlılık testi; ekim tarihleri sabit tutuldu."** Ledger (Grafik B) ve kanıt paneli sadece baseline için.
+- [ ] **Kanıt paneli artık 6 kontrol:** yeni `smap_anomaly` (SMAP ile modelin aylık anomalileri). SMAP verisi gelene kadar `pending` → "bekleniyor" göster.
+- [ ] `precip_vs_mgm` değeri artık IMERG (ikinci uydu tahmini) sütununu da içeriyor; metni olduğu gibi gösterebilirsin.
+- [ ] **Toprak kartı:** `results.soil.properties[].meaning` artık dolu (EN + TR, her özellik için tek cümle); kartta kullan.
+- `ResultsFile` tipine `scenario_id` eklendi.
+
+## 13. Toprak kartı: kullanılmayan AWC tahminleri (15 Kas)
+
+- [ ] `results.soil.awc_mm_per_m` = motorun **kullandığı** AWC (doku sınıfı → FAO-56 tablosu, taş düzeltmeli). Yanına isteğe bağlı `results.soil.awc_alternatives` ile karşılaştırma göster: "SoilGrids'in kendi tahmini: 58,6 mm/m · Saxton–Rawls: 131,4 mm/m (kullanılmadı; SoilGrids bu killi toprak için tarla kapasitesini düşük tahmin ediyor)". `results.soil.texture_class` (ör. "silty clay") kartın başlığında kullanılabilir. Alanlar yoksa gösterme.
+
+## 14. Öneri ne kadar sağlam? `priceRobustness` (15 Kas)
+
+- [ ] Öneri kartının altına küçük bir satır: `priceRobustness(results, site, depthId, inp, weights)` →
+  - `stable: true` → "Bu öneri fiyatlar ±%20 değişse de değişmiyor." / "This holds if prices move ±20 %."
+  - `stable: false` → her `sensitive_to` için: "Nohut fiyatı %20 artarsa öneri Nohut → Buğday olur." (fiyat ya da TL yazma; sadece ürün, yön ve yüzde). Nohut fiyatı en belirsiz parametre olduğu için bu satır önemli.

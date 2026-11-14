@@ -77,3 +77,5 @@ def test_pulled_values_within_physical_bounds(loc):
     assert tex["usda_class"] == sg.usda_texture_class(tex["clay"], tex["sand"], tex["silt"])
     assert 0 <= rec["cfvo_0_100cm_fraction"]["value"] < 1
     assert 50 <= rec["awc_alternatives"]["saxton_rawls_2006"]["value"] <= 250
+    for x in rec["properties"]:
+        assert x["meaning"]["en"] and "pending" not in x["meaning"]["en"] and "bekleniyor" not in x["meaning"]["tr"], x["id"]
