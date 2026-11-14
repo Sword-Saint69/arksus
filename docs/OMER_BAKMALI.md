@@ -90,3 +90,7 @@ Senin tarafında yapılması gerekenler:
 **13 lokasyonla gerçek koşu sonucu (14 Kas, Gümüş):** 42 dosya şemadan geçti, kütle dengesi 2808 sekansta 1,6e-12 mm. İki önemli gözlem:
 - [ ] **POWER yağış sapması bazı ilçelerde büyük** (`precip_vs_mgm`): Karaman **+83 %**, Eskişehir **+39 %**, Karapınar **+36 %**; diğer 10 ilçe −14…+13 %. Bu ilçelerde su ve nadas avantajı olduğundan büyük çıkıyor. Seçenekler: (a) sadece kanıt panelinde göster ve kartta "bu ilçede uydu yağışı istasyondan X % yüksek" uyarısı, (b) basit istasyon düzeltmesi: günlük POWER yağışını `MGM_normal / POWER_ortalama` oranıyla ölçekle (PLAN'da "etkinlik sonrası" listesinde). (b) motor girdisini değiştirir, karar senin; istersen ölçek katsayısını `references.yaml`'dan okuyabilirsin, değerleri ben veririm.
 - [ ] **Çıplak gün her ilçede aynı** (nadas 460, mercimek 310): tek takvim kullanıldığı için beklenen; §6'daki bölge takvimi kararı bunu da çözer.
+
+## 7. Bilgi: sitede para kalktı, karar modülü geldi (14 Kas)
+
+Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları puanlayıp öneri veriyor; senin çıktılarından `wheat.yield_ratio`, `first_crop.yield_ratio`, `water_at_wheat_sowing_mm`, `wind_exposed_bare_days` kullanılıyor. Engeller: ortanca buğday oranı < 0,85 × nadas sonrası buğday ya da ilk yıl ürünü ortanca oranı < 0,30 → öneri dışı. Bu yüzden **verim oranlarının ve takvimin doğruluğu artık önerinin kendisini belirliyor**; soğuk ilçeler için takvim (§6) önceliğini artırıyor.

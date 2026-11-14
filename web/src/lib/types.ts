@@ -102,11 +102,18 @@ export interface SmapFile extends FileHeader {
   monthly_series: { month_start: string; rootzone_wetness: number; surface_wetness: number }[];
 }
 
-// §4.4 defaults.json
-export interface CropDefaults { ym_kg_per_da: V; price_tl_per_kg: V; cost_tl_per_da: V; support_tl_per_da: V }
-export interface FallowDefaults { cost_tl_per_da: V; support_tl_per_da: V }
-export interface LocationDefaults { wheat: CropDefaults; chickpea: CropDefaults; lentil: CropDefaults; fallow: FallowDefaults }
-export interface DefaultsFile extends FileHeader { values: Record<LocationId, LocationDefaults> }
+// §4.4 defaults.json — decision parameters (14 Nov). National, same for every location.
+// Prices and supports are INTERNAL parameters: never render them or any TL amount.
+export interface CropParams { ref_yield_kg_per_da: V; price_tl_per_kg: V; support_tl_per_da: V }
+export interface DecisionParams {
+  weights: { value: V; yield: V; soil: V; water: V };
+  guardrails: { min_wheat_ratio_vs_baseline: V; min_first_crop_ratio: V };
+  close_call_margin: V;
+}
+export interface DefaultsFile extends FileHeader {
+  crops: { wheat: CropParams; chickpea: CropParams; lentil: CropParams; fallow: { support_tl_per_da: V } };
+  decision: DecisionParams;
+}
 
 // §4.5 validation.json
 export type CheckId = 'mass_balance' | 'et0_fao56_ex18' | 'pse_literature' | 'trial_ratio' | 'precip_vs_mgm';

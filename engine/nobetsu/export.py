@@ -125,16 +125,10 @@ def _ledger(out: dict, mock: bool, ts: str) -> dict:
 
 
 def _defaults(mock: bool, ts: str) -> dict:
-    values = copy.deepcopy(config.load("defaults")["values"])
-    if mock:
-        for crops in values.values():
-            for fields in crops.values():
-                for v in fields.values():
-                    if v.get("value") is None:
-                        v["value"] = mockmod.fake_defaults_value(v.get("unit", ""))
-                        v["source"] = mockmod.MOCK_SOURCE
-                        v["type"] = "assumption"
-    return {**_header(mock, ts), "values": values}
+    """Decision parameters (ARAYUZLER §4.4): crops (reference yield, price, support) + decision (weights, guardrails).
+    Prices are internal parameters; the site never shows money."""
+    cfg = copy.deepcopy(config.load("defaults"))
+    return {**_header(mock, ts), "crops": cfg["crops"], "decision": cfg["decision"]}
 
 
 def _smap(location_id: str, mock: bool, ts: str) -> dict:

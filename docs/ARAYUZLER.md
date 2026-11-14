@@ -90,7 +90,7 @@ Tüm YAML'lar `engine/config/` altında. Okuma: `nobetsu.config.load("crops")` �
 |---|---|---|
 | `locations.yaml` | Gümüş | id, name, district, province, lat, lon, note |
 | `rotations.yaml` | Gümüş (metin: Muhammet) | id, is_baseline, crops, label, soil_traits, strategy |
-| `defaults.yaml` | Gümüş (değer: Muhammet) | Ym, fiyat, maliyet, destek — lokasyon × ürün |
+| `defaults.yaml` | Gümüş | **Karar parametreleri (14 Kas):** ürün başına referans verim, fiyat, destek (ulusal, iç parametre) + öncelik ağırlıkları, verimlilik engelleri. Maliyet yok. |
 | `references.yaml` | Gümüş (değer: Muhammet) | deneme verimleri, PSE aralığı, MGM normalleri, sıcak gün eşiği |
 | `crops.yaml` | Ömer (takvim: Muhammet) | ekim, evre süreleri, Kcb, p, Zr_max, h_max, Ky |
 | `soil.yaml` | Ömer | derinlik sınıfları (id, depth_m, label), Ze, TEW/REW, yedek AWC |
@@ -98,10 +98,10 @@ Tüm YAML'lar `engine/config/` altında. Okuma: `nobetsu.config.load("crops")` �
 Her sayısal parametre **değer nesnesi (V)** biçimindedir (PLAN_MVP §4.4 ile aynı):
 
 ```yaml
-cost_tl_per_da:
-  value: 0
-  unit: "TL/da"
-  source: "Konya Ziraat Odası 2026 maliyet tablosu"
+ref_yield_kg_per_da:
+  value: 296
+  unit: "kg/da"
+  source: "TEPGE Buğday Durum-Tahmin Raporu 2025 (TÜİK)"
   source_url: "https://..."
   type: official | statistic | literature | assumption
   verified: false
@@ -109,7 +109,7 @@ cost_tl_per_da:
 ```
 
 **M0 netleştirmeleri (Gümüş):**
-- `value: null` = değer henüz kaynaklı değil (**pending**). Sitede sayı yerine "bekleniyor" gösterilir; `economics.ts` bunu 0 sayar. Mock build'de pending değerler sahte sayıyla ve `source: "MOCK ..."` ile doldurulur.
+- `value: null` = değer henüz kaynaklı değil (**pending**). Sitede sayı yerine "bekleniyor" gösterilir.
 - `soil.yaml` (Ömer) derinlik sınıflarını `depth_classes: [{id, depth_m, label: {en, tr}}]` olarak tutar (`depth_m` sayı veya V). Dosya yoksa export PLAN_MVP §4.1'deki 0.6 / 0.9 / 1.2 m değerlerini kullanır.
 - `references.yaml` anahtarları (Ömer `validate.py`'de bunları okur): `trial_yields_kg_per_da.{after_fallow, after_lentil, after_chickpea}`, `pse_range.{low, high}` (oran, 0–1), `mgm_annual_precip_mm.{karapinar, develi}` (+ `station`), `heat_threshold_c`. Hepsi V.
 
@@ -184,7 +184,7 @@ Biçim: PLAN_MVP §4. Dosyalar `web/public/data/` altında:
 |---|---|
 | `site_index.json` | sayfa açılınca |
 | `results/{location_id}.json` | lokasyon seçilince |
-| `defaults.json` | sayfa açılınca |
+| `defaults.json` | sayfa açılınca — karar parametreleri; **fiyat/destek asla ekranda gösterilmez** |
 | `validation.json` | sayfa açılınca |
 | `smap/{location_id}.json` | lokasyon seçilince (**her zaman vardır**; veri yoksa `available: false`, `latest: null`, listeler boş). Mock'ta Karapınar `available: true`, Develi `false` (iki UI durumu da denenebilsin) |
 | `ledger/{location_id}.json` | Grafik B görünür olunca (lazy) |
@@ -198,80 +198,59 @@ Netleştirmeler:
 
 ---
 
-## 9. Ekonomi API'si — `economics.ts` (Gümüş) → web (İsmail)
+## 9. Karar API'si — `economics.ts` (Gümüş) → web (İsmail)  — SÖZLEŞME DEĞİŞTİ 14 Kas
 
-İsmail **para hesabını kendisi yapmaz**; sadece bu fonksiyonları çağırır. Gümüş M0'da bu imzaları basit çalışan bir sürümle koyar; T+4'e kadar testli gerçek sürümle değiştirir. İmzalar değişmez.
+**Sitede para yok.** İsmail hiçbir TL, fiyat, gelir ya da maliyet göstermez ve puan hesabı yazmaz; sadece bu fonksiyonları çağırır.
+Fiyat, destek ve referans verim yalnızca `sequenceValue` içinde "hangi rotasyon çiftçiye daha çok kazandırır" tahmini için kullanılır.
+Bu tahmin, buğday verimi, toprak koruma ve su ile ağırlıklı puanda dengelenir; verimlilik engeline takılan rotasyon önerilmez.
 
 ```ts
 // web/src/lib/economics.ts
-import type { SiteIndex, ResultsFile, DefaultsFile, SequenceRow, Rotation } from './types';
-
-export type CropId = 'wheat' | 'chickpea' | 'lentil' | 'fallow';
-export type Badge = 'measured' | 'model' | 'official' | 'statistic' | 'literature' | 'assumption' | 'user';
-
-export interface CropInputs {
-  ym_kg_per_da?: number;      // fallow'da yok
-  price_tl_per_kg?: number;   // fallow'da yok
-  cost_tl_per_da: number;
-  support_tl_per_da: number;
-}
-export type LocationInputs = Partial<Record<CropId, CropInputs>>;
-
-export function inputsFromDefaults(d: DefaultsFile, locationId: string): LocationInputs;
+export interface DecisionInputs { crops: LocationInputs; weights: Weights; guardrails: Guardrails; close_call_margin: number }
+export interface Weights { value: number; yield: number; soil: number; water: number }   // kaydırıcılar; toplam 1'e ölçeklenir
+export function inputsFromDefaults(d: DefaultsFile): DecisionInputs;                       // defaults.json → girdiler (ulusal)
 
 export interface Range { p10: number; p50: number; p90: number }
-export function percentile(values: number[], p: number): number;   // p: 0–100, §10'daki yöntem
+export function percentile(values: number[], p: number): number;   // §10
 export function range(values: number[]): Range;
 
-export interface SequenceMoney {
-  start_year: number;
-  wheat_kg_per_da: number;
-  first_crop_kg_per_da: number | null;
-  income_tl_per_da: number;
-  cost_tl_per_da: number;
-  net_2yr_tl_per_da: number;
-}
-export function sequenceMoney(row: SequenceRow, rotation: Rotation, inp: LocationInputs): SequenceMoney;
+/** İÇ: 2 yıllık piyasa değeri (TL/da). ASLA gösterme. */
+export function sequenceValue(row: SequenceRow, rotation: Rotation, crops: LocationInputs): number;
 
-export function breakEvenYield(cost: number, support: number, price: number): number; // (cost − support) / price
-
-export interface RotationSummary {
-  rotation_id: string;
-  depth_id: string;
-  is_baseline: boolean;
-  nets: number[];                         // 24 değer, start_year sırasıyla (Grafik A)
-  net_2yr: Range;
-  loss_probability: number;               // 0–1
-  wheat_kg_per_da: Range;
-  first_crop_kg_per_da: Range | null;
+export interface RotationSummary {                 // kart: sadece tarım göstergeleri
+  rotation_id: string; depth_id: string; is_baseline: boolean;
+  harvests_in_two_years: number;                   // nadas 1, baklagil 2
   water_at_wheat_sowing_mm: Range;
-  bare_days_p50: number;
-  wind_exposed_bare_days_p50: number;
-  wheat_stress_days_p50: number;
-  wheat_break_even_kg_per_da: number;
-  delta_vs_baseline: {                    // baz senaryoda null
-    net_2yr_p50: number; water_p50: number; bare_days_p50: number; wind_exposed_p50: number;
-  } | null;
+  wheat_yield_ratio: Range;                        // 0–1: su sıkıntısı olmasa alınacak verimin payı
+  first_crop_yield_ratio: Range | null;            // nadasta null
+  bare_days_p50: number; wind_exposed_bare_days_p50: number; wheat_stress_days_p50: number;
+  delta_vs_baseline: { water_p50: number; wheat_yield_ratio_p50: number; bare_days_p50: number; wind_exposed_p50: number } | null;
 }
-export function summarize(results: ResultsFile, site: SiteIndex, depthId: string, inp: LocationInputs): RotationSummary[];
+export function summarize(results: ResultsFile, site: SiteIndex, depthId: string): RotationSummary[];
+
+export type BlockReason = 'wheat_yield_below_baseline' | 'first_crop_fails';
+export interface RankedRotation {
+  rotation_id: string; eligible: boolean; blocked: BlockReason[];
+  score: number;                                   // 0–1
+  parts: Weights;                                  // her biri 0–1, o ölçütte en iyiye göre
+  driver: keyof Weights;                           // puanı en çok belirleyen ölçüt ("neden?")
+}
+export interface Decision {
+  depth_id: string;
+  recommended: string | null;                      // "Önceliklerine göre bu arazi için en uygun"
+  runner_up: string | null;
+  close_call: boolean;                             // ilk iki uygun seçenek arasındaki fark < close_call_margin
+  ranking: RankedRotation[];                       // uygunlar (puan sırasıyla), sonra engellenenler
+}
+export function decide(results: ResultsFile, site: SiteIndex, depthId: string, inp: DecisionInputs, weights?: Weights, years?: Set<number>): Decision;
 
 export type Tercile = 'dry' | 'normal' | 'wet';
-export interface FlipCell { depth_id: string; tercile: Tercile; rotation_id: string; median_net: number; n_years: number }
-export function flipTable(results: ResultsFile, site: SiteIndex, inp: LocationInputs): FlipCell[]; // 9 hücre
-
-export interface Priorities { water: number; income: number; soil: number }  // 0–100, toplam 100
-export interface RankedRotation {
-  rotation_id: string;
-  score: number;                           // 0–1
-  driver: 'water' | 'income' | 'soil';     // sıralamayı en çok belirleyen ölçüt
-  parts: { water: number; income: number; soil: number };
-}
-export function rankByPriority(s: RotationSummary[], pr: Priorities): RankedRotation[]; // yüksekten düşüğe
+export interface FlipCell { depth_id: string; tercile: Tercile; rotation_id: string | null; close_call: boolean; n_years: number }
+export function flipTable(results: ResultsFile, site: SiteIndex, inp: DecisionInputs, weights?: Weights): FlipCell[]; // 9 hücre
 ```
 
-Para kuralı (PLAN_MVP §5.5): `income = Σ (yield_ratio × Ym × price) + Σ support`; `cost = cost[ilk yıl ürünü] + cost[wheat]`; nadas yılı: sadece destek ve maliyet.
-
----
+Puan kuralı: her ölçüt 24 yılın ortancası; `value` = ortanca `sequenceValue` (Σ oran × referans verim × fiyat + Σ destek; **maliyet yok**), `yield` = ortanca buğday verim oranı, `water` = ortanca ekimde su, `soil` = ortanca rüzgâra açık çıplak gün (az olan iyi). Her ölçüt en iyi rotasyona oranlanır (`x / en iyi`; toprakta `en iyi / x`), ağırlıklarla toplanır.
+Engeller (`defaults.yaml` → `decision.guardrails`): ortanca buğday oranı < 0,85 × nadas sonrası buğday → `wheat_yield_below_baseline`; ilk yıl ürünü ortanca oranı < 0,30 → `first_crop_fails`.
 
 ## 10. Ortak tanımlar (Python ve TypeScript aynı sonucu versin)
 
@@ -287,7 +266,7 @@ Para kuralı (PLAN_MVP §5.5): `income = Σ (yield_ratio × Ym × price) + Σ su
 
 | Kim | Neyi beklemeden ne ile çalışır |
 |---|---|
-| İsmail | `web/public/data/` altındaki mock JSON + M0 `economics.ts` |
+| İsmail | `web/public/data/` altındaki JSON + `economics.ts` karar API'si |
 | Gümüş | `mock.fake_run_location()` ile export/build; Ömer'in motoru gelince tek satır değişir |
 | Ömer | Sentetik hava `DataFrame`'i (§2 sütunları) ile testler; POWER önbelleği gelince gerçek sekans |
 | Muhammet | Hiçbir koda bağlı değil; `docs/SOURCES.md` satırlarını doldurur |
@@ -306,7 +285,7 @@ Mock sayılar "makul ama belli ki sahte" olur (ör. tüm yıllar düzgün bir e�
 | T+1 | Gümüş → İsmail | `types.ts`, mock JSON, `economics.ts` imzaları | İsmail PLAN §4'ten geçici yerel tip yazmaz, bekler; bu arada layout yapar |
 | T+2 | Gümüş → Ömer | POWER önbelleği + `load_weather()` | Ömer sentetik havayla devam eder |
 | T+2:45 | Gümüş → Ömer | `data/soilgrids/*.json` (AWC) | FAO-56 Tablo 19 yedek AWC (`assumption`) |
-| T+3 → T+5 | Muhammet → Gümüş | Fiyat, destek, maliyet, Ym (`SOURCES.md`) | `assumption` olarak kalır |
+| T+3 → T+5 | Muhammet → Gümüş | Fiyat, destek, referans verim (`SOURCES.md`; iç parametre) | yapıldı (14 Kas) |
 | T+6 | Muhammet → Ömer | Ekim/hasat takvimleri | FAO-56 başlangıç değerleri |
 | T+7 | Muhammet → Gümüş → Ömer | Deneme verimleri, PSE aralığı, MGM normalleri (`references.yaml`) | İlgili kontrol `pending` |
 | T+7:30 | Ömer → Gümüş | `run_location()` gerçek çıktı | M2 mock ile değil, kısmi gerçek veriyle |

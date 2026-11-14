@@ -97,3 +97,19 @@ Proje 2 noktadan **13 ile** genişledi (her ilden bir kuru tarım ilçesi): Kara
 - [ ] Dosya yükleme aynı: `results/{id}.json`, `smap/{id}.json` lokasyon seçilince; `ledger/{id}.json` lazy (~2 MB her biri, 13 lokasyonda toplam ~26 MB; sadece seçilen yüklenir).
 - **`main`'de 13 lokasyonlu gerçek veri var** (`mock: false`). Ömer'in bölge takvimi ve yağış düzeltmesi gelince aynı dosyalar yeniden üretilecek; biçim değişmeyecek.
 - [ ] **Yağış uyarısı:** `validation.json` → `precip_vs_mgm` her ilçe için uydu (POWER) ile yer istasyonu farkını verir. Karaman **+83 %**, Eskişehir +39 %, Karapınar +36 %. Lokasyon kartında bu fark ±%20'yi aşıyorsa görünür bir not göster: "Bu ilçede uydu yağışı istasyondan %X yüksek; su sonuçları iyimser olabilir." Ömer düzeltme eklerse bu not küçülür.
+
+## 11. SÖZLEŞME DEĞİŞTİ: sitede para yok, öneri var (14 Kas) — §4, §5'teki para maddelerinin yerine geçer
+
+Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **en uygun rotasyonu önerecek**; fiyat sadece arka planda "hangisi daha çok kazandırır" tahmininde kullanılacak, verimliliği bozan seçenekler engellenecek.
+
+- [ ] **Hiçbir yerde TL, fiyat, gelir, maliyet, kâr gösterme.** "Senin rakamların" (fiyat/maliyet giriş) paneli **kaldırıldı**. `defaults.json`'daki fiyat/destek değerlerini ekrana basma.
+- [ ] **Öneri kartı (sayfanın en üstü):** `decide(results, site, depthId, inputsFromDefaults(defaults), weights)` →
+  - `recommended`: "Önceliklerine göre bu arazi için en uygun: Mercimek → Buğday" / "Most suitable for this land under your priorities: …"
+  - `driver` (önerilen rotasyonun): "en çok etki eden: kazanç / buğday verimi / toprak koruma / su"
+  - `close_call: true` ise: "Sonuçlar yakın: {runner_up} de neredeyse aynı uygun."
+  - `recommended === null` ise (her şey engelli): "Bu koşullarda hiçbir seçenek verimlilik eşiklerini geçmiyor."
+- [ ] **Engellenen seçenekler** (`eligible: false`): kartta soluk göster + neden: `wheat_yield_below_baseline` → "Sonraki buğdayı nadas sonrasının %85'inin altına düşürüyor"; `first_crop_fails` → "İlk yıl ürünü çoğu yıl başarısız (ortanca verim %30'un altında)". Kazançlı olsa bile önerilmediğini açıkça yaz.
+- [ ] **Kaydırıcılar (4):** kazanç / buğday verimi / toprak / su; başlangıç değerleri `defaults.decision.weights` (0,40 / 0,30 / 0,20 / 0,10). Değişince `decide` ve `flipTable` yeniden çağrılır. Her ölçütün çubuğu: `parts` (0–1, "en iyiye göre").
+- [ ] **Rotasyon kartları:** `summarize(results, site, depthId)` → su (mm ve m³/da), **buğday verimi yüzde olarak** ("su yeterli olsaydı alınabilecek verimin %54'ü"), ilk yıl ürünü yüzdesi, 2 yılda hasat sayısı (nadas 1, baklagil 2), çıplak / rüzgâra açık gün, azot bağlama. Para satırı yok.
+- [ ] **Flip ızgarası:** `flipTable(...)` artık her hücrede **önerilen rotasyonu** verir (`rotation_id` null olabilir), `close_call` hücrede işaretlenir.
+- [ ] `economics.ts`'te `sequenceMoney`, `breakEvenYield`, `rankByPriority` ve `Priorities` **yok**; yerine `decide`, `sequenceValue` (iç, gösterme) var. Tam imzalar: ARAYUZLER §9.
