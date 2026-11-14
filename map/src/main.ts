@@ -11,6 +11,7 @@ import {
 } from './geo';
 import { featureContains, loadIslands, loadProvinces, type Feature } from './vector/features';
 import { Pilots } from './pilots';
+import { ProcessSim } from './sim/ProcessSim';
 import { parcelAt, parcelByNumber, TkgmError } from './tkgm';
 import { attachParcelSearch } from './ui/parcelSearch';
 import { applyStatic, getLang, setLang, t, type Key, type Lang } from './strings';
@@ -36,7 +37,17 @@ const scene = new THREE.Scene();
 const params = new URLSearchParams(location.hash.slice(1));
 const terrain = new Terrain(renderer, BASEMAPS.find((b) => b.id === params.get('b')) ?? BASEMAPS[0]);
 scene.add(terrain.group);
-const sky = createSky(terrain.shared.uFogColor.value);
+// The map is limited to Turkey (15 Nov): no tiles beyond this box, the camera
+// stays inside it, and sky, fog and the masked outside share one paper colour so
+// the edge of the box never shows.
+const PAPER = '#e9e6dc';
+const TR_BOX = { w: 25.2, e: 45.4, s: 35.4, n: 42.6 };
+const regionA = lonLatToMerc(TR_BOX.w, TR_BOX.s), regionB = lonLatToMerc(TR_BOX.e, TR_BOX.n);
+const REGION = { minX: regionA.x, minY: regionA.y, maxX: regionB.x, maxY: regionB.y };
+terrain.region = REGION;
+terrain.shared.uFogColor.value.set(PAPER);
+terrain.shared.uOutside.value.set(PAPER);
+const sky = createSky(terrain.shared.uFogColor.value, { zenith: '#c9d6de', space: PAPER });
 scene.add(sky.mesh);
 
 const vectors = new VectorScene();
@@ -44,6 +55,35 @@ const overlay = new OverlayManager(vectors, Math.min(8, renderer.capabilities.ge
 terrain.overlay = overlay;
 
 const cam = new MapCamera(canvas, terrain);
+{
+  const a = mercToSceneXZ(REGION.minX, REGION.maxY), b = mercToSceneXZ(REGION.maxX, REGION.minY);
+  cam.bounds = { minX: a.x, maxX: b.x, minZ: a.z, maxZ: b.z };
+  cam.maxDistance = 2.4e6;
+}
+
+/** Rasterise the 81 provinces once into the Turkey mask the terrain shader reads. */
+function buildTurkeyMask(provinces: Feature[]) {
+  const W = 4096;
+  const H = Math.round(W * (REGION.maxY - REGION.minY) / (REGION.maxX - REGION.minX));
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
+  const s = W / (REGION.maxX - REGION.minX);
+  ctx.setTransform(s, 0, 0, -s, -REGION.minX * s, REGION.maxY * s);
+  const p = new Path2D();
+  for (const f of provinces) for (const poly of f.polys) for (const r of poly) {
+    p.moveTo(r[0], r[1]);
+    for (let i = 2; i < r.length; i += 2) p.lineTo(r[i], r[i + 1]);
+    p.closePath();
+  }
+  ctx.fillStyle = '#fff';
+  ctx.fill(p, 'evenodd');
+  // A hairline stroke closes the slivers between neighbouring province borders.
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.2 / s;
+  ctx.stroke(p);
+  terrain.setMask(c, REGION);
+}
 let dirty = 4;
 const wake = (n = 3) => { dirty = Math.max(dirty, n); };
 cam.onChange = () => wake();
@@ -69,6 +109,7 @@ pilots.onLoaded = () => { refreshInspector(); $('.mock-banner').hidden = !pilots
 Promise.all([loadProvinces(), loadIslands(), pilots.init().catch((e) => { console.warn('NöbetSu data', e); return []; })])
   .then(([provinces, islands, pilotFeatures]) => {
     vectors.setProvinces(provinces);
+    buildTurkeyMask(provinces);
     vectors.setIslands(islands);
     vectors.setPilots(pilotFeatures);
     $('#island-count').textContent = `${islands.length} · OSM`;
@@ -89,8 +130,8 @@ const hashView = parseView();
 if (hashView) {
   cam.flyTo(hashView.lon, hashView.lat, { distance: hashView.d, heading: hashView.h, pitch: hashView.p, duration: 0 });
 } else {
-  cam.flyTo(35, 39, { distance: 2.2e7, pitch: 0, heading: 0, duration: 0 });
-  setTimeout(() => cam.flyTo(35.2, 38.2, { distance: 1.45e6, pitch: THREE.MathUtils.degToRad(38), heading: 0, duration: 3200 }), 900);
+  cam.flyTo(35.3, 39.0, { distance: 2.3e6, pitch: 0, heading: 0, duration: 0 });
+  setTimeout(() => cam.flyTo(35.3, 38.4, { distance: 1.5e6, pitch: THREE.MathUtils.degToRad(40), heading: 0, duration: 2600 }), 700);
 }
 
 // Frame loop -------------------------------------------------------------------
@@ -371,6 +412,7 @@ function refreshInspector() {
     setScenario: (id) => { pilots.scenario = id; refreshInspector(); },
     setWeight: (k, v) => { pilots.setWeight(k, v); refreshInspector(); },
     resetWeights: () => { pilots.resetWeights(); refreshInspector(); },
+    simulate: (f) => { openSim(f); },
     select: (f) => { active = f; if (!vectors.selected.has(f.id)) select(f); else refreshInspector(); },
   });
 }
@@ -634,6 +676,26 @@ function restoreSelectionFromHash() {
       refreshInspector();
       writeHash();
     }).catch(() => toast(t('psNotFound')));
+  }
+}
+
+// Process simulation -----------------------------------------------------------
+let sim: ProcessSim | null = null;
+async function openSim(f: Feature) {
+  if (sim || !pilots.site) return;
+  const id = String(f.props.location_id);
+  toast(t('simLoading'));
+  try {
+    const [ledger, results] = await Promise.all([pilots.ledger(id), pilots.baselineResults(id)]);
+    hideToast();
+    // The map keeps its state underneath; the simulation is a modal on top.
+    sim = new ProcessSim($('#app'), {
+      site: pilots.site, locationName: f.name, results, ledger, depth: pilots.depth,
+      showBaselineNote: pilots.scenario !== 'baseline',
+    }, () => { sim = null; wake(); });
+  } catch (e) {
+    console.warn('ledger', e);
+    toast(t('simFailed'));
   }
 }
 

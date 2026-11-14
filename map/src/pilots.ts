@@ -5,7 +5,7 @@
 // 15 Nov: climate scenarios (E2), the decision module (priorities → ranking, guardrails,
 // close call, price robustness, flip table) and the evidence panel (validation.json).
 
-import type { DefaultsFile, DepthId, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
+import type { DefaultsFile, DepthId, LedgerFile, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
 import {
   decide, flipTable, inputsFromDefaults, priceRobustness, summarize,
   type Decision, type DecisionInputs, type FlipCell, type PriceRobustness, type Weights,
@@ -32,6 +32,7 @@ export class Pilots {
   private inputs: DecisionInputs | null = null;
   private results = new Map<string, ResultsFile>();   // key: `${id}__${scenario}`
   private smap = new Map<string, SmapFile>();
+  private ledgers = new Map<string, Promise<LedgerFile>>();
   private loading = new Map<string, Promise<void>>();
   onLoaded: () => void = () => {};
 
@@ -89,6 +90,27 @@ export class Pilots {
       moneyPending: false, scenario: this.scenario, weights: this.weights, decision, robustness, flip,
       validation: this.validation,
     };
+  }
+
+  /** Weekly water ledger for the process simulation (baseline climate only, per contract). */
+  ledger(id: string): Promise<LedgerFile> {
+    let p = this.ledgers.get(id);
+    if (!p) {
+      p = getJSON<LedgerFile>(`ledger/${id}.json`);
+      p.catch(() => this.ledgers.delete(id));
+      this.ledgers.set(id, p);
+    }
+    return p;
+  }
+
+  /** Baseline results for a district (the simulation always shows the historical climate). */
+  async baselineResults(id: string): Promise<ResultsFile> {
+    const key = `${id}__baseline`;
+    const hit = this.results.get(key);
+    if (hit) return hit;
+    const r = await getJSON<ResultsFile>(resultsPath(id, 'baseline'));
+    this.results.set(key, r);
+    return r;
   }
 
   /** Nearest pilot point and its ground distance, if within reach of the district. */
