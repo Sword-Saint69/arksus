@@ -1,6 +1,6 @@
 # NöbetSu
 
-**Fallow saves water but leaves the soil bare. See the trade-off — water, soil and lira — across 24 years of NASA climate.**
+**Fallow saves water but leaves the soil bare. NöbetSu weighs water, soil, yield and what the farmer can earn across 24 years of NASA climate, and shows which rotation suits the land best.**
 
 NASA Space Apps Challenge 2026 · *Field Shift: Adapting Farms with NASA Data*
 
@@ -17,9 +17,9 @@ For **13 districts** (one per Central Anatolian province), **3 soil depth classe
 - **Water:** plant-available water left in the soil at wheat sowing, and the months when wheat is under water or heat stress.
 - **Soil:** bare days per month and windy, dry, bare days (wind-exposure count); nitrogen-fixing crops; a regional soil card from SoilGrids.
 - **Yield:** the range of wheat and legume yields that water allows (P10 / P50 / P90).
-- **Money:** the two-year gross margin range and the chance of a loss, computed in the browser with editable prices, costs and supports.
+- **Recommendation:** the rotation most suitable for this land under the farmer's priorities (earnings, wheat yield, soil, water). Prices and supports are used **internally** to judge what earns more; the site shows **no money**. Rotations that cut the next wheat below 85 % of after-fallow wheat, or whose year-1 crop fails in the median year, are **blocked** whatever they would earn.
 
-It is **not** a yield forecast for one field, a price forecast or a fertiliser advisor, and it does not tell the farmer what to plant. It shows the options side by side; the decision stays with the farmer and local experts.
+It is **not** a yield forecast for one field, a price forecast or a fertiliser advisor. Every recommendation shows its main reason, the blocked options and whether the result is a close call; the final decision stays with the farmer and local experts.
 
 ---
 
@@ -30,9 +30,9 @@ It is **not** a yield forecast for one field, a price forecast or a fertiliser a
 | Engine (FAO-56 ET₀, two-layer dual-Kc water balance, yield ratio, soil indicators) | done, 13 districts |
 | Real data in `web/public/data/` (`mock: false`) | done, tag `v0.1` (2 districts), extended to 13 |
 | Validation checks (5) | 2 pass, 3 info |
-| Economics (`web/src/lib/economics.ts`) | done, unit-tested |
-| Prices, supports, validation references | sourced (`docs/SOURCES.md`) |
-| **Production costs and attainable yields (Ym)** | **not yet found** → stored as `null`, shown as "pending" |
+| Decision module (`web/src/lib/economics.ts`: score, guardrails, recommendation) | done, unit-tested |
+| Reference yields, prices, supports (internal parameters), validation references | sourced (`docs/SOURCES.md`) |
+| Production costs | not used (team decision 14 Nov: no money shown; costs not sourced) |
 | NASA SMAP soil wetness | requested from AppEEARS, not yet in the data (`available: false`) |
 | Web site (React) | not started yet |
 
@@ -43,12 +43,12 @@ It is **not** a yield forecast for one field, a price forecast or a fertiliser a
 ```
 NASA POWER (daily weather, 2000→) ─┐
 SoilGrids 2.0 (soil, 250 m) ───────┼─► engine/ (Python, offline) ─► web/public/data/*.json ─► web/ (static React site)
-engine/config/*.yaml (crops, soil, ┘     FAO-56 water balance,          contract: docs/contract/     economics in the browser
- locations, prices, references)          yield ratio Ya/Ym                                         (editable inputs)
+engine/config/*.yaml (crops, soil, ┘     FAO-56 water balance,          contract: docs/contract/     decision in the browser
+ locations, prices, references)          yield ratio Ya/Ym                                         (priority sliders)
 ```
 
 - The Python engine computes **physical results only** (water, ET, yield ratio 0–1). It runs once and writes JSON.
-- The browser turns ratios into kg/da and TL/da with the user's own prices, costs, supports and Ym. No server, no database, no live API calls.
+- The browser scores each rotation (earnings estimate from yield ratio × reference yield × price + support, wheat yield, soil, water), applies the guardrails and names the most suitable rotation. No TL is displayed. No server, no database, no live API calls.
 - Every number carries a source and a type badge: `measured`, `model`, `official`, `statistic`, `literature`, `assumption`, `user`. Values not yet sourced are `null` and shown as pending, never as a number.
 
 ### Engine in short
@@ -104,7 +104,7 @@ Raw downloads are cached in `data/` and committed, so `make data` needs no netwo
 
 ```
 engine/
-  config/        locations, crops, soil, rotations (texts), defaults (prices…), references (validation)
+  config/        locations, crops, soil, rotations (texts), defaults (decision parameters), references (validation)
   nobetsu/       power, soilgrids, et0, waterbalance, rotations, yieldmodel, indicators, runner, validate, export, build, mock
   tests/         pytest
 web/
@@ -127,7 +127,7 @@ docs/            PLAN_MVP.md, ARAYUZLER.md (interfaces), contract/*.schema.json,
 | **ESA WorldCover 2021** (10 m) | check that each point lies on cropland | AWS open data |
 | FAO-56 (Allen et al. 1998), FAO-33 | method and crop/soil parameters | [fao.org/4/x0490e](https://www.fao.org/4/x0490e/x0490e00.htm) |
 | Gültekin et al. 2017, KSÜ Doğa Bil. Derg. 20: 283–287 | Konya dryland trial (wheat after fallow / lentil / chickpea) | [doi:10.18016/ksudobil.349258](https://doi.org/10.18016/ksudobil.349258) |
-| TMO 2026, Ministry of Agriculture 2026 supports | default prices and supports | see `docs/SOURCES.md` |
+| TEPGE/TÜİK national yields, TMO 2026 prices, 2026 supports | internal decision parameters (never displayed) | see `docs/SOURCES.md` |
 
 Every value, its link and access date are listed in `docs/SOURCES.md`; the YAML files repeat them next to each number.
 
@@ -155,7 +155,7 @@ Every value, its link and access date are listed in `docs/SOURCES.md`; the YAML 
 - **Nitrogen fixation** is shown as a trait only; no kg N/da is estimated (needs a soil test).
 - Phosphorus, potassium, micronutrients and compaction cannot be estimated from satellites; the site says so.
 - ESA WorldCover does not separate irrigated from rainfed cropland.
-- **Costs and attainable yields (Ym) are not yet sourced**; until they are, money results are incomplete and marked as such.
+- **Earnings are an internal estimate** from national reference yields, 2026 prices and supports; production costs are not included. The chickpea price (one exchange, Feb 2026) is the least certain parameter and pushes several districts towards chickpea.
 - Supports are national 2026 amounts (basic + planned production); conditional extras are not included.
 
 ---
@@ -165,7 +165,7 @@ Every value, its link and access date are listed in `docs/SOURCES.md`; the YAML 
 | Person | Role |
 |---|---|
 | Ömer | engine and science |
-| Gümüş | data, contract, economics, delivery |
+| Gümüş | data, contract, decision module, delivery |
 | İsmail | web site |
 | Muhammet | research, sources, pitch |
 

@@ -7,6 +7,8 @@ Gümüş koda geçirdiğinde "Kodda" sütununa ✅ koyar.
 
 ## 1. Fiyatlar
 
+> **14 Kas kararı:** sitede para gösterilmez. Bu değerler sadece `economics.ts` içinde "hangi rotasyon daha çok kazandırır" tahmini için **iç parametre** olarak kullanılır (`engine/config/defaults.yaml` → `crops`).
+
 | ID | Değer | Birim | Kaynak adı | Link | Erişim tarihi | Tür | Not | Kodda |
 |---|---|---|---|---|---|---|---|---|
 | price.wheat | 16,5 (16.500 TL/ton) | TL/kg | TMO 2026 hububat alım fiyatı | https://www.tarimorman.gov.tr/Haber/7092/2026-Yili-Hububat-Alim-Ve-Satis-Fiyatlari-Belirlendi | 2026-11-14 | official | grup/sınıf: 2. grup ekmeklik ve makarnalık (1. grup 16.750 TL/ton); 2 Haziran 2026 (Gümüş) | ✅ |
@@ -14,6 +16,8 @@ Gümüş koda geçirdiğinde "Kodda" sütununa ✅ koyar.
 | price.lentil | 32 (32.000 TL/ton) | TL/kg | TMO 2026 natürel yeşil mercimek alım fiyatı (haber) | https://www.cnbce.com/haberler/yesil-mercimekte-uretim-yuzde-62-artti-tmo-alim-fiyatini-acikladi-h36052 | 2026-11-14 | official | bülten tarihi, kırmızı/yeşil: yeşil; alım 31 Ağustos 2026'dan itibaren; kırmızı mercimek 2026 fiyatı bulunamadı; TMO duyurusu doğrudan görülmedi (Gümüş) | ✅ |
 
 ## 2. Destekler (kuru, TL/da)
+
+> **14 Kas kararı:** sitede para gösterilmez. Bu değerler sadece `economics.ts` içinde "hangi rotasyon daha çok kazandırır" tahmini için **iç parametre** olarak kullanılır (`engine/config/defaults.yaml` → `crops`).
 
 | ID | Değer | Birim | Kaynak adı | Link | Erişim tarihi | Tür | Not (hangi kalemler) | Kodda |
 |---|---|---|---|---|---|---|---|---|
@@ -28,6 +32,8 @@ Gümüş koda geçirdiğinde "Kodda" sütununa ✅ koyar.
 
 ## 3. Maliyetler (kira hariç, TL/da)
 
+> **Kaldırıldı (14 Kas kararı):** maliyet kullanılmıyor; kaynak da bulunamamıştı. Satırlar arşiv için duruyor.
+
 | ID | Değer | Birim | Kaynak adı | Link | Erişim tarihi | Tür | Not (yıl) | Kodda |
 |---|---|---|---|---|---|---|---|---|
 | cost.karapinar.wheat | bulunamadı | TL/da | — | — | 2026-11-14 | assumption | denenen: Konya/Karaman/Kayseri ziraat odası 2026, TZOB, ZMO, haberler; Orta Anadolu kuru dekar maliyeti yok (yalnız Adana buğday 2026 net 5.867 TL/da, kullanılmadı) (Gümüş) | YAML'da boş (pending) |
@@ -40,6 +46,9 @@ Gümüş koda geçirdiğinde "Kodda" sütununa ✅ koyar.
 | cost.develi.fallow | bulunamadı | TL/da | — | — | 2026-11-14 | assumption | denenen: Konya/Karaman/Kayseri ziraat odası 2026, TZOB, ZMO, haberler; Orta Anadolu kuru dekar maliyeti yok (yalnız Adana buğday 2026 net 5.867 TL/da, kullanılmadı) (Gümüş) | YAML'da boş (pending) |
 
 ## 4. Verimler — TÜİK ilçe, kuru (kg/da)
+
+> **14 Kas:** Ym yerine ürün başına **ulusal referans verim** kullanılıyor (iç parametre, ürünleri kıyaslamak için):
+> buğday **296 kg/da** (TEPGE Buğday Durum-Tahmin 2025, TÜİK; rapor metninde görüldü) · nohut **125 kg/da** (575 bin t ÷ 4,6 milyon da, TEPGE Nohut Temmuz 2025; arama özetinden) · mercimek **169 kg/da** (405 bin t ÷ 2,4 milyon da kırmızı mercimek, TEPGE Mercimek Temmuz 2025; arama özetinden, rapor tablosundaki 1,25 t/ha ile tutarsız). Aşağıdaki ilçe tablosu artık zorunlu değil; doldurulursa ilçe bazında referans verime geçilebilir.
 
 Kaynak: TÜİK Bitkisel Üretim İstatistikleri · Link: https://biruni.tuik.gov.tr/medas/?kn=92&locale=tr · Erişim tarihi: 2026-11-14 · Tür: statistic
 **Durum (Gümüş):** bulunamadı. TÜİK ilçe veritabanı etkileşimli, otomatik okunamadı. Tek bulunan: Konya yatırım ofisi Karapınar profili, TÜİK 2018: buğday (durum hariç) ekilen 178.562 da, üretim 76.893 t (sulu+kuru karışık, kullanılmadı). `ym.*` YAML'da boş (pending).

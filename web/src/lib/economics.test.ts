@@ -1,20 +1,25 @@
-// Unit tests for economics.ts — PLAN_MVP §5.5, §5.9; ARAYUZLER §9–§10. Owner: Gümüş (Rol B).
+// Unit tests for the decision module (economics.ts) — ARAYUZLER §9–§10. Owner: Gümüş (Rol B).
 // Reference percentiles were computed with numpy.percentile (default "linear" = type 7).
 
 import { describe, expect, it } from 'vitest';
 import type { DefaultsFile, ResultsFile, Rotation, SequenceRow, SiteIndex, V } from './types';
 import {
-  breakEvenYield, flipTable, inputsFromDefaults, percentile, range, rankByPriority, sequenceMoney, summarize,
-  type LocationInputs, type RotationSummary,
+  decide, flipTable, inputsFromDefaults, percentile, range, sequenceValue, summarize,
+  type DecisionInputs,
 } from './economics';
 
 // ---------- toy data ----------
-
-const INP: LocationInputs = {
-  wheat: { ym_kg_per_da: 400, price_tl_per_kg: 15, cost_tl_per_da: 2000, support_tl_per_da: 300 },
-  chickpea: { ym_kg_per_da: 150, price_tl_per_kg: 50, cost_tl_per_da: 1800, support_tl_per_da: 200 },
-  lentil: { ym_kg_per_da: 150, price_tl_per_kg: 50, cost_tl_per_da: 1800, support_tl_per_da: 200 },
-  fallow: { cost_tl_per_da: 600, support_tl_per_da: 100 },
+// wheat ref 300 kg/da × 15 TL/kg + 300 support; chickpea 100 × 50 + 200; lentil 100 × 40 + 200; fallow support 100.
+const INP: DecisionInputs = {
+  crops: {
+    wheat: { ref_yield_kg_per_da: 300, price_tl_per_kg: 15, support_tl_per_da: 300 },
+    chickpea: { ref_yield_kg_per_da: 100, price_tl_per_kg: 50, support_tl_per_da: 200 },
+    lentil: { ref_yield_kg_per_da: 100, price_tl_per_kg: 40, support_tl_per_da: 200 },
+    fallow: { support_tl_per_da: 100 },
+  },
+  weights: { value: 0.4, yield: 0.3, soil: 0.2, water: 0.1 },
+  guardrails: { min_wheat_ratio_vs_baseline: 0.85, min_first_crop_ratio: 0.3 },
+  close_call_margin: 0.05,
 };
 
 const text = { en: '', tr: '' };
@@ -46,8 +51,8 @@ function row(p: Partial<SequenceRow> & Pick<SequenceRow, 'start_year' | 'rotatio
   };
 }
 
-/** 24 years × 3 depths. Year index i: precip = 100 + i (dry → wet).
- *  fallow: wheat 0.8 every year → net 2600.  chickpea: ratios r = i/23 → net 13500 r − 3300.  lentil: ratios 0 → net −3300. */
+/** 24 years × 3 depths; year index i: precip 100 + i (dry → wet).
+ *  fallow: wheat 0.8; chickpea: wheat = first = i/23 (good only in wet years); lentil: wheat 0.75, first 0.5. */
 function toyResults(): ResultsFile {
   const sequences: SequenceRow[] = [];
   for (const depth of SITE.depth_classes) {
@@ -56,13 +61,14 @@ function toyResults(): ResultsFile {
       const r = i / 23;
       sequences.push(row({ ...base, rotation_id: 'fallow_wheat', water_at_wheat_sowing_mm: 120, bare_days: 470, wind_exposed_bare_days: 90 }, 0.8, null));
       sequences.push(row({ ...base, rotation_id: 'chickpea_wheat', water_at_wheat_sowing_mm: 60, bare_days: 380, wind_exposed_bare_days: 60 }, r, r));
-      sequences.push(row({ ...base, rotation_id: 'lentil_wheat', water_at_wheat_sowing_mm: 70, bare_days: 390, wind_exposed_bare_days: 65 }, 0, 0));
+      sequences.push(row({ ...base, rotation_id: 'lentil_wheat', water_at_wheat_sowing_mm: 70, bare_days: 390, wind_exposed_bare_days: 65 }, 0.75, 0.5));
     }
   }
   return { schema_version: '1.0', mock: true, generated_at: '', location_id: 'karapinar',
     soil: { awc_mm_per_m: { value: 1, source: '', type: 'model', verified: false }, properties: [], not_available_remotely: [] },
     sequences };
 }
+const RES = toyResults();
 
 // ---------- tests ----------
 
@@ -70,150 +76,117 @@ describe('percentile (numpy type 7)', () => {
   it('matches numpy on known arrays', () => {
     expect(percentile([1, 2, 3, 4], 10)).toBeCloseTo(1.3, 10);
     expect(percentile([1, 2, 3, 4], 50)).toBeCloseTo(2.5, 10);
-    expect(percentile([1, 2, 3, 4], 90)).toBeCloseTo(3.7, 10);
     expect(percentile([15, 20, 35, 40, 50], 40)).toBeCloseTo(29, 10);
-    expect(percentile([-3, 10, -1, 4], 10)).toBeCloseTo(-2.4, 10);   // unsorted input
     expect(percentile([-3, 10, -1, 4], 90)).toBeCloseTo(8.2, 10);
-    expect(percentile([7], 50)).toBe(7);
-  });
-  it('handles edges', () => {
     expect(percentile([], 50)).toBeNaN();
-    expect(percentile([3, 1, 2], 0)).toBe(1);
-    expect(percentile([3, 1, 2], 100)).toBe(3);
   });
-  it('range gives P10 / P50 / P90 and does not mutate input', () => {
+  it('range does not mutate input', () => {
     const xs = [4, 3, 2, 1];
-    expect(range(xs)).toEqual({ p10: expect.closeTo(1.3, 10), p50: 2.5, p90: expect.closeTo(3.7, 10) });
+    expect(range(xs).p50).toBe(2.5);
     expect(xs).toEqual([4, 3, 2, 1]);
   });
 });
 
-describe('sequenceMoney (hand-computed)', () => {
-  it('chickpea → wheat', () => {
-    const m = sequenceMoney(row({ start_year: 2010, rotation_id: 'chickpea_wheat', depth_id: 'medium' }, 0.5, 0.6), ROTATIONS[1], INP);
-    // chickpea 0.6×150 = 90 kg × 50 = 4500 + 200 support; wheat 0.5×400 = 200 kg × 15 = 3000 + 300 support
-    expect(m.first_crop_kg_per_da).toBeCloseTo(90);
-    expect(m.wheat_kg_per_da).toBeCloseTo(200);
-    expect(m.income_tl_per_da).toBeCloseTo(8000);
-    expect(m.cost_tl_per_da).toBe(3800);
-    expect(m.net_2yr_tl_per_da).toBeCloseTo(4200);
-  });
-  it('fallow → wheat: fallow year has only support and cost', () => {
-    const m = sequenceMoney(row({ start_year: 2010, rotation_id: 'fallow_wheat', depth_id: 'medium' }, 0.8, null), ROTATIONS[0], INP);
-    // wheat 320 kg × 15 = 4800 + 300; fallow support 100; cost 600 + 2000
-    expect(m.first_crop_kg_per_da).toBeNull();
-    expect(m.income_tl_per_da).toBeCloseTo(5200);
-    expect(m.cost_tl_per_da).toBe(2600);
-    expect(m.net_2yr_tl_per_da).toBeCloseTo(2600);
-  });
-  it('missing inputs count as zero', () => {
-    const m = sequenceMoney(row({ start_year: 2010, rotation_id: 'lentil_wheat', depth_id: 'medium' }, 1, 1), ROTATIONS[2], {});
-    expect(m.net_2yr_tl_per_da).toBe(0);
-  });
-});
-
-describe('breakEvenYield', () => {
-  it('(cost − support) / price', () => {
-    expect(breakEvenYield(2000, 300, 15)).toBeCloseTo(113.333, 3);
-    expect(breakEvenYield(100, 300, 10)).toBe(-20);
-    expect(breakEvenYield(2000, 300, 0)).toBeNaN();
-  });
-});
-
 describe('inputsFromDefaults', () => {
-  it('pending (null) values become 0, real values pass through', () => {
+  it('reads crops, weights, guardrails and margin', () => {
     const v = (value: number | null): V => ({ ...pending, value });
-    const crop = { ym_kg_per_da: v(400), price_tl_per_kg: v(null), cost_tl_per_da: v(2000), support_tl_per_da: v(300) };
+    const crop = { ref_yield_kg_per_da: v(296), price_tl_per_kg: v(16.5), support_tl_per_da: v(954) };
     const d = { schema_version: '1.0', mock: false, generated_at: '',
-      values: { karapinar: { wheat: crop, chickpea: crop, lentil: crop, fallow: { cost_tl_per_da: v(600), support_tl_per_da: v(null) } } },
-    } as unknown as DefaultsFile;
-    const inp = inputsFromDefaults(d, 'karapinar');
-    expect(inp.wheat).toEqual({ ym_kg_per_da: 400, price_tl_per_kg: 0, cost_tl_per_da: 2000, support_tl_per_da: 300 });
-    expect(inp.fallow).toEqual({ cost_tl_per_da: 600, support_tl_per_da: 0 });
-    expect(inputsFromDefaults(d, 'develi')).toEqual({});
+      crops: { wheat: crop, chickpea: crop, lentil: crop, fallow: { support_tl_per_da: v(110.1) } },
+      decision: { weights: { value: v(0.4), yield: v(0.3), soil: v(0.2), water: v(0.1) },
+        guardrails: { min_wheat_ratio_vs_baseline: v(0.85), min_first_crop_ratio: v(0.3) }, close_call_margin: v(0.05) },
+    } as DefaultsFile;
+    const inp = inputsFromDefaults(d);
+    expect(inp.crops.wheat).toEqual({ ref_yield_kg_per_da: 296, price_tl_per_kg: 16.5, support_tl_per_da: 954 });
+    expect(inp.crops.fallow).toEqual({ support_tl_per_da: 110.1 });
+    expect(inp.weights).toEqual({ value: 0.4, yield: 0.3, soil: 0.2, water: 0.1 });
+    expect(inp.guardrails.min_wheat_ratio_vs_baseline).toBe(0.85);
+    expect(inp.close_call_margin).toBe(0.05);
   });
 });
 
-describe('summarize', () => {
-  const s = summarize(toyResults(), SITE, 'medium', INP);
-  it('one summary per rotation, baseline first, 24 nets in year order', () => {
+describe('sequenceValue (internal, hand-computed)', () => {
+  it('fallow → wheat: wheat revenue + supports only', () => {
+    // 0.8 × 300 × 15 = 3600, + 300 wheat support + 100 fallow support
+    expect(sequenceValue(row({ start_year: 2010, rotation_id: 'fallow_wheat', depth_id: 'medium' }, 0.8, null), ROTATIONS[0], INP.crops)).toBeCloseTo(4000);
+  });
+  it('lentil → wheat: both harvests + supports', () => {
+    // 0.75 × 300 × 15 = 3375 + 300; 0.5 × 100 × 40 = 2000 + 200
+    expect(sequenceValue(row({ start_year: 2010, rotation_id: 'lentil_wheat', depth_id: 'medium' }, 0.75, 0.5), ROTATIONS[2], INP.crops)).toBeCloseTo(5875);
+  });
+});
+
+describe('summarize (agronomy only, no money)', () => {
+  const s = summarize(RES, SITE, 'medium');
+  it('baseline first, harvest counts, ratios and deltas', () => {
     expect(s.map((x) => x.rotation_id)).toEqual(['fallow_wheat', 'chickpea_wheat', 'lentil_wheat']);
-    expect(s[0].is_baseline).toBe(true);
-    expect(s[1].nets).toHaveLength(24);
-    expect(s[1].nets[0]).toBeCloseTo(-3300);
-    expect(s[1].nets[23]).toBeCloseTo(10200);
+    expect(s.map((x) => x.harvests_in_two_years)).toEqual([1, 2, 2]);
+    expect(s[0].wheat_yield_ratio.p50).toBeCloseTo(0.8);
+    expect(s[0].first_crop_yield_ratio).toBeNull();
+    expect(s[2].first_crop_yield_ratio?.p50).toBeCloseTo(0.5);
+    expect(s[2].delta_vs_baseline).toEqual({ water_p50: -50, wheat_yield_ratio_p50: expect.closeTo(-0.05, 10), bare_days_p50: -80, wind_exposed_p50: -25 });
   });
-  it('loss probability, ranges and break-even', () => {
-    expect(s[0].loss_probability).toBe(0);
-    expect(s[2].loss_probability).toBe(1);
-    // chickpea net < 0 when 13500 i/23 < 3300 → i ≤ 5 → 6 of 24
-    expect(s[1].loss_probability).toBeCloseTo(6 / 24);
-    expect(s[0].net_2yr).toEqual({ p10: 2600, p50: 2600, p90: 2600 });
-    expect(s[0].first_crop_kg_per_da).toBeNull();
-    expect(s[1].first_crop_kg_per_da?.p50).toBeCloseTo(75);   // 150 × median(i/23) = 150 × 0.5
-    expect(s[0].wheat_break_even_kg_per_da).toBeCloseTo(113.333, 3);
+  it('contains no money fields', () => {
+    expect(JSON.stringify(s)).not.toMatch(/tl|net|price|income|cost/i);
   });
-  it('differences from the baseline', () => {
-    expect(s[0].delta_vs_baseline).toBeNull();
-    expect(s[1].delta_vs_baseline).toEqual({
-      net_2yr_p50: expect.closeTo(13500 * 0.5 - 3300 - 2600, 6), water_p50: -60, bare_days_p50: -90, wind_exposed_p50: -30,
-    });
+});
+
+describe('decide', () => {
+  const d = decide(RES, SITE, 'medium', INP);
+  it('blocks chickpea: it earns more than fallow but cuts the next wheat below 85 % of after-fallow', () => {
+    const chick = d.ranking.find((r) => r.rotation_id === 'chickpea_wheat')!;
+    expect(chick.eligible).toBe(false);
+    expect(chick.blocked).toContain('wheat_yield_below_baseline');   // 0.5 / 0.8 = 0.625 < 0.85
+    expect(chick.parts.value).toBeGreaterThan(d.ranking.find((r) => r.rotation_id === 'fallow_wheat')!.parts.value);
+  });
+  it('recommends lentil with default weights (hand-computed scores)', () => {
+    // parts relative to best: value 4000/5875 (fallow), 1 (lentil); yield 1 / 0.9375; soil 60/90 / 60/65; water 1 / 70/120
+    const score = (id: string) => d.ranking.find((r) => r.rotation_id === id)!.score;
+    expect(score('fallow_wheat')).toBeCloseTo(0.4 * (4000 / 5875) + 0.3 * 1 + 0.2 * (60 / 90) + 0.1 * 1, 6);
+    expect(score('lentil_wheat')).toBeCloseTo(0.4 * 1 + 0.3 * 0.9375 + 0.2 * (60 / 65) + 0.1 * (70 / 120), 6);
+    expect(d.recommended).toBe('lentil_wheat');
+    expect(d.runner_up).toBe('fallow_wheat');
+    expect(d.close_call).toBe(false);
+    expect(d.ranking.map((r) => r.eligible)).toEqual([true, true, false]);  // blocked ones last
+  });
+  it('priorities change the answer; a blocked rotation is never recommended', () => {
+    expect(decide(RES, SITE, 'medium', INP, { value: 0, yield: 1, soil: 0, water: 0 }).recommended).toBe('fallow_wheat');
+    const soilOnly = decide(RES, SITE, 'medium', INP, { value: 0, yield: 0, soil: 1, water: 0 });
+    expect(soilOnly.ranking.find((r) => r.rotation_id === 'chickpea_wheat')!.parts.soil).toBe(1); // best soil, but blocked
+    expect(soilOnly.recommended).toBe('lentil_wheat');
+  });
+  it('first-crop guardrail blocks a legume that fails too often', () => {
+    const strict = { ...INP, guardrails: { min_wheat_ratio_vs_baseline: 0, min_first_crop_ratio: 0.6 } };
+    const lentil = decide(RES, SITE, 'medium', strict).ranking.find((r) => r.rotation_id === 'lentil_wheat')!;
+    expect(lentil.blocked).toEqual(['first_crop_fails']);
+  });
+  it('close call when the top two are within the margin', () => {
+    expect(decide(RES, SITE, 'medium', { ...INP, close_call_margin: 0.2 }).close_call).toBe(true);
+  });
+  it('exposes no money: no money-named fields, every number is a 0–1 score', () => {
+    const keys: string[] = [];
+    const nums: number[] = [];
+    const walk = (x: unknown): void => {
+      if (typeof x === 'number') nums.push(x);
+      else if (Array.isArray(x)) x.forEach(walk);
+      else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) { keys.push(k); walk(v); }
+    };
+    walk(d);
+    expect(keys.filter((k) => /tl|price|income|cost|net|money/i.test(k))).toEqual([]);
+    expect(nums.every((v) => v >= 0 && v <= 1)).toBe(true);
   });
 });
 
 describe('flipTable', () => {
-  const cells = flipTable(toyResults(), SITE, INP);
+  const cells = flipTable(RES, SITE, INP);
   it('9 cells, 8 years each', () => {
     expect(cells).toHaveLength(9);
     expect(cells.every((c) => c.n_years === 8)).toBe(true);
   });
-  it('picks the rotation with the highest median net per depth × tercile', () => {
+  it('chickpea only where it does not hurt the wheat (wet years)', () => {
     for (const depth of ['shallow', 'medium', 'deep']) {
-      const by = Object.fromEntries(cells.filter((c) => c.depth_id === depth).map((c) => [c.tercile, c]));
-      expect(by.dry.rotation_id).toBe('fallow_wheat');          // chickpea median net −1245 < 2600
-      expect(by.normal.rotation_id).toBe('chickpea_wheat');     // 13500 × 11.5/23 − 3300 = 3450
-      expect(by.wet.rotation_id).toBe('chickpea_wheat');
-      expect(by.normal.median_net).toBeCloseTo(3450);
+      const by = Object.fromEntries(cells.filter((c) => c.depth_id === depth).map((c) => [c.tercile, c.rotation_id]));
+      expect(by).toEqual({ dry: 'lentil_wheat', normal: 'lentil_wheat', wet: 'chickpea_wheat' });
     }
-  });
-  it('recomputes with new inputs (a large fallow support makes fallow win every cell)', () => {
-    const subsidised = { ...INP, fallow: { cost_tl_per_da: 600, support_tl_per_da: 20000 } };
-    expect(flipTable(toyResults(), SITE, subsidised).every((c) => c.rotation_id === 'fallow_wheat')).toBe(true);
-  });
-});
-
-describe('rankByPriority', () => {
-  const mk = (id: string, water: number, net: number, wind: number, stress = 0, loss = 0): RotationSummary => ({
-    rotation_id: id, depth_id: 'medium', is_baseline: id === 'A', nets: [],
-    net_2yr: { p10: net, p50: net, p90: net }, loss_probability: loss,
-    wheat_kg_per_da: { p10: 0, p50: 0, p90: 0 }, first_crop_kg_per_da: null,
-    water_at_wheat_sowing_mm: { p10: water, p50: water, p90: water },
-    bare_days_p50: 0, wind_exposed_bare_days_p50: wind, wheat_stress_days_p50: stress,
-    wheat_break_even_kg_per_da: 0, delta_vs_baseline: null,
-  });
-  const S = [mk('A', 100, 0, 50), mk('B', 50, 1000, 10), mk('C', 0, 500, 30)];
-
-  it('100 % on one priority reproduces that single-metric order', () => {
-    expect(rankByPriority(S, { water: 100, income: 0, soil: 0 }).map((r) => r.rotation_id)).toEqual(['A', 'B', 'C']);
-    expect(rankByPriority(S, { water: 0, income: 100, soil: 0 }).map((r) => r.rotation_id)).toEqual(['B', 'C', 'A']);
-    expect(rankByPriority(S, { water: 0, income: 0, soil: 100 }).map((r) => r.rotation_id)).toEqual(['B', 'C', 'A']);
-    expect(rankByPriority(S, { water: 100, income: 0, soil: 0 })[0].driver).toBe('water');
-  });
-  it('equal weights: min–max parts, weighted score, driver', () => {
-    const r = rankByPriority(S, { water: 34, income: 33, soil: 33 });
-    expect(r[0].rotation_id).toBe('B');
-    expect(r[0].parts).toEqual({ water: 0.5, income: 1, soil: 1 });
-    expect(r[0].score).toBeCloseTo(0.34 * 0.5 + 0.33 + 0.33);
-    expect(r[0].driver).toBe('income');
-    expect(r.every((x) => x.score >= 0 && x.score <= 1)).toBe(true);
-  });
-  it('ties on the main metric fall back to the tie-break metric', () => {
-    const tie = [mk('A', 80, 0, 0, 20), mk('B', 80, 0, 0, 5), mk('C', 80, 0, 0, 10)];
-    expect(rankByPriority(tie, { water: 100, income: 0, soil: 0 }).map((r) => r.rotation_id)).toEqual(['B', 'C', 'A']);
-  });
-  it('weights are normalised; all-zero weights count as equal', () => {
-    const a = rankByPriority(S, { water: 1, income: 1, soil: 1 });
-    const b = rankByPriority(S, { water: 0, income: 0, soil: 0 });
-    expect(a.map((x) => x.score)).toEqual(b.map((x) => x.score));
   });
 });

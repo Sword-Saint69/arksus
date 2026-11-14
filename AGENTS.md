@@ -11,7 +11,9 @@ Tek doğru kaynak: `docs/PLAN_MVP.md`. Kod bağlantıları: `docs/ARAYUZLER.md`.
 - **Uydurma sayı yok.** Her parametre YAML'da `value, unit, source, type, verified` ile durur. Doğrulanmamışsa `verified: false`, UI'da "assumption".
 - **Sözleşme donmuş.** `docs/ARAYUZLER.md` ve PLAN_MVP §4'teki ad, alan ve yolları değiştirme. Gerekirse DUR ve kullanıcıya "Gümüş'e sözleşme değişikliği sorulmalı" de.
 - **Mock bayrağı.** Her JSON'da `"mock": true|false`; site mock varken bant gösterir.
-- **Dürüst dil.** Hiçbir metinde "recommended", "best choice", "banned", "profit guaranteed" (TR: "önerilen", "en iyi seçim", "yasak", "kâr garantili") yazma. "Ranking under your priorities" de.
+- **Para gösterilmez (14 Kas kararı).** Sitede TL, fiyat, gelir, kâr, maliyet hiçbir yerde görünmez. Fiyat, destek ve referans verim sadece `economics.ts` içinde, "hangi rotasyon çiftçiye daha çok kazandırır" tahmininde **iç parametre** olarak kullanılır; çıktılar 0–1 puandır.
+- **Öneri dili.** Site arazi için öneri verir: "Önceliklerine göre bu arazi için en uygun: …" / "Most suitable for this land under your priorities: …". Gerekçe (en çok etki eden ölçüt), engellenen seçenekler ve "sonuçlar yakın" durumu her zaman gösterilir. "kâr garantili" / "profit guaranteed", "kesin" / "certain", "yasak" / "banned" yazılmaz.
+- **Verimlilik engeli.** Sonraki buğdayı nadas sonrasının %85'inin altına düşüren ya da ilk yıl ürünü ortanca yılda %30'un altında kalan rotasyon, kazancı ne olursa olsun önerilmez (eşikler `engine/config/defaults.yaml` → `decision.guardrails`).
 - **Rozet.** Gösterilen her sayının türü var: measured, model, official, statistic, literature, assumption, user.
 - **Ürüne özel `if` yok** (motor). Parametreler sadece `engine/config/*.yaml`'dan.
 - Testler geçmeden merge yok. `main` her zaman build alır.

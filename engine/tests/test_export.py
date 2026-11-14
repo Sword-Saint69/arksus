@@ -24,11 +24,15 @@ def test_rounding_rules():
                  "fullness_by_month": [33.3], "bare_by_month": [1], "first_crop": None}
 
 
-def test_real_defaults_keep_pending_as_null():
+def test_defaults_are_decision_parameters_without_nulls():
     d = export._defaults(mock=False, ts="t")
-    assert d["values"]["karapinar"]["wheat"]["ym_kg_per_da"]["value"] is None
-    m = export._defaults(mock=True, ts="t")
-    assert m["values"]["karapinar"]["wheat"]["ym_kg_per_da"]["value"] is not None
+    assert set(d["crops"]) == {"wheat", "chickpea", "lentil", "fallow"}
+    assert set(d["decision"]["weights"]) == {"value", "yield", "soil", "water"}
+    assert abs(sum(v["value"] for v in d["decision"]["weights"].values()) - 1) < 1e-9
+    for crop in ("wheat", "chickpea", "lentil"):
+        for k in ("ref_yield_kg_per_da", "price_tl_per_kg", "support_tl_per_da"):
+            assert isinstance(d["crops"][crop][k]["value"], (int, float))
+    assert "cost_tl_per_da" not in str(d)  # costs removed (14 Nov decision)
 
 
 def test_awc_value_rounded_to_one_decimal():

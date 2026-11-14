@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { SiteIndex, ResultsFile, LedgerFile, SmapFile, DefaultsFile, ValidationFile } from './types';
-import { inputsFromDefaults, summarize, flipTable, rankByPriority } from './economics';
+import { inputsFromDefaults, summarize, flipTable, decide } from './economics';
 
 const DATA = resolve(__dirname, '../../public/data');
 const read = <T>(rel: string): T => JSON.parse(readFileSync(resolve(DATA, rel), 'utf-8')) as T;
@@ -28,11 +28,11 @@ describe('contract', () => {
       ['mass_balance', 'et0_fao56_ex18', 'pse_literature', 'trial_ratio', 'precip_vs_mgm']);
   });
 
-  it('locations are a non-empty list with unique ids, and defaults cover each one', () => {
+  it('locations are a non-empty list with unique ids; defaults hold the four crops', () => {
     const ids = site.locations.map((l) => l.id);
     expect(ids.length).toBeGreaterThan(0);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const id of ids) expect(defaults.values[id]).toBeDefined();
+    expect(Object.keys(defaults.crops).sort()).toEqual(['chickpea', 'fallow', 'lentil', 'wheat']);
   });
 
   for (const loc of site.locations.map((l) => l.id)) {
@@ -50,12 +50,13 @@ describe('contract', () => {
       }
       if (!smap.available) expect(smap.latest).toBeNull();
 
-      const inp = inputsFromDefaults(defaults, loc);
-      const summary = summarize(results, site, 'medium', inp);
+      const inp = inputsFromDefaults(defaults);
+      const summary = summarize(results, site, 'medium');
       expect(summary).toHaveLength(3);
-      expect(summary[0].nets).toHaveLength(24);
+      const d = decide(results, site, 'medium', inp);
+      expect(d.ranking).toHaveLength(3);
+      if (d.recommended) expect(d.ranking.find((r) => r.rotation_id === d.recommended)!.eligible).toBe(true);
       expect(flipTable(results, site, inp)).toHaveLength(9);
-      expect(rankByPriority(summary, { water: 34, income: 33, soil: 33 })).toHaveLength(3);
     });
   }
 });

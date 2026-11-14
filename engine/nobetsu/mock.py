@@ -209,8 +209,3 @@ def fake_checks() -> list[dict]:
          "note": {"en": "Mock: check not run yet.", "tr": "Mock: kontrol henüz çalıştırılmadı."}}
         for i in ids
     ]
-
-
-def fake_defaults_value(unit: str) -> float:
-    """Placeholder for pending defaults, only in mock builds."""
-    return {"kg/da": 300.0, "TL/kg": 20.0, "TL/da": 1500.0}.get(unit, 1.0)
