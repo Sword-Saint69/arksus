@@ -90,3 +90,10 @@ Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı.
 - Geri almak gerekirse: `soil.yaml`'da `awc_method.value: soilgrids` → motor eskisi gibi senin değerini kullanır. Kod değişmez.
 - [ ] **Öneri (UI / export, senin ve İsmail'in kararı):** toprak kartında SoilGrids'in kendi AWC değeri ve 90 % aralığı (`range_q05_q95`) da "SoilGrids estimate (not used by the engine)" diye gösterilebilir; şeffaflık için iyi olur. Gösterilecekse sözleşmeye nasıl gireceğine sen karar ver.
 - **Gerçek veriyle etkisi (orta derinlik, ortanca):** Karapınar nadas buğday ekiminde 104 mm su bırakıyor (nohut 13, mercimek 26); nadas depolama verimi %23 (literatür %8–30 içinde). Deneme oranı modelde 0,90 / 0,91 (deneme 0,80 / 0,87).
+
+## 11. `make data` kontrolü (14 Kas, `omer`)
+
+- [x] `python -m nobetsu.build` `omer` üzerinde gerçek POWER + SoilGrids ile ~19 sn'de çalıştı (geçici klasöre yazıldı, `web/public/data`'ya dokunulmadı). 9 dosyanın hepsi şemadan ve `check_invariants`'tan geçti, hepsi `mock: false`, yasak kelime yok.
+- [ ] **Senin adımın:** `omer` main'e girince `make data` → `web/public/data`'yı commit et → `v0.1` etiketi (M2).
+- [ ] **Bilgi:** her `ledger/{loc}.json` 2,1 MB (mock ile aynı boyut); gzip'li ~0,12 MB. Vercel gzip/brotli ile sunduğu için sorun olmamalı; yine de İsmail lazy-load etsin (planda zaten öyle).
+- [ ] **Bilgi:** `validation.json` → `precip_vs_mgm` MGM normalleri gelene kadar `pending`; `smap/*.json` `available: false`.
