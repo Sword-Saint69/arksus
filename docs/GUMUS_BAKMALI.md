@@ -96,3 +96,22 @@ Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı.
 - `trial_ratio` değer satırına "soil available water used: X mm/m" ve notuna "sonuç AWC'ye çok bağlı, alternatifler toprak kartında" eklendi (yeni check id'si yok).
 - `make data` yeniden koşuldu (geçici klasöre): 9 dosya şemadan geçti.
 - [ ] **Senin tarafın (export):** `results.soil.awc_mm_per_m.value` yuvarlanmadan yazılıyor (Develi `121.36500000000001`). ARAYUZLER §10'a göre yuvarlama export'ta; `awc_mm_per_m.value`'yu da 1 ondalığa yuvarlar mısın?
+
+## 13. Muhammet'in doğrulama referanslarını Ömer buldu → `references.yaml` (14 Kas)
+
+Kullanıcı isteğiyle Ömer, Muhammet'in "doğrulama kaynakları" görevini yaptı. Değerler tam metinden okundu; `references.yaml` senin dosyan olduğu için geçirmeyi sana bırakıyorum.
+
+- [ ] **`trial_yields_kg_per_da`** → değerler **doğru**: nadas 286, mercimek 249, nohut 228 kg/da. `verified: true` yapılabilir.
+  - Kaynak: Gültekin İ., Partigöç F., Gültekin S., Kaya Y., Arısoy R.Z., Taner A. 2017. *Orta Anadolu Bölgesi Kuru Koşullarında Buğday Tabanlı Üretimde Doğrudan Ekim.* KSÜ Doğa Bil. Derg. 20 (Özel Sayı): 283–287. doi:10.18016/ksudobil.349258 — https://dergipark.org.tr/en/download/article-file/390551
+  - `years`: "2011–2014 (buğday hasatları 2012, 2013, 2014; geleneksel + doğrudan ekim ortalaması)". Yer: Bahri Dağdaş, Konya merkez, kuru, killi alüviyal toprak.
+- [ ] **`pse_range`** → literatür **%11–29** (plandaki %8–30 değil):
+  - low **0.11**: nadas yılında biriken nem yıllık yağışın %11–23'ü — Ayday ve Oylukan 1984, aktaran Adak M.S. 1999, *Tarla Bitkileri Merkez Araştırma Enstitüsü Dergisi* 8(1–2) — https://dergipark.org.tr/tr/download/article-file/118589
+  - high **0.29**: Orta Anadolu, 180 cm: %12,9–29,0 — Özbek, Aksoy, Çelebi 1967 (IAEA), aktaran Demiralay İ., "Nadasın etkinliği" (Atatürk Üniv. Ziraat Fak.) — https://dergipark.org.tr/en/download/article-file/34779 ; ayrıca Gültekin ve ark. 2017: "yağışların %29'una kadar".
+  - Not: kaynaklar yüzdeyi **yıllık yağışa** göre veriyor; bizim model **nadas dönemi yağışına** (Temmuz y → Ekim y+1, ~15 ay) bölüyor. Karşılaştırma `info` kalmalı.
+- [ ] **`mgm_annual_precip_mm`** → MGM'nin **ilçe sayfası yok**; en yakın yayımlanan normaller il merkezi istasyonları. Sayfa yıllık toplamı basmıyor, değerler 12 aylık 1991–2020 normalinin toplamı:
+  - karapinar: **325.3** mm, `station: "Konya (il merkezi)"` — https://www.mgm.gov.tr/veridegerlendirme/il-ve-ilceler-istatistik.aspx?k=H&m=KONYA
+  - develi: **408.2** mm, `station: "Kayseri (il merkezi)"` — https://www.mgm.gov.tr/veridegerlendirme/il-ve-ilceler-istatistik.aspx?k=H&m=KAYSERI
+  - Bunlar ilçe değil, il merkezi; `source`'a yaz. Ekrana koymadan önce canlı sayfadan bir kez kontrol et (tablo HTML'den okundu).
+- [ ] **`heat_threshold_c`** → literatür **31 °C** (30 değil): "temperatures higher than 31 °C limit the success of pollination" — Jacott & Boden 2020, *J. Exp. Bot.* 71(19): 5740–5751, doi:10.1093/jxb/eraa326, Porter & Gawith 1999'a atıfla — https://pmc.ncbi.nlm.nih.gov/articles/PMC7540836 . Kaynak bunun günlük maksimum olduğunu açıkça yazmıyor; biz `T2M_MAX`'a uyguluyoruz (not olarak ekle).
+
+Bulunamayan: Kayseri'ye özel ekim/hasat takvimi (Develi'de Konya takvimi kullanılıyor), buğday çiçeklenme tarihi.

@@ -92,7 +92,7 @@ def test_legume_schedule_is_bare_crop_bare(crops, weather):
     assert s.loc["2011-05-15", "crop"] == "chickpea" and s.loc["2011-05-15", "phase"] == "first"
     assert s.loc["2011-09-01", "crop"] == "bare"
     assert s.loc["2012-05-01", "crop"] == "wheat"
-    assert s.attrs["first_crop_sowing"] == "2011-04-01"
+    assert s.attrs["first_crop_sowing"] == f"2011-{crops['chickpea']['sowing']['value']}"
     first = s[s["phase"] == "first"]
     assert first.index[-1] < pd.Timestamp(s.attrs["main_sowing"])
 

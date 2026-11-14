@@ -15,6 +15,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) — SoilGrids dokusundan FAO-56 Tablo 19 ile AWC seçimi (USDA doku üçgeni), testleri — `engine/config/soil.yaml`, `engine/nobetsu/{runner,waterbalance}.py`, `engine/tests/test_runner.py`
 - Claude Code (Opus 5.5) + web-fetch — crops.yaml / soil.yaml / Örnek 18 değerlerini FAO-56 resmi HTML sürümüyle (fao.org/4/x0490e) karşılaştırma ve düzeltme — `engine/config/{crops,soil}.yaml`, `engine/tests/test_et0.py`, `engine/nobetsu/validate.py`
 - Claude Code (Opus 5.5) — AWC taş (cfvo) düzeltmesi, 0–100 cm doku sınıfı, trial_ratio notunda AWC — `engine/config/soil.yaml`, `engine/nobetsu/{runner,validate}.py`, `engine/tests/test_{runner,validate}.py`
+- Claude Code (Opus 5.5) + web-fetch/WebSearch — Muhammet'in takvim ve doğrulama kaynağı araştırması (deneme makalesi, nadas etkinliği, MGM normalleri, sıcaklık eşiği; PDF'ler tam metinden okundu), takvimlerin crops.yaml'a geçirilmesi — `engine/config/crops.yaml`, `engine/tests/test_rotations.py`, `docs/GUMUS_BAKMALI.md`
 
 ## Gümüş
 - Claude Code (Opus 5.5) — M0 sözleşme iskeleti: paket, config, mock runner, export/build, JSON şemaları, testler, types.ts, economics.ts — `engine/`, `docs/contract/`, `web/src/lib/`, `Makefile`
