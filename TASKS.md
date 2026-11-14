@@ -102,7 +102,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+0:10–1: Sözleşme iskeleti** — `engine/` paket iskeleti (sadece kendi modüllerin), `Makefile`, `config.py`, `types.ts`, `docs/contract/*.schema.json`, `mock.py` ile 6 tür mock JSON, `economics.ts` imzaları → M0 — ✅ 16:29 (gumus/m0)
 - [ ] **T+0:30: Koordinatları `locations.yaml`'a yaz, Muhammet'e gönder** — ⏳ kalan: noktaları uydu görüntüsünde tarla olarak doğrula, Muhammet'e gönder
 - [ ] **T+1: AppEEARS'a SMAP L4 nokta isteğini gönder (5 dk)** — sm_rootzone, sm_rootzone_wetness, sm_surface_wetness; iki nokta; 2015-04-01 → bugün
-- [ ] **T+1–2: power.py** — iki lokasyon için 2000 → son tarih NASA POWER çekimi + önbellek + `load_weather()`; birimleri başlıktan oku (WS2M_MAX dahil) → **Ömer'e haber ver**
+- [x] **T+1–2: power.py** — iki lokasyon için 2000 → son tarih NASA POWER çekimi + önbellek + `load_weather()`; birimleri başlıktan oku (WS2M_MAX dahil) → **Ömer'e haber ver** — ✅ 16:34 (gumus/power)
 - [ ] **T+2–2.75: SoilGrids tek seferlik çekim (45 dk sınır)** → `data/soilgrids/{lokasyon}.json`; olmazsa Muhammet'e "elle oku" de
 - [ ] **T+2.75–4: economics.ts + vitest testleri** — P10/P50/P90, zarar olasılığı, başabaş verimi, flip tablosu, öncelik puanı (§5.9) → M1
 - [ ] **T+4–7: export.py + build.py** — mock runner ile uçtan uca, şema doğrulama testi
