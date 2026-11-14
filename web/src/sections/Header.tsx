@@ -9,10 +9,9 @@ type Props = {
   depthId: DepthId;
   onLocation: (id: string) => void;
   onDepth: (id: DepthId) => void;
-  onLang: (lang: Lang) => void;
 };
 
-export function Header({ site, lang, locationId, depthId, onLocation, onDepth, onLang }: Props) {
+export function Header({ site, lang, locationId, depthId, onLocation, onDepth }: Props) {
   // Grouped by province from site_index, never a hard-coded list (ISMAIL_BAKMALI §10).
   const byProvince = new Map<string, SiteIndex['locations']>();
   for (const l of site.locations) byProvince.set(l.province, [...(byProvince.get(l.province) ?? []), l]);
@@ -32,18 +31,6 @@ export function Header({ site, lang, locationId, depthId, onLocation, onDepth, o
               <p className="text-sm font-bold tracking-wide text-primary">{t(lang, 'appName')}</p>
               <h1 className="text-xl font-semibold leading-tight sm:text-2xl">{t(lang, 'question')}</h1>
             </div>
-          </div>
-          <div role="group" aria-label={t(lang, 'language')} className="flex shrink-0 rounded-lg border border-line bg-canvas p-0.5">
-            {(['en', 'tr'] as const).map((l) => (
-              <button
-                key={l}
-                aria-pressed={lang === l}
-                onClick={() => onLang(l)}
-                className={cn('h-9 min-w-10 rounded-md px-2 font-mono text-xs font-semibold uppercase text-muted', lang === l && 'bg-paper text-ink shadow-sm')}
-              >
-                {l}
-              </button>
-            ))}
           </div>
         </div>
         <p className="max-w-3xl text-sm text-muted">{t(lang, 'tagline')}</p>
