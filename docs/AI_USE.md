@@ -17,6 +17,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) — NASA POWER çekimi, önbellek, birim/boşluk işleme ve testleri — `engine/nobetsu/power.py`, `engine/tests/test_power.py`
 - Claude Code (Opus 5.5) — SoilGrids WCS çekimi, birim dönüşümü, AWC hesabı ve testleri — `engine/nobetsu/soilgrids.py`, `engine/tests/test_soilgrids.py`
 - Claude Code (Opus 5.5) — economics.ts birim testleri (elle hesaplanmış örnekler, numpy ile karşılaştırmalı yüzdelik) — `web/src/lib/economics.test.ts`
+- Claude Code (Opus 5.5) — AWC ayrışması analizi (Saxton–Rawls çapraz kontrolü, motor duyarlılığı), doku sınıfı ve taş oranı çıktısı — `engine/nobetsu/soilgrids.py`, `docs/ARAYUZLER.md` §3, `docs/GUMUS_BAKMALI.md`
 
 ## Ortak (plan ve görev dağılımı)
 - Claude — görev dağılımı, kişi rehberleri, arayüz sözleşmesi taslağı, proje özeti — `TASKS.md`, `AGENTS.md`, `docs/ARAYUZLER.md`, `docs/PROJE_OZETI.md`, `docs/team/*`

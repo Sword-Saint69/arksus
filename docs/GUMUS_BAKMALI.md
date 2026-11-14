@@ -71,3 +71,26 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - pandas: bende 2.2.3, senin testlerin dahil 109 test geçiyor; sabitleme yok (`pandas>=2.1`).
 - `engine/tests/__init__.py` **ekledim**: bazı makinelerde (ultralytics/roboflow kuruluysa) site-packages'ta bir `tests` paketi var ve namespace paketini gölgeliyor; `from tests.fixtures import ...` bu yüzden kırılıyordu. Senin import'ların aynen çalışıyor.
 - Sıradaki: `build.py` gerçek koşu için `validate.py`'yi bekliyor; gelene kadar kontrolleri `pending` yazacak şekilde ayarlayacağım (M2).
+
+## AWC kararı — Ömer'e (14 Kas, Gümüş)
+
+Önerin **iki düzeltmeyle kabul**: doku SoilGrids'ten, AWC FAO-56 Tablo 19'dan. Sözleşme notu ARAYUZLER §3'te.
+
+**Senin dosyalarında (`soil.yaml`, `runner.py`) yapılacaklar:**
+- [ ] AWC'yi `data/soilgrids/{loc}.json` → `texture_0_100cm.usda_class` ile Tablo 19 orta değerinden al, **× (1 − `cfvo_0_100cm_fraction.value`)**. Taşlar su tutmaz; tablo değeri ince toprak içindir. Develi'de taş %21,7 → fark büyük.
+- [ ] `awc_mm_per_m` (SoilGrids doğrudan) artık **bilgi amaçlı**; motor onu kullanmasın. (Şu an `_awc_used` onu okuyor; sen değiştirene kadar M2 koşusu 58,6 / 67,4 ile çıkar.)
+- [ ] `awc_used`: `type: "literature"`, `verified: false`, kaynak: "SoilGrids dokusu (siltli kil) → FAO-56 Tablo 19, taş düzeltmeli".
+- [ ] **TEW / REW** da aynı doku sınıfından gelsin (şu an "loam" yazıyor). Hafızadan: siltli kil ve kil için TEW 22–29 mm, REW 8–12 mm (Ze = 0,10 m) — kitaptan teyit.
+- [ ] Develi **killi tın** Tablo 19'da yok. En yakın: siltli killi tın (0,13–0,18) ya da kil (0,12–0,20). Hangisini seçtiğini kaynağa yaz.
+- [ ] Sınıf → değer eşlemesi `soil.yaml`'da dursun (kodda `if` yok).
+
+**Veri (yeni çekim, 0–100 cm, ortalama haritalar):**
+
+| | Doku | Kil / kum / silt % | Taş | SoilGrids doğrudan | Saxton–Rawls 2006 (taş düzeltmeli) | Tablo 19 orta × (1 − taş) (hafızadan) |
+|---|---|---|---|---|---|---|
+| Karapınar | siltli kil | 48,6 / 10,5 / 41,0 | 0,033 | 58,6 | 131,4 | 160 × 0,967 ≈ 155 |
+| Develi | killi tın | 39,7 / 27,6 / 32,6 | 0,217 | 67,4 | 106,2 | ~155–160 × 0,783 ≈ 121–125 |
+
+**Duyarlılık (senin motorun, gerçek hava, orta derinlik, 24 yıl ortancası):** nohut sonrası / nadas sonrası buğday Ya/Ym — AWC 60: Karapınar 0,98, Develi 0,96; AWC 160: 0,91 / 0,85. Konya denemesi 228/286 = 0,80. Yani 58 ile nadas avantajı neredeyse görünmüyor; senin tespitin doğru.
+
+**Kanıt paneli önerisi:** `validate.py`'de (ya da `precip_vs_mgm` notunun yanında) "AWC: tablo X, Saxton–Rawls Y, SoilGrids doğrudan Z" satırı. Sözleşmede yeni check id'si gerekirse bana yaz; şimdilik mevcut 5 kontrol yeterli, metin `trial_ratio` notuna eklenebilir.

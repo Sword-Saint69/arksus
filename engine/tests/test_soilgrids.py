@@ -34,6 +34,26 @@ def test_build_record_shape():
     assert rec["awc_mm_per_m"]["value"] == 0.0 and rec["awc_mm_per_m"]["unit"] == "mm/m"
 
 
+@pytest.mark.parametrize("clay,sand,silt,expected", [
+    (5, 92, 3, "sand"), (5, 82, 13, "loamy sand"), (10, 65, 25, "sandy loam"), (20, 40, 40, "loam"),
+    (15, 20, 65, "silt loam"), (5, 7, 88, "silt"), (25, 60, 15, "sandy clay loam"), (33, 33, 34, "clay loam"),
+    (33, 10, 57, "silty clay loam"), (40, 50, 10, "sandy clay"), (45, 10, 45, "silty clay"), (60, 20, 20, "clay"),
+])
+def test_usda_texture_class(clay, sand, silt, expected):
+    assert sg.usda_texture_class(clay, sand, silt) == expected
+
+
+def test_saxton_rawls_behaves_physically():
+    fc_loam, wp_loam = sg.saxton_rawls_2006(0.40, 0.20, 2.5)
+    fc_clay, wp_clay = sg.saxton_rawls_2006(0.15, 0.45, 2.5)
+    fc_sand, wp_sand = sg.saxton_rawls_2006(0.88, 0.05, 1.0)
+    for fc, wp in [(fc_loam, wp_loam), (fc_clay, wp_clay), (fc_sand, wp_sand)]:
+        assert 0 < wp < fc < 0.6
+    assert wp_sand < wp_loam < wp_clay and fc_sand < fc_loam < fc_clay
+    assert 0.10 <= fc_loam - wp_loam <= 0.20          # loam AWC in the usual 100–200 mm/m band
+    assert (fc_sand - wp_sand) < (fc_loam - wp_loam)
+
+
 @pytest.mark.parametrize("loc", ["karapinar", "develi"])
 def test_pulled_values_within_physical_bounds(loc):
     path = sg.out_path(loc)
@@ -51,3 +71,8 @@ def test_pulled_values_within_physical_bounds(loc):
     assert 0.5 <= p["bdod"]["q50"] <= 2.2
     assert 0 <= p["cfvo"]["q50"] <= 100
     assert 20 <= rec["awc_mm_per_m"]["value"] <= 300
+    tex = rec["texture_0_100cm"]
+    assert abs(tex["clay"] + tex["sand"] + tex["silt"] - 100) <= 0.2
+    assert tex["usda_class"] == sg.usda_texture_class(tex["clay"], tex["sand"], tex["silt"])
+    assert 0 <= rec["cfvo_0_100cm_fraction"]["value"] < 1
+    assert 50 <= rec["awc_alternatives"]["saxton_rawls_2006"]["value"] <= 250
