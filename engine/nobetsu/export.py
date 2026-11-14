@@ -149,9 +149,8 @@ def write_all(outputs: dict[str, dict], checks: list[dict], mock: bool, out_dir:
 
     weather_meta: optional {location_id: weather.attrs} for elevation_m and power_range.
     """
-    out = Path(out_dir)
-    if not out.is_absolute():
-        out = config.REPO_ROOT / out
+    # The default means the repo's web/public/data from any cwd; any other relative path is relative to cwd.
+    out = config.WEB_DATA_DIR if out_dir == "web/public/data" else Path(out_dir).resolve()
     ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     meta = weather_meta or {}
     _write(out / "site_index.json", _site_index(mock, ts, meta))

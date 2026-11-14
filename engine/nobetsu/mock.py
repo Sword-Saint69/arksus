@@ -114,7 +114,7 @@ def _sequence(location_id: str, y: int, rotation_id: str, depth_id: str) -> tupl
     }
 
     weeks = []
-    for i in range(0, len(labels), 7):
+    for i in range(0, (len(labels) // 7) * 7, 7):  # 104 full weeks, as the real engine
         chunk = labels[i:i + 7]
         counts: dict[str, int] = {}
         for _, lab in chunk:
