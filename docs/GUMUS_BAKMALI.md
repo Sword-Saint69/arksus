@@ -143,3 +143,15 @@ Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi 
 - **Yöntem (bilgi):** Model tarafı bir "arazi": iki parsel, biri nadas yılındayken öteki buğdayda (her yıl arazinin yarısı nadas), orta derinlik, 2013-10 → son POWER tarihi, aylık ortalama doluluk. İki seri de takvim ayına göre standart anomaliye çevrilip **Spearman ρ** hesaplanıyor; ayrıca en ıslak / en kuru ay karşılaştırılıyor. Mutlak uyum iddiası yok (not metninde yazıyor).
 - **Gerçek havayla model tarafı:** Karapınar aylık doluluk en yüksek Şubat (%64), en düşük Ağustos–Eylül (%28); Develi Şubat–Mart (%57) / Temmuz–Eylül (%26).
 - (İsteğe bağlı) Kanıt panelinde küçük grafik istenirse aylık anomali serisini (`validate.smap_comparison` içindeki iki seri) dışa vermek kolay; sözleşmede yer açarsan yazarım.
+
+## 16. E2 kurak / sıcak senaryolar — motor tarafı hazır (14 Kas, branch `exp/E2-scenarios`)
+
+- **Senaryolar:** `engine/config/scenarios.yaml` (yeni dosya, motor parametresi; id'leri sözleşmede sen onayla): `baseline`, `dry10` (yağış ×0,9), `dry20` (×0,8), `warm1` (+1 °C), `warm2` (+2 °C), `dry10_warm1`. Her birinde `label {en, tr}` ve V biçiminde `precip_factor`, `temp_shift_c`. Sıcaklık kayması Tmax, Tmin ve Tdew'e birlikte uygulanıyor (bağıl nem yaklaşık sabit), ET₀ kaydırılmış havadan yeniden hesaplanıyor.
+- **Motor API:** `runner.run_scenarios(location_id, weather, soilgrids, scenario_ids=None) -> {scenario_id: EngineOutput}` (her biri `run_location` ile aynı biçim). Tek senaryo için `runner.apply_scenario(weather, scenario)` + `run_location`. 6 senaryo × 2 lokasyon ≈ 2 dk.
+- [ ] **Sözleşme (sende, PLAN_EXPANSION E2):** `results/{loc}__{scenario_id}.json` (aynı şema) + `site_index.scenarios: [{id, label}]` (`scenarios.yaml`'dan). `baseline` için mevcut `results/{loc}.json` kalabilir. Ledger senaryo başına gerekirse söyle (dosyalar büyük: 2,1 MB × 12).
+- [ ] **`build.py`:** `for sid, out in run_scenarios(loc, w, sg).items(): ...` ile yazdır; `validation.json` sadece baseline'dan.
+- **Gerçek veriyle sonuç (orta derinlik, ortanca, nadas / nohut / mercimek):**
+  - Karapınar buğday oranı: baseline 0,54 / 0,48 / 0,49 → dry20 0,46 / 0,39 / 0,40 → warm2 0,52 / 0,46 / 0,47. Nadas ekimde su 104 → 59 mm (dry20).
+  - Develi: baseline 0,55 / 0,50 / 0,50 → dry20 0,44 / 0,40 / 0,40.
+  - Kuraklıkta nadas avantajı (nadas − nohut buğday oranı) 0,06'dan 0,07'ye çıkıyor: kuru iklimde nadasın su değeri biraz artıyor.
+- **Sınır (UI notuna ekle):** ısınma bitki gelişimini hızlandırır, ama takvimler sabit (ekim/hasat tarihi değişmiyor). Bu yüzden `warm` senaryolarının etkisi muhtemelen olduğundan küçük görünüyor. "Projeksiyon değil, duyarlılık testi" etiketi şart.

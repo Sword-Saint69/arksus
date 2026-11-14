@@ -376,3 +376,43 @@ def run_landscape(location_id: str, weather: pd.DataFrame, soilgrids: dict | Non
     land.attrs.update(cycle=cycle, capacity_mm=soil.capacity_mm, awc_used=awc,
                       max_mass_balance_error_mm=float(max(errors)), location_id=location_id)
     return land
+
+
+# --- E2: drier / warmer delta-change scenarios ----------------------------------------------
+
+SCENARIO_TEMP_COLUMNS = ("tmax_c", "tmin_c", "tdew_c")
+
+
+def apply_scenario(weather: pd.DataFrame, scenario: dict) -> pd.DataFrame:
+    """Weather for one scenario (config/scenarios.yaml): daily precipitation × factor,
+    Tmax/Tmin/Tdew + shift (relative humidity stays roughly constant; ET0 follows because it
+    is recomputed from the shifted weather). The input frame is not modified."""
+    w = weather.copy()
+    w.attrs = dict(weather.attrs)
+    factor = float(scenario["precip_factor"]["value"])
+    shift = float(scenario["temp_shift_c"]["value"])
+    if factor < 0:
+        raise ValueError("precip_factor must be non-negative")
+    if factor != 1.0:
+        w["precip_mm"] = weather["precip_mm"] * factor
+    if shift != 0.0:
+        for col in SCENARIO_TEMP_COLUMNS:
+            w[col] = weather[col] + shift
+    w.attrs["scenario_id"] = scenario["id"]
+    return w
+
+
+def run_scenarios(location_id: str, weather: pd.DataFrame, soilgrids: dict | None,
+                  scenario_ids: list[str] | None = None, start_years=None) -> dict[str, dict]:
+    """{scenario_id: EngineOutput} — run_location() on each scenario's weather.
+
+    The wind-exposure threshold is recomputed per run from the scenario weather, but wind is
+    never changed by a scenario, so it is the same as in the baseline.
+    """
+    defined = {s["id"]: s for s in _load_config("scenarios")["scenarios"]}
+    ids = list(defined) if scenario_ids is None else list(scenario_ids)
+    unknown = [i for i in ids if i not in defined]
+    if unknown:
+        raise KeyError(f"unknown scenario ids: {unknown}")
+    return {sid: run_location(location_id, apply_scenario(weather, defined[sid]), soilgrids, start_years=start_years)
+            for sid in ids}
