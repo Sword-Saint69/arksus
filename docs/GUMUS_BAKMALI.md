@@ -170,3 +170,18 @@ Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi 
 - **Sahiplik:** IMERG gibi, `modis.py` ve `data/modis/` sende olsun mu? Karşılaştırma (`validate.ndvi_comparison`, `check_ndvi_calendar`) bende.
 - [ ] **Sözleşme:** `check_ndvi_calendar` yeni bir kontrol id'si (`ndvi_calendar`) istiyor; `smap_anomaly` ile aynı durum, `run_checks`'e eklemedim.
 - **⚠️ Karapınar noktası büyük ihtimalle kuru tarım değil.** NDVI aylık ortalaması Haz–Eyl 0,57 / 0,62 / 0,55 / 0,50, zirve Temmuz. Kuru buğday–nadas tarlası Temmuz'da hasat edilmiş ve kurumuş olmalı. Develi ise beklenen gibi: zirve Mayıs (0,39), Ağustos–Eylül 0,23 / 0,18. Esri uydu görüntüsünde de noktanın yanında yeşil parseller ve çiftlik yerleşkesi var (görüntü tarihi bilinmiyor). `locations.yaml`'da `coord_verified: false` zaten; **Karapınar koordinatını kuru tarım alanına kaydırmayı öner.** Hava verisi (~50 km) pek değişmez ama SoilGrids (250 m) ve IMERG/NDVI hücresi değişir.
+
+## 19. MODIS NDVI — sitede gösterilmesi için istediğim alanlar (15 Kas)
+
+Senin notuna göre: çekme kodu (`modis.py`) bende kalıyor; JSON alanı ve şema sende. İstediğim biçim:
+
+- [ ] **Kanıt paneli:** yeni kontrol id'si `ndvi_calendar` (`validation.schema.json` enum + `checks` 6/7 eleman; `smap_anomaly` ile birlikte). Üretim: `validate.check_ndvi_calendar(landscapes, ndvis)`; girdiler `runner.run_landscape(loc, w, sg, start="2013-01-01")` ve `modis.load_cached(location_ids)`. Biçim mevcut kontrol öğesiyle aynı (`id, status, value, reference, note`), `status` yalnız `info` / `pending`.
+- [ ] **(İsteğe bağlı) İlçe kartı grafiği:** yeni dosya `ndvi/{loc}.json` (smap ile aynı desen):
+  ```jsonc
+  { "schema_version": "1.0", "mock": false, "generated_at": "...", "location_id": "develi",
+    "available": true, "product": "MOD13Q1 v061 NDVI", "pixel_m": 250, "years": [2013, 2024],
+    "monthly": [ { "month": 1, "ndvi_mean": 0.11, "model_cover": 0.00 } ],   // 12 satır; model_cover = landscape kcb ortalaması
+    "ndvi_peak_month": 5, "model_peak_month": 5, "ndvi_summer_peak": false }
+  ```
+  Değerleri `validate.ndvi_comparison(...)` sözlüğünden ve iki aylık klimatolojiden (ben yardımcı fonksiyon yazarım, istersen) üretebilirsin. Etiket: `measured` (NDVI) ve `model` (model_cover).
+- **Durum:** Karapınar, Develi, Polatlı tamam; diğerleri iniyor (ORNL API yavaş, 502 verince kaldığı yerden devam ediyor).
