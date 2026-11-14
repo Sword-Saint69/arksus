@@ -91,6 +91,70 @@ def awc_mm_per_m(fc: dict[str, float], wp: dict[str, float], cfvo_mapped: dict[s
     return depth_weighted(per_layer, AWC_DEPTHS)
 
 
+def usda_texture_class(clay: float, sand: float, silt: float) -> str:
+    """USDA soil texture triangle (percent, should sum to ~100)."""
+    if silt + 1.5 * clay < 15:
+        return "sand"
+    if silt + 2 * clay < 30:
+        return "loamy sand"
+    if clay >= 40:
+        if silt >= 40:
+            return "silty clay"
+        if sand <= 45:
+            return "clay"
+    if clay >= 35 and sand > 45:
+        return "sandy clay"
+    if clay >= 27:
+        if sand <= 20:
+            return "silty clay loam"
+        if sand <= 45:
+            return "clay loam"
+    if clay >= 20 and sand > 45 and silt < 28:
+        return "sandy clay loam"
+    if silt >= 80 and clay < 12:
+        return "silt"
+    if silt >= 50 and (clay < 27):
+        return "silt loam"
+    if clay >= 7 and silt >= 28 and sand <= 52:
+        return "loam"
+    return "sandy loam"
+
+
+def saxton_rawls_2006(sand: float, clay: float, om_pct: float) -> tuple[float, float]:
+    """(θ33 kPa, θ1500 kPa) in m³/m³ from Saxton & Rawls (2006), Soil Sci. Soc. Am. J. 70:1569, Table 1.
+    sand, clay: fractions (0–1, w/w); om_pct: organic matter, % w."""
+    s, c, om = sand, clay, om_pct
+    t1500 = -0.024 * s + 0.487 * c + 0.006 * om + 0.005 * s * om - 0.013 * c * om + 0.068 * s * c + 0.031
+    t33 = -0.251 * s + 0.195 * c + 0.011 * om + 0.006 * s * om - 0.027 * c * om + 0.452 * s * c + 0.299
+    wp = t1500 + (0.14 * t1500 - 0.02)
+    fc = t33 + (1.283 * t33 ** 2 - 0.374 * t33 - 0.015)
+    return fc, wp
+
+
+SOC_TO_OM = 1.724  # van Bemmelen factor (organic matter = 1.724 × organic carbon); conventional, VERIFY
+
+
+def texture_0_100(raw: dict) -> dict:
+    """Depth-weighted mean texture over 0–100 cm from the mean maps, normalised to 100 %."""
+    m = {t: depth_weighted({d: raw[t][d]["mean"] for d in AWC_DEPTHS}, AWC_DEPTHS) / 10 for t in TEXTURE}
+    total = sum(m.values())
+    pct = {t: round(100 * m[t] / total, 1) for t in TEXTURE}
+    return {**pct, "usda_class": usda_texture_class(pct["clay"], pct["sand"], pct["silt"]),
+            "source": "SoilGrids 2.0 mean maps, 0–100 cm thickness-weighted, normalised to 100 %"}
+
+
+def awc_saxton_rawls(raw: dict) -> float:
+    """Per layer: Saxton–Rawls (θ33 − θ1500) from mean texture + mean SOC, × (1 − cfvo), weighted over 0–100 cm."""
+    per = {}
+    for d in AWC_DEPTHS:
+        tex = {t: raw[t][d]["mean"] for t in TEXTURE}
+        tot = sum(tex.values())
+        om = convert("soc", raw["soc"][d]["mean"]) / 10 * SOC_TO_OM  # g/kg → % OC → % OM
+        fc, wp = saxton_rawls_2006(tex["sand"] / tot, tex["clay"] / tot, om)
+        per[d] = max(0.0, fc - wp) * 1000 * (1 - raw["cfvo"][d]["q50"] / 1000.0)
+    return depth_weighted(per, AWC_DEPTHS)
+
+
 def build_record(location_id: str, raw: dict) -> dict:
     """raw[prop][depth][quantile_key] = mapped value  ->  data/soilgrids/{loc}.json content."""
     properties = []
@@ -107,19 +171,36 @@ def build_record(location_id: str, raw: dict) -> dict:
                             {d: raw["wv1500"][d][qk] for d in AWC_DEPTHS},
                             {d: raw["cfvo"][d]["q50"] for d in AWC_DEPTHS})
            for qk in QUANTILES}
-    return {
+    direct = {
+        "value": round(awc["q50"], 1), "unit": "mm/m",
+        "source": "SoilGrids 2.0 wv0033−wv1500, cfvo düzeltmeli, 0–100 cm ağırlıklı",
+        "type": "model", "verified": False,
+        "range_q05_q95": [round(awc["q05"], 1), round(awc["q95"], 1)],
+    }
+    has_full = all("mean" in raw[t].get(d, {}) for t in [*TEXTURE, "soc"] for d in AWC_DEPTHS)
+    record = {
         "location_id": location_id,
         "how_obtained": "wcs",
         "window": f"median of 250 m pixels within ±{HALF_WINDOW_DEG}° of the point",
         "properties": properties,
-        "awc_mm_per_m": {
-            "value": round(awc["q50"], 1), "unit": "mm/m",
-            "source": "SoilGrids 2.0 wv0033−wv1500, cfvo düzeltmeli, 0–100 cm ağırlıklı",
-            "type": "model", "verified": False,
-            "range_q05_q95": [round(awc["q05"], 1), round(awc["q95"], 1)],
-        },
+        # Informational: the engine takes AWC from the texture class (FAO-56 Table 19) × (1 − cfvo), see ARAYUZLER §3.
+        "awc_mm_per_m": direct,
         "raw_mapped": raw,
     }
+    if has_full:
+        cfvo = depth_weighted({d: raw["cfvo"][d]["q50"] for d in AWC_DEPTHS}, AWC_DEPTHS) / 1000.0
+        record["texture_0_100cm"] = texture_0_100(raw)
+        record["cfvo_0_100cm_fraction"] = {
+            "value": round(cfvo, 3), "unit": "fraction (volume)",
+            "source": "SoilGrids 2.0 cfvo Q0.5, 0–100 cm thickness-weighted", "type": "model", "verified": False}
+        record["awc_alternatives"] = {
+            "soilgrids_wv0033_wv1500": direct,
+            "saxton_rawls_2006": {
+                "value": round(awc_saxton_rawls(raw), 1), "unit": "mm/m",
+                "source": "Saxton & Rawls (2006) pedotransfer from SoilGrids mean texture + SOC, cfvo düzeltmeli, 0–100 cm",
+                "type": "model", "verified": False},
+        }
+    return record
 
 
 def _requests_for() -> list[tuple[str, str, str]]:
@@ -128,7 +209,9 @@ def _requests_for() -> list[tuple[str, str, str]]:
     jobs += [("cfvo", d, "q50") for d in AWC_DEPTHS if d not in CARD_DEPTHS]
     # Quantile maps are predicted independently, so texture Q0.5s need not sum to 100 %;
     # the mean maps do. Kept in raw_mapped for the physical-bounds test.
-    jobs += [(p, d, "mean") for p in TEXTURE for d in CARD_DEPTHS]
+    # Mean texture and SOC over 0–100 cm: texture class for the engine's AWC and the Saxton–Rawls cross-check.
+    jobs += [(p, d, "mean") for p in [*TEXTURE, "soc"] for d in AWC_DEPTHS]
+    jobs += [("cfvo", d, "q50") for d in AWC_DEPTHS if d not in CARD_DEPTHS and ("cfvo", d, "q50") not in jobs]
     return jobs
 
 
@@ -153,8 +236,11 @@ def main() -> None:
         path = out_path(loc)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
-        q50 = {p["id"]: p["q50"] for p in rec["properties"]}
-        print(f"{loc}: AWC {rec['awc_mm_per_m']['value']} mm/m {rec['awc_mm_per_m']['range_q05_q95']} | {q50}")
+        tex = rec["texture_0_100cm"]
+        alt = rec["awc_alternatives"]
+        print(f"{loc}: {tex['usda_class']} (clay {tex['clay']} sand {tex['sand']} silt {tex['silt']}), "
+              f"cfvo {rec['cfvo_0_100cm_fraction']['value']} | AWC SoilGrids {alt['soilgrids_wv0033_wv1500']['value']}, "
+              f"Saxton-Rawls {alt['saxton_rawls_2006']['value']} mm/m")
 
 
 if __name__ == "__main__":

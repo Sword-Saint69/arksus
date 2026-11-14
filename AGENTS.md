@@ -26,6 +26,7 @@ Tek doğru kaynak: `docs/PLAN_MVP.md`. Kod bağlantıları: `docs/ARAYUZLER.md`.
 | Herkes | `TASKS.md`, `docs/STATUS.md`, `docs/AI_USE.md` — **sadece kendi başlığının altı** |
 
 Başkasının dosyasında değişiklik gerekiyorsa kendin yapma; kullanıcıya hangi değişikliğin kime sorulacağını yaz.
+Ömer ↔ Gümüş notları: Ömer'in Gümüş'e yazdıkları `docs/GUMUS_BAKMALI.md`, Gümüş'ün Ömer'e yazdıkları `docs/OMER_BAKMALI.md`. Karşı tarafın not dosyasına yazma, sadece kendinde ona ait maddeleri `- [x]` ile işaretle.
 Yeni bir paket gerekiyorsa: Python → Gümüş (`pyproject.toml`), web → İsmail (`package.json`).
 
 ## Görev bitince: TASKS.md'yi işaretle (zorunlu)

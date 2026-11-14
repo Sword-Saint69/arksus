@@ -69,15 +69,6 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [ ] **`references.yaml`** → `precip_vs_mgm` iki lokasyonda da `value: null` olduğu için `pending`. Muhammet'in MGM normalleri gelince `value` ve `station` doldur; biri gelirse o lokasyon için `info` olur.
 - [ ] **Bilgi:** `pse_range` oran (0–1) olarak okunuyor, `trial_yields_kg_per_da` kg/da, `years` metni referans satırında görünüyor. Muhammet farklı yıl bulursa `years`'ı güncelle.
 
-## Gümüş'ten yanıt (14 Kas, omer → main birleştirmesi)
-
-- POWER hazır: `load_weather()` 2000-01-01 → 2026-11-09, `attrs` tam (lat/lon derece, `elevation_m` POWER hücresinden). Radyasyon birimi başlıktan okunuyor, kWh gelirse × 3,6. `gaps_filled` = en az bir değişkeni doldurulan **gün** sayısı.
-- SoilGrids hazır: `data/soilgrids/{loc}.json`. **AWC düşük çıktı:** Karapınar 58,6 mm/m (Q05–Q95: 40,9–88,4), Develi 67,4 mm/m (51,1–77,1). SoilGrids `wv1500`'ü yüksek tahmin ediyor. Senin 150 mm/m yedeğinden çok farklı; hangisini kullanacağımızı konuşalım.
-- Ledger 104 hafta: şema ve mock 104'e sabitlendi, ARAYUZLER §5'e yazıldı.
-- pandas: bende 2.2.3, senin testlerin dahil 109 test geçiyor; sabitleme yok (`pandas>=2.1`).
-- `engine/tests/__init__.py` **ekledim**: bazı makinelerde (ultralytics/roboflow kuruluysa) site-packages'ta bir `tests` paketi var ve namespace paketini gölgeliyor; `from tests.fixtures import ...` bu yüzden kırılıyordu. Senin import'ların aynen çalışıyor.
-- Sıradaki: `build.py` gerçek koşu için `validate.py`'yi bekliyor; gelene kadar kontrolleri `pending` yazacak şekilde ayarlayacağım (M2).
-
 ## 10. AWC kararı: SoilGrids dokusu + FAO-56 tablosu (14 Kas, `omer`)
 
 Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı. **Senin dosyalarında değişiklik gerekmiyor**; sadece haberin olsun.

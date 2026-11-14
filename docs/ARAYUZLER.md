@@ -74,7 +74,10 @@ Gümüş her lokasyon için `data/soilgrids/{location_id}.json` yazar:
 }
 ```
 
-- Ömer AWC'yi buradan okur. **Dosya yoksa** `soil.yaml`'daki FAO-56 Tablo 19 değerini kullanır ve `type: "assumption"` yapar.
+- **AWC kararı (14 Kas, Gümüş + Ömer):** SoilGrids'in doğrudan `wv0033 − wv1500` değeri bu killi topraklarda tarla kapasitesini düşük tahmin ediyor (Karapınar 58,6, Develi 67,4 mm/m; Saxton–Rawls ile solma noktası uyuşuyor, tarla kapasitesi ~0,31'e karşı ~0,40). Bu yüzden motor AWC'yi **dokudan** alır:
+  `AWC = FAO-56 Tablo 19 [texture_0_100cm.usda_class] orta değeri × (1 − cfvo_0_100cm_fraction)`, `type: "assumption"`, `verified: false`, kaynakta "SoilGrids dokusu → FAO-56 Tablo 19, taş düzeltmeli" (Ömer uyguladı; taş düzeltmesi OMER_BAKMALI §3). Tablo değerleri ve sınıf eşlemesi `soil.yaml`'da (Ömer). Tabloda olmayan sınıf (ör. killi tın) için hangi sınıfın kullanıldığı kaynakta yazılır.
+- Dosyadaki ek alanlar (Gümüş yazar): `texture_0_100cm {clay, sand, silt, usda_class, source}` (ortalama haritalar, 100'e ölçekli), `cfvo_0_100cm_fraction` (V), `awc_alternatives {soilgrids_wv0033_wv1500, saxton_rawls_2006}` (V). `awc_mm_per_m` = SoilGrids doğrudan değeri, **sadece bilgi amaçlı** (kanıt panelinde karşılaştırma için).
+- **Dosya yoksa** motor `soil.yaml`'daki yedek değeri kullanır ve `type: "assumption"` yapar.
 - Motorun **gerçekte kullandığı** AWC, `run_location` çıktısında `awc_used` olarak döner (§5); export bunu `results.soil.awc_mm_per_m`'ye yazar.
 
 ---
