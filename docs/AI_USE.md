@@ -22,6 +22,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) — SoilGrids WCS çekimi, birim dönüşümü, AWC hesabı ve testleri — `engine/nobetsu/soilgrids.py`, `engine/tests/test_soilgrids.py`
 - Claude Code (Opus 5.5) — economics.ts birim testleri (elle hesaplanmış örnekler, numpy ile karşılaştırmalı yüzdelik) — `web/src/lib/economics.test.ts`
 - Claude Code (Opus 5.5) — AWC ayrışması analizi (Saxton–Rawls çapraz kontrolü, motor duyarlılığı), doku sınıfı ve taş oranı çıktısı — `engine/nobetsu/soilgrids.py`, `docs/ARAYUZLER.md` §3, `docs/OMER_BAKMALI.md`
+- Claude Code (Opus 5.5) + WebSearch/web-fetch — Muhammet'in Gümüş'e giden araştırma görevleri: fiyat, destek, deneme verimleri, nadas etkinliği, WMO yağış normalleri, erozyon kaynağı, strateji metinleri, sözlük; kaynak PDF'leri pdftotext ile okundu — `docs/SOURCES.md`, `engine/config/{defaults,references,rotations}.yaml`
 
 ## Ortak (plan ve görev dağılımı)
 - Claude — görev dağılımı, kişi rehberleri, arayüz sözleşmesi taslağı, proje özeti — `TASKS.md`, `AGENTS.md`, `docs/ARAYUZLER.md`, `docs/PROJE_OZETI.md`, `docs/team/*`

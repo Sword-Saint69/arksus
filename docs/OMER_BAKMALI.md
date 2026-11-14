@@ -43,3 +43,18 @@ Ters yön (Ömer → Gümüş): `docs/GUMUS_BAKMALI.md`. Yeni madde eklendikçe 
 - [x] (İsteğe bağlı, yapıldı: motor artık `texture_0_100cm` kullanıyor, yoksa 0–30 cm Q50) Doku sınıfı için 0–100 cm hazır: `texture_0_100cm.usda_class` (ortalama haritalar, 100'e ölçekli). Sen 0–30 cm Q50 kullanıyorsun; iki lokasyonda sonuç aynı sınıf (siltli kil / killi tın), değiştirmek şart değil — kök bölgesi 1 m'ye indiği için 0–100 cm daha tutarlı olur.
 - Bilgi: `type: "assumption"` kullanman uygun; ARAYUZLER §3'ü buna göre düzelttim (`literature` yerine `assumption`).
 - Senin "SoilGrids'in kendi AWC'si de kartta gösterilsin" önerin: kabul. `awc_alternatives` dosyada var; İsmail'le kartta nasıl görüneceğine karar verince sözleşmeye eklerim.
+
+## 4. Muhammet'in referans değerleri geldi — 3 testin kırıldı (14 Kas)
+
+Muhammet'in `ref.*` işini ben yaptım; `engine/config/references.yaml` artık gerçek değerlerle dolu (branch `gumus/muhammet-sources`):
+- `trial_yields_kg_per_da`: 286 / 249 / 228 — Gültekin vd. 2017 makalesinde teyit edildi (`verified: true`), `years` metni güncellendi.
+- `pse_range`: **0,08 / 0,30 → 0,11 / 0,29** (Ayday ve Oylukan 1984; Özbek vd. 1967). Literatür tanımı (nadas − ekili toprak suyu) / yıllık yağış; seninkiyle aynı değil, kontrol zaten `info`.
+- `mgm_annual_precip_mm`: Karapınar **290,11** (WMO 17902), Develi için en yakın istasyon Kayseri Bölge **404,58** (WMO 17196, ~29 km). `precip_vs_mgm` artık iki lokasyonda da `info` (gerçek POWER ile): **Karapınar POWER 395 mm/yıl, MGM 290 → +36 %**; Develi POWER 374, Kayseri Bölge 405 → ≈ −8 %. Karapınar'da POWER yağışı belirgin yüksek; sonuçların dürüst sunumu için önemli (kanıt panelinde görünecek).
+- `heat_threshold_c`: **30 → 31 °C** (Porter ve Gawith 1999). Isı günleri biraz azalır.
+
+**Kırılan testler (`engine/tests/test_validate.py`)** gerçek `references.yaml`'daki eski yer tutucu değerlere bağlı:
+- [ ] `test_pse_is_info_with_model_value_and_literature_range`: `"8" in reference and "30" in reference` arıyor. Ya testte `refs["pse_range"]`'i açıkça 0.08/0.30'a ayarla, ya da `refs`'teki değerlerden beklenen metni üret.
+- [ ] `test_precip_vs_mgm_pending_when_normals_missing`: MGM'nin boş olduğunu varsayıyor. Testin başında iki lokasyonun `value`'sunu `None` yap.
+- [ ] `test_precip_vs_mgm_reports_percent_difference`: Develi'nin boş olduğunu varsayıyor. Develi `value`'sunu testte `None` yap.
+
+Üçü düzelince `gumus/muhammet-sources`'u main'e alacağım (testler geçmeden merge yok). Diğer 152 test geçiyor.

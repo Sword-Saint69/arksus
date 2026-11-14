@@ -1,77 +1,78 @@
-# Owner: Gümüş (Rol B); values from Muhammet via docs/SOURCES.md (ref.*). Read by validate.run_checks (Ömer).
-# Values quoted in PLAN_MVP are "reported" and NOT yet verified against the papers (verified: false).
-# value: null = not available -> the related check returns status "pending".
+# Owner: Gümüş (Rol B). Values researched for Muhammet's SOURCES.md §6 (ref.*) on 2026-11-14 by Gümüş.
+# Read by validate.run_checks (Ömer). value: null = not available -> the related check returns status "pending".
 
-trial_yields_kg_per_da:          # Konya dryland previous-crop trial (PLAN_MVP §5.7, check: trial_ratio)
-  years: "2011–2014"
+trial_yields_kg_per_da:          # check: trial_ratio
+  years: "2011–2014 (buğday hasatları 2012, 2013, 2014; Konya Merkez, kuru koşul)"
   after_fallow:
     value: 286
     unit: "kg/da"
-    source: "Konya kuru koşul ön bitki denemesi, PLAN_MVP §5.7'de raporlanan değer — Muhammet makaleden doğrulayacak (ref.trial)"
-    source_url: ""
+    source: "Gültekin İ., Partigöç F., Gültekin S., Kaya Y., Arısoy R.Z., Taner A. 2017. Orta Anadolu Bölgesi Kuru Koşullarında Buğday Tabanlı Üretimde Doğrudan Ekim. KSÜ Doğa Bil. Derg. 20 (Özel Sayı): 283–287. Geleneksel ekim ve doğrudan ekim ile yılların ortalaması."
+    source_url: "https://doi.org/10.18016/ksudobil.349258"
     type: literature
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
   after_lentil:
     value: 249
     unit: "kg/da"
-    source: "Konya kuru koşul ön bitki denemesi, PLAN_MVP §5.7'de raporlanan değer — Muhammet makaleden doğrulayacak (ref.trial)"
-    source_url: ""
+    source: "Gültekin vd. 2017 (yukarıdaki gibi); mercimek = Sultan-1 yeşil mercimek"
+    source_url: "https://doi.org/10.18016/ksudobil.349258"
     type: literature
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
   after_chickpea:
     value: 228
     unit: "kg/da"
-    source: "Konya kuru koşul ön bitki denemesi, PLAN_MVP §5.7'de raporlanan değer — Muhammet makaleden doğrulayacak (ref.trial)"
-    source_url: ""
+    source: "Gültekin vd. 2017 (yukarıdaki gibi); nohut = Gökçe"
+    source_url: "https://doi.org/10.18016/ksudobil.349258"
     type: literature
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
 
-pse_range:                       # fallow (precipitation) storage efficiency, Central Anatolia (check: pse_literature)
+pse_range:                       # check: pse_literature (fraction 0–1)
+  # Literature definition: (soil water under fallow − soil water under crop) / annual precipitation.
+  # The engine's PSE is ΔS / P over the fallow period; the check is "info" only.
   low:
-    value: 0.08
+    value: 0.11
     unit: "fraction"
-    source: "Orta Anadolu nadas su depolama verimi, PLAN_MVP §5.7'de raporlanan ~%8–30 — Muhammet doğrulayacak (ref.pse)"
-    source_url: ""
+    source: "Ayday ve Oylukan (1984), Adak M.S. 1999 içinde: 'Bir defa nadas yılında toprakta biriken nem miktarı yıllık yağışın %11–23'ü kadardır'. Adak M.S. 1999. Tarla Bitkileri Merkez Araştırma Enstitüsü Dergisi 8(1-2)."
+    source_url: "https://dergipark.org.tr/tr/download/article-file/118589"
     type: literature
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
   high:
-    value: 0.30
+    value: 0.29
     unit: "fraction"
-    source: "Orta Anadolu nadas su depolama verimi, PLAN_MVP §5.7'de raporlanan ~%8–30 — Muhammet doğrulayacak (ref.pse)"
-    source_url: ""
+    source: "Özbek vd. (1967), Demiralay İ. 'Nadasın Etkinliği' içinde: Orta Anadolu'da 180 cm toprak derinliğinde nadasın etkinliği %12,9–29,0."
+    source_url: "https://dergipark.org.tr/en/download/article-file/34779"
     type: literature
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
 
-mgm_annual_precip_mm:            # MGM 1991–2020 normal at the nearest station (check: precip_vs_mgm)
+mgm_annual_precip_mm:            # check: precip_vs_mgm (WMO 1991–2020 climate normals, submitted by MGM)
   karapinar:
-    station: ""
-    value: null
+    station: "Karapınar (WMO 17902; 37.715 K, 33.526 D, 996 m)"
+    value: 290.11
     unit: "mm/year"
-    source: "pending: SOURCES.md ref.mgm.karapinar"
-    source_url: ""
+    source: "WMO Climate Normals 1991–2020, Karapınar 17902, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Karapinar_17902.csv"
     type: official
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
   develi:
-    station: ""
-    value: null
+    station: "Kayseri Bölge (WMO 17196; 38.687 K, 35.500 D, 1094 m) — WMO normallerinde Develi istasyonu yok; en yakın istasyon, Develi noktasına ~29 km kuzeyde"
+    value: 404.58
     unit: "mm/year"
-    source: "pending: SOURCES.md ref.mgm.develi"
-    source_url: ""
+    source: "WMO Climate Normals 1991–2020, Kayseri Bölge 17196, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Kayseri_Bolge_17196.csv"
     type: official
-    verified: false
-    as_of: ""
+    verified: true
+    as_of: "2026-11-14"
 
 heat_threshold_c:                # T2M_MAX threshold for heat days at wheat flowering (PLAN_MVP §5.8)
-  value: 30
+  value: 31
   unit: "°C"
-  source: "PLAN_MVP §5.8 literatür eşiği (VERIFY) — Muhammet doğrulayacak (ref.heat)"
-  source_url: ""
+  source: "Porter J.R., Gawith M. 1999. Temperatures and the growth and development of wheat: a review. Eur. J. Agron. 10: 23–36 — çiçeklenmede 31 °C üstü tozlanma başarısını sınırlar (ikincil atıf üzerinden; birincil metin görülmedi)"
+  source_url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC7540836"
   type: literature
   verified: false
-  as_of: ""
+  as_of: "2026-11-14"

@@ -43,15 +43,15 @@ Ayrıntı: `docs/PLAN_MVP.md` (tek doğru kaynak) · kod uyumu: `docs/ARAYUZLER.
 Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · birim · kaynak adı · link · tarih · tür (official / statistic / literature / assumption)**. Gümüş bunları koda geçirir.
 
 - [ ] **T+0–1: Yarışma kuralları** — teslim saati, video/slayt kuralı, AI kullanım beyanı, proje sayfası alanları, jüri kriterleri; ekibe 5 satırlık özet at
-- [ ] **T+1–3: Fiyatlar** — TMO 2026 buğday alım fiyatı (resmi sayfadan teyit), nohut ve mercimek için TMO günlük bülten veya Konya Ticaret Borsası → SOURCES.md `price.*`
-- [ ] **T+1–3: Destekler** — Bakanlık destek hesaplayıcısı (destekhesaplama.tarimorman.gov.tr): Karapınar ve Develi × buğday, nohut, mercimek, nadas, kuru (sulu değil) → `support.*`
-- [ ] **T+3 (sadece Gümüş "SoilGrids olmadı" derse): SoilGrids web haritasından iki koordinatın toprak değerleri** — kil/kum/silt, pH, organik karbon, azot, CEC; Q05/Q50/Q95 → `soil.*`
-- [ ] **T+3–5: Maliyetler** — Konya / Kayseri ziraat odası 2026 dekar başı maliyet tabloları (kira hariç); nadas için toprak işleme maliyeti → `cost.*`
-- [ ] **T+3–5: Verimler** — TÜİK ilçe bitkisel üretim: Karapınar ve Develi kuru buğday, nohut, mercimek verimi (kg/da), 2004–2025 → `ym.*` yıllık tablo
+- [x] **T+1–3: Fiyatlar** — TMO 2026 buğday alım fiyatı (resmi sayfadan teyit), nohut ve mercimek için TMO günlük bülten veya Konya Ticaret Borsası → SOURCES.md `price.*` — ✅ 17:55 — gümüş yaptı (nohut fiyatı Gönen TB'den; Konya borsası 2026 bulunamadı)
+- [x] **T+1–3: Destekler** — Bakanlık destek hesaplayıcısı (destekhesaplama.tarimorman.gov.tr): Karapınar ve Develi × buğday, nohut, mercimek, nadas, kuru (sulu değil) → `support.*` — ✅ 17:55 — gümüş yaptı (2026 ulusal tutarlar; nadas tutarı katsayıdan hesaplandı)
+- [x] **T+3 (sadece Gümüş "SoilGrids olmadı" derse): SoilGrids web haritasından iki koordinatın toprak değerleri** — kil/kum/silt, pH, organik karbon, azot, CEC; Q05/Q50/Q95 → `soil.*` — ✅ 17:55 — gümüş yaptı (gerek kalmadı: WCS ile çekildi)
+- [ ] **T+3–5: Maliyetler** — Konya / Kayseri ziraat odası 2026 dekar başı maliyet tabloları (kira hariç); nadas için toprak işleme maliyeti → `cost.*` — ⏳ kalan: Orta Anadolu kuru tarım 2026 dekar maliyeti bulunamadı (gümüş denedi; ziraat odasından elle alınmalı)
+- [ ] **T+3–5: Verimler** — TÜİK ilçe bitkisel üretim: Karapınar ve Develi kuru buğday, nohut, mercimek verimi (kg/da), 2004–2025 → `ym.*` yıllık tablo — ⏳ kalan: TÜİK ilçe verileri otomatik okunamadı (gümüş denedi; TÜİK'ten elle indirilmeli)
 - [ ] **T+5–6: Ekim/hasat takvimi** — TAGEM / GKTAEM / Bahri Dağdaş: Konya ve Kayseri için buğday, nohut, mercimek ekim ve hasat tarihleri → `calendar.*` → **Ömer'e haber ver**
-- [ ] **T+6–7: Karapınar rüzgâr erozyonu kaynağı** — Konya Toprak Su ve Çölleşme Araştırma Enstitüsü tarih sayfası (nadas–hububat + diskaro, 1960'lar) → `story.erosion`
-- [ ] **T+6–7: Doğrulama kaynakları** — Konya kuru koşul ön bitki denemesi (286 / 249 / 228 kg/da ve yıllar); Orta Anadolu nadas su depolama verimi (%8–30); Karapınar ve Develi'ye en yakın MGM istasyonunun 1991–2020 yıllık yağış normali → `ref.*`
-- [ ] **T+7–9: Strateji açıklamaları + toprak özellikleri + sözlük** — 3 rotasyon × neden / kanıt / faydalar / bilgi boşlukları / yerel uzmana sorulacaklar; azot bağlama, nadas yılındaki toprak işleme sayısı; 12 sözlük terimi → `strategy.*`, `trait.*`, `glossary.*` → Gümüş ve İsmail'e haber ver
+- [x] **T+6–7: Karapınar rüzgâr erozyonu kaynağı** — Konya Toprak Su ve Çölleşme Araştırma Enstitüsü tarih sayfası (nadas–hububat + diskaro, 1960'lar) → `story.erosion` — ✅ 17:55 — gümüş yaptı
+- [x] **T+6–7: Doğrulama kaynakları** — Konya kuru koşul ön bitki denemesi (286 / 249 / 228 kg/da ve yıllar); Orta Anadolu nadas su depolama verimi (%8–30); Karapınar ve Develi'ye en yakın MGM istasyonunun 1991–2020 yıllık yağış normali → `ref.*` — ✅ 17:55 — gümüş yaptı (PSE %11–29, MGM yerine WMO normalleri)
+- [x] **T+7–9: Strateji açıklamaları + toprak özellikleri + sözlük** — 3 rotasyon × neden / kanıt / faydalar / bilgi boşlukları / yerel uzmana sorulacaklar; azot bağlama, nadas yılındaki toprak işleme sayısı; 12 sözlük terimi → `strategy.*`, `trait.*`, `glossary.*` → Gümüş ve İsmail'e haber ver — ✅ 17:55 — gümüş yaptı (baklagil yılı toprak işleme sayısı bulunamadı)
 - [ ] **T+9–10: Hikâye ve slayt iskeleti (7 slayt)**
 - [ ] **T+10–12: Proje sayfası İngilizce taslak + AI beyanı taslağı + jüri soru-cevap listesi** (PLAN_MVP §8)
 - [ ] **T+12–14: Siteyi kullanıcı gibi test et** — anlaşılmayan her yeri İsmail'e yaz; mümkünse bir çiftçiden veya MUSTECH'ten 5 dk görüş (isim için izin iste)
