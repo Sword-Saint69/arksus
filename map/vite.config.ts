@@ -5,7 +5,7 @@ import { join, normalize, resolve } from 'node:path';
 // NöbetSu data lives in ../web/public/data (owned by the web/contract side).
 // Serve it under /data/nobetsu in dev and copy it into the build, instead of
 // keeping a second copy in this folder.
-const DATA = resolve(__dirname, '../web/public/data');
+const DATA = resolve(import.meta.dirname, '../web/public/data');
 // ledger/ is ~2 MB per district and only fetched when the process simulation opens.
 const FILES = ['site_index.json', 'defaults.json', 'validation.json', 'results', 'smap', 'ledger'];
 
