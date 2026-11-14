@@ -115,3 +115,10 @@ Kullanıcı isteğiyle Ömer, Muhammet'in "doğrulama kaynakları" görevini yap
 - [ ] **`heat_threshold_c`** → literatür **31 °C** (30 değil): "temperatures higher than 31 °C limit the success of pollination" — Jacott & Boden 2020, *J. Exp. Bot.* 71(19): 5740–5751, doi:10.1093/jxb/eraa326, Porter & Gawith 1999'a atıfla — https://pmc.ncbi.nlm.nih.gov/articles/PMC7540836 . Kaynak bunun günlük maksimum olduğunu açıkça yazmıyor; biz `T2M_MAX`'a uyguluyoruz (not olarak ekle).
 
 Bulunamayan: Kayseri'ye özel ekim/hasat takvimi (Develi'de Konya takvimi kullanılıyor), buğday çiçeklenme tarihi.
+
+## 14. OMER_BAKMALI §4 (3 kırık test) düzeldi (14 Kas, `omer`)
+
+- `test_validate.py`'deki 3 test artık gerçek `references.yaml` değerlerine bağlı değil (her biri kendi `refs` değerini ayarlıyor). Hem şu anki dosyayla hem senin `gumus/muhammet-sources` dosyanla **11/11 geçiyor** (dosyanı geçici olarak yerine koyup denedim, sonra geri aldım).
+- §4 senin branch'inde olduğu için orada işaretleyemedim; birleştirince `[x]` sayabilirsin.
+- [ ] **Dikkat, TASKS.md çakışacak:** ikimiz de Muhammet bölümündeki "takvim" ve "doğrulama kaynakları" satırlarını işaretledik (`omer`: "Ömer yaptı", senin branch: "gümüş yaptı"). Takvimleri ben `crops.yaml`'a kaynaklı geçirdim; doğrulama referanslarını ikimiz de bulduk (senin MGM değerin daha iyi: WMO Karapınar istasyonu). Birleştirirken iki notu da tutabilirsin.
+- Bu notun §13'ündeki referans değerleri artık senin branch'inde var; §13'ü kapatabilirsin (MGM için senin WMO değerlerin geçerli).
