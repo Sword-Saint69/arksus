@@ -1,10 +1,15 @@
 // Loads the NöbetSu data files (web/public/data, served under /data/nobetsu) and
-// turns them into what the pilot-district panel shows. All range maths goes
-// through the project's own economics.ts, never re-implemented here.
+// turns them into what the pilot-district panel shows. All range and decision maths
+// goes through the project's own economics.ts, never re-implemented here.
 // 14 Nov: the site shows no money (ARAYUZLER §9); defaults.json holds decision parameters only.
+// 15 Nov: climate scenarios (E2), the decision module (priorities → ranking, guardrails,
+// close call, price robustness, flip table) and the evidence panel (validation.json).
 
-import type { DefaultsFile, DepthId, LocationId, ResultsFile, SiteIndex, SmapFile } from '../../web/src/lib/types';
-import { summarize } from '../../web/src/lib/economics';
+import type { DefaultsFile, DepthId, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
+import {
+  decide, flipTable, inputsFromDefaults, priceRobustness, summarize,
+  type Decision, type DecisionInputs, type FlipCell, type PriceRobustness, type Weights,
+} from '../../web/src/lib/economics';
 import { pilotFeature, type Feature } from './vector/features';
 import type { PilotData } from './ui/inspector';
 
@@ -14,46 +19,76 @@ const getJSON = <T>(path: string) => fetch(`${base}/${path}`).then((r) => {
   return r.json() as Promise<T>;
 });
 
+const resultsPath = (id: string, scenario: string) => (scenario === 'baseline' ? `results/${id}.json` : `results/${id}__${scenario}.json`);
+
 export class Pilots {
   site: SiteIndex | null = null;
   defaults: DefaultsFile | null = null;
+  validation: ValidationFile | null = null;
   features: Feature[] = [];
   depth: DepthId = 'medium';
-  private results = new Map<string, ResultsFile>();
+  scenario = 'baseline';
+  weights: Weights | null = null;
+  private inputs: DecisionInputs | null = null;
+  private results = new Map<string, ResultsFile>();   // key: `${id}__${scenario}`
   private smap = new Map<string, SmapFile>();
   private loading = new Map<string, Promise<void>>();
   onLoaded: () => void = () => {};
 
   async init() {
     [this.site, this.defaults] = await Promise.all([getJSON<SiteIndex>('site_index.json'), getJSON<DefaultsFile>('defaults.json')]);
+    this.inputs = inputsFromDefaults(this.defaults);
+    this.weights = { ...this.inputs.weights };
+    getJSON<ValidationFile>('validation.json').then((v) => { this.validation = v; this.onLoaded(); }).catch(() => {});
     this.features = this.site.locations.map(pilotFeature);
     return this.features;
   }
 
   get anyMock() {
-    return !!(this.site?.mock || this.defaults?.mock || [...this.results.values()].some((r) => r.mock));
+    return !!(this.site?.mock || this.defaults?.mock || this.validation?.mock || [...this.results.values()].some((r) => r.mock));
   }
 
-  /** Fetch a district's results and SMAP file once; the panel re-renders when they land. */
+  setWeight(k: keyof Weights, v: number) {
+    if (this.weights) this.weights = { ...this.weights, [k]: Math.max(0, v) };
+  }
+
+  resetWeights() {
+    if (this.inputs) this.weights = { ...this.inputs.weights };
+  }
+
+  /** Fetch a district's results (current scenario) and SMAP file once; the panel re-renders when they land. */
   ensure(id: string) {
-    if (this.results.has(id) || this.loading.has(id)) return;
-    const p = Promise.all([getJSON<ResultsFile>(`results/${id}.json`), getJSON<SmapFile>(`smap/${id}.json`).catch(() => null)])
-      .then(([r, s]) => { this.results.set(id, r); if (s) this.smap.set(id, s); this.onLoaded(); })
-      .finally(() => this.loading.delete(id));
-    this.loading.set(id, p);
+    const key = `${id}__${this.scenario}`;
+    if (this.results.has(key) || this.loading.has(key)) return;
+    const p = Promise.all([
+      getJSON<ResultsFile>(resultsPath(id, this.scenario)),
+      this.smap.has(id) ? Promise.resolve(this.smap.get(id)!) : getJSON<SmapFile>(`smap/${id}.json`).catch(() => null),
+    ])
+      .then(([r, s]) => { this.results.set(key, r); if (s) this.smap.set(id, s); this.onLoaded(); })
+      .catch((e) => console.warn('NöbetSu results', key, e))
+      .finally(() => this.loading.delete(key));
+    this.loading.set(key, p);
   }
 
   data(f: Feature): PilotData | null {
-    if (!this.site || !this.defaults) return null;
+    if (!this.site || !this.defaults || !this.inputs || !this.weights) return null;
     const id = String(f.props.location_id) as LocationId;
     const location = this.site.locations.find((l) => l.id === id);
     if (!location) return null;
     this.ensure(id);
-    const results = this.results.get(id) ?? null;
-    const summaries = results ? summarize(results, this.site, this.depth) : null;
-    // No money is shown anywhere (14 Nov decision): nothing is "pending", so the old money notice stays off.
-    const moneyPending = false;
-    return { site: this.site, location, results, smap: this.smap.get(id) ?? null, summaries, depth: this.depth, moneyPending };
+    const results = this.results.get(`${id}__${this.scenario}`) ?? null;
+    let summaries = null, decision: Decision | null = null, robustness: PriceRobustness | null = null, flip: FlipCell[] | null = null;
+    if (results) {
+      summaries = summarize(results, this.site, this.depth);
+      decision = decide(results, this.site, this.depth, this.inputs, this.weights);
+      robustness = priceRobustness(results, this.site, this.depth, this.inputs, this.weights);
+      flip = flipTable(results, this.site, this.inputs, this.weights);
+    }
+    return {
+      site: this.site, location, results, smap: this.smap.get(id) ?? null, summaries, depth: this.depth,
+      moneyPending: false, scenario: this.scenario, weights: this.weights, decision, robustness, flip,
+      validation: this.validation,
+    };
   }
 
   /** Nearest pilot point and its ground distance, if within reach of the district. */

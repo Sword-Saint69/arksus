@@ -368,6 +368,9 @@ function refreshInspector() {
     exportGeoJSON,
     copy: (text) => { navigator.clipboard?.writeText(text).then(() => toast(t('copied')), () => toast(t('copyFailed'))); },
     setDepth: (d) => { pilots.depth = d; refreshInspector(); },
+    setScenario: (id) => { pilots.scenario = id; refreshInspector(); },
+    setWeight: (k, v) => { pilots.setWeight(k, v); refreshInspector(); },
+    resetWeights: () => { pilots.resetWeights(); refreshInspector(); },
     select: (f) => { active = f; if (!vectors.selected.has(f.id)) select(f); else refreshInspector(); },
   });
 }

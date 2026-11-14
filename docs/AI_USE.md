@@ -21,6 +21,8 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) + tarayıcı — MODIS NDVI (ORNL API) çekimi, model takvimi ile NDVI karşılaştırması, Karapınar noktası bulgusu, testleri — `engine/nobetsu/modis.py`, `engine/nobetsu/{runner,validate}.py`, `engine/tests/test_ndvicheck.py`, `data/modis/*.json`
 - Claude Code (Opus 5.5) — E2 kurak/sıcak senaryolar: scenarios.yaml, apply_scenario / run_scenarios, testleri — `engine/config/scenarios.yaml`, `engine/nobetsu/runner.py`, `engine/tests/test_scenarios.py`
 
+- Claude Code (Opus 5.5) — harita arayüzünü yeni backend'e bağlama: iklim senaryosu seçimi (E2), öncelik kaydırıcıları + karar modülü sıralaması (decide, priceRobustness), nerede değişir tablosu (flipTable), kanıt paneli (validation.json), toprak kartı ek alanları — `map/src/{pilots,main,strings}.ts`, `map/src/ui/inspector.ts`, `map/src/style.css`
+
 ## Gümüş
 - Claude Code (Opus 5.5) — M0 sözleşme iskeleti: paket, config, mock runner, export/build, JSON şemaları, testler, types.ts, economics.ts — `engine/`, `docs/contract/`, `web/src/lib/`, `Makefile`
 - Claude Code (Opus 5.5) — NASA POWER çekimi, önbellek, birim/boşluk işleme ve testleri — `engine/nobetsu/power.py`, `engine/tests/test_power.py`
