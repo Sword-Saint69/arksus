@@ -1,0 +1,22 @@
+{
+  "task_type": "point",
+  "task_name": "nobetsu_smap_l4_karapinar_develi",
+  "params": {
+    "dates": [
+      {
+        "startDate": "04-01-2015",
+        "endDate": "11-13-2026"
+      }
+    ],
+    "layers": [
+      { "product": "SPL4SMGP.008", "layer": "Geophysical_Data_sm_rootzone" },
+      { "product": "SPL4SMGP.008", "layer": "Geophysical_Data_sm_rootzone_wetness" },
+      { "product": "SPL4SMGP.008", "layer": "Geophysical_Data_sm_surface_wetness" },
+      { "product": "SPL4SMGP.008", "layer": "Geophysical_Data_sm_rootzone_pctl" }
+    ],
+    "coordinates": [
+      { "id": "karapinar", "category": "nobetsu", "latitude": 37.72, "longitude": 33.48 },
+      { "id": "develi", "category": "nobetsu", "latitude": 38.43, "longitude": 35.47 }
+    ]
+  }
+}
