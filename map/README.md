@@ -1,8 +1,8 @@
 # NöbetSu · land map (`map/`)
 
 A 3D land map of Turkey built on three.js, for the NöbetSu project
-(NASA Space Apps 2026, *Field Shift*). It opens the two pilot districts
-(Karapınar, Develi) with their 24-year water / soil results, and lets you pick
+(NASA Space Apps 2026, *Field Shift*). It opens the 13 Central Anatolian pilot districts
+(one per province, from `web/public/data/site_index.json`) with their 24-year water / soil results, and lets you pick
 provinces, islands, fields and parcels anywhere in Turkey.
 
 ```bash

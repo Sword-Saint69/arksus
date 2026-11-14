@@ -61,8 +61,8 @@ const S = {
   // Inspector
   emptyTitle: { tr: 'Bir yer seçin', en: 'Pick a place' },
   emptyBody: {
-    tr: 'NöbetSu iki pilot ilçede 24 yıllık NASA iklim verisiyle nadas ve baklagil seçeneklerini karşılaştırır. Bir pilot ilçeyle başlayın ya da haritada bir il, ada, tarla veya parsele tıklayın.',
-    en: 'NöbetSu compares fallow and legume options in two pilot districts with 24 years of NASA climate data. Start with a pilot district, or click a province, island, field or parcel on the map.',
+    tr: 'NöbetSu İç Anadolu’nun 13 pilot ilçesinde 24 yıllık NASA iklim verisiyle nadas ve baklagil seçeneklerini karşılaştırır. Bir pilot ilçeyle başlayın ya da haritada bir il, ada, tarla veya parsele tıklayın.',
+    en: 'NöbetSu compares fallow and legume options in 13 Central Anatolian pilot districts with 24 years of NASA climate data. Start with a pilot district, or click a province, island, field or parcel on the map.',
   },
   emptyPilots: { tr: 'Pilot ilçeler', en: 'Pilot districts' },
   howTo: { tr: 'Nasıl seçilir', en: 'How to pick' },
