@@ -86,3 +86,14 @@ const ranked = rankByPriority(cards, { water: 34, income: 33, soil: 33 }); // ka
 - `web/public/data/` artık gerçek NASA POWER + motor çıktısı, `mock: false`, etiket `v0.1`.
 - [ ] Gerçek veride **maliyet ve Ym `null`** (kaynak bulunamadı) → para kartlarında "veri eksik" durumu şimdiden görünecek; §5'teki uyarıyı ilk sürümde kur.
 - [ ] SMAP iki lokasyonda da `available: false` (mock'taki Karapınar örneği artık yok; "yakında" durumu ile başla).
+
+## 10. SÖZLEŞME DEĞİŞTİ: 13 İç Anadolu lokasyonu (14 Kas)
+
+Proje 2 noktadan **13 ile** genişledi (her ilden bir kuru tarım ilçesi): Karapınar (Konya), Develi (Kayseri), Polatlı (Ankara), Eskişehir, Aksaray, Karaman, Niğde, Nevşehir, Kaman (Kırşehir), Kırıkkale, Çankırı, Gemerek (Sivas), Boğazlıyan (Yozgat).
+
+- [ ] **Sabit lokasyon listesi yazma.** `LocationId` artık `string`; liste `site_index.locations`'tan gelir (id, name, district, province, lat, lon, note). `defaults.values[id]` her lokasyon için var.
+- [ ] **Lokasyon seçici:** 13 ilçe, ile göre gruplu açılır liste (`province` alanı).
+- [ ] **Harita (E7, zaman kalırsa):** `lat/lon` ile 13 nokta; kullanıcı haritada bir yere tıklarsa **en yakın hesaplanmış ilçe** ve mesafe: "Bölgesel sonuç: en yakın hesaplanmış ilçe Kaman (23 km). Tarlanız değil, ilçenin tipik bir tarlası." Canlı hesap yok; her şey önceden hesaplı.
+- [ ] Dosya yükleme aynı: `results/{id}.json`, `smap/{id}.json` lokasyon seçilince; `ledger/{id}.json` lazy (~2 MB her biri, 13 lokasyonda toplam ~26 MB; sadece seçilen yüklenir).
+- **`main`'de 13 lokasyonlu gerçek veri var** (`mock: false`). Ömer'in bölge takvimi ve yağış düzeltmesi gelince aynı dosyalar yeniden üretilecek; biçim değişmeyecek.
+- [ ] **Yağış uyarısı:** `validation.json` → `precip_vs_mgm` her ilçe için uydu (POWER) ile yer istasyonu farkını verir. Karaman **+83 %**, Eskişehir +39 %, Karapınar +36 %. Lokasyon kartında bu fark ±%20'yi aşıyorsa görünür bir not göster: "Bu ilçede uydu yağışı istasyondan %X yüksek; su sonuçları iyimser olabilir." Ömer düzeltme eklerse bu not küçülür.

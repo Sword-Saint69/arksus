@@ -1,0 +1,474 @@
+{
+ "location_id": "cankiri",
+ "how_obtained": "wcs",
+ "window": "median of 250 m pixels within ±0.005° of the point",
+ "properties": [
+  {
+   "id": "clay",
+   "label": {
+    "en": "Clay",
+    "tr": "Kil"
+   },
+   "depth": "0-30 cm",
+   "q05": 4.39,
+   "q50": 27.99,
+   "q95": 68.61,
+   "unit": "%",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "sand",
+   "label": {
+    "en": "Sand",
+    "tr": "Kum"
+   },
+   "depth": "0-30 cm",
+   "q05": 8.88,
+   "q50": 29.89,
+   "q95": 60.21,
+   "unit": "%",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "silt",
+   "label": {
+    "en": "Silt",
+    "tr": "Silt"
+   },
+   "depth": "0-30 cm",
+   "q05": 4.94,
+   "q50": 34.44,
+   "q95": 78.22,
+   "unit": "%",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "phh2o",
+   "label": {
+    "en": "pH (water)",
+    "tr": "pH (su)"
+   },
+   "depth": "0-30 cm",
+   "q05": 6.0,
+   "q50": 7.85,
+   "q95": 8.4,
+   "unit": "pH",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "soc",
+   "label": {
+    "en": "Soil organic carbon",
+    "tr": "Toprak organik karbonu"
+   },
+   "depth": "0-30 cm",
+   "q05": 3.15,
+   "q50": 11.77,
+   "q95": 50.19,
+   "unit": "g/kg",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "nitrogen",
+   "label": {
+    "en": "Total nitrogen",
+    "tr": "Toplam azot"
+   },
+   "depth": "0-30 cm",
+   "q05": 0.35,
+   "q50": 0.93,
+   "q95": 4.27,
+   "unit": "g/kg",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "cec",
+   "label": {
+    "en": "Cation exchange capacity",
+    "tr": "Katyon değişim kapasitesi"
+   },
+   "depth": "0-30 cm",
+   "q05": 8.03,
+   "q50": 24.52,
+   "q95": 45.57,
+   "unit": "cmol(c)/kg",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "bdod",
+   "label": {
+    "en": "Bulk density",
+    "tr": "Hacim ağırlığı"
+   },
+   "depth": "0-30 cm",
+   "q05": 0.93,
+   "q50": 1.39,
+   "q95": 1.72,
+   "unit": "g/cm³",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  },
+  {
+   "id": "cfvo",
+   "label": {
+    "en": "Coarse fragments",
+    "tr": "Kaba parçalar"
+   },
+   "depth": "0-30 cm",
+   "q05": 0.0,
+   "q50": 8.83,
+   "q95": 54.25,
+   "unit": "vol %",
+   "source": "SoilGrids 2.0 (ISRIC), WCS",
+   "type": "model",
+   "how_obtained": "wcs",
+   "meaning": {
+    "en": "[text pending]",
+    "tr": "[metin bekleniyor]"
+   }
+  }
+ ],
+ "awc_mm_per_m": {
+  "value": 98.5,
+  "unit": "mm/m",
+  "source": "SoilGrids 2.0 wv0033−wv1500, cfvo düzeltmeli, 0–100 cm ağırlıklı",
+  "type": "model",
+  "verified": false,
+  "range_q05_q95": [
+   34.9,
+   105.8
+  ]
+ },
+ "raw_mapped": {
+  "clay": {
+   "0-5cm": {
+    "q05": 33.0,
+    "q50": 246.5,
+    "q95": 600.5,
+    "mean": 271.0
+   },
+   "5-15cm": {
+    "q05": 41.0,
+    "q50": 253.0,
+    "q95": 666.0,
+    "mean": 290.5
+   },
+   "15-30cm": {
+    "q05": 49.5,
+    "q50": 309.0,
+    "q95": 728.0,
+    "mean": 331.0
+   },
+   "30-60cm": {
+    "mean": 338.0
+   },
+   "60-100cm": {
+    "mean": 345.5
+   }
+  },
+  "sand": {
+   "0-5cm": {
+    "q05": 94.5,
+    "q50": 320.0,
+    "q95": 611.5,
+    "mean": 334.5
+   },
+   "5-15cm": {
+    "q05": 90.0,
+    "q50": 305.5,
+    "q95": 614.0,
+    "mean": 324.5
+   },
+   "15-30cm": {
+    "q05": 86.0,
+    "q50": 287.5,
+    "q95": 591.0,
+    "mean": 302.5
+   },
+   "30-60cm": {
+    "mean": 299.0
+   },
+   "60-100cm": {
+    "mean": 307.0
+   }
+  },
+  "silt": {
+   "0-5cm": {
+    "q05": 53.5,
+    "q50": 363.0,
+    "q95": 802.0,
+    "mean": 395.0
+   },
+   "5-15cm": {
+    "q05": 54.0,
+    "q50": 351.5,
+    "q95": 786.0,
+    "mean": 387.5
+   },
+   "15-30cm": {
+    "q05": 45.0,
+    "q50": 333.5,
+    "q95": 773.0,
+    "mean": 365.0
+   },
+   "30-60cm": {
+    "mean": 363.5
+   },
+   "60-100cm": {
+    "mean": 348.0
+   }
+  },
+  "phh2o": {
+   "0-5cm": {
+    "q05": 58.0,
+    "q50": 76.0,
+    "q95": 84.0
+   },
+   "5-15cm": {
+    "q05": 59.5,
+    "q50": 79.0,
+    "q95": 84.0
+   },
+   "15-30cm": {
+    "q05": 61.0,
+    "q50": 79.0,
+    "q95": 84.0
+   }
+  },
+  "soc": {
+   "0-5cm": {
+    "q05": 53.0,
+    "q50": 179.5,
+    "q95": 1079.5,
+    "mean": 310.0
+   },
+   "5-15cm": {
+    "q05": 36.5,
+    "q50": 135.0,
+    "q95": 522.0,
+    "mean": 218.0
+   },
+   "15-30cm": {
+    "q05": 21.0,
+    "q50": 85.5,
+    "q95": 296.0,
+    "mean": 107.5
+   },
+   "30-60cm": {
+    "mean": 74.0
+   },
+   "60-100cm": {
+    "mean": 35.0
+   }
+  },
+  "nitrogen": {
+   "0-5cm": {
+    "q05": 38.0,
+    "q50": 133.0,
+    "q95": 1028.0
+   },
+   "5-15cm": {
+    "q05": 40.0,
+    "q50": 92.0,
+    "q95": 357.0
+   },
+   "15-30cm": {
+    "q05": 31.0,
+    "q50": 80.0,
+    "q95": 273.0
+   }
+  },
+  "cec": {
+   "0-5cm": {
+    "q05": 63.0,
+    "q50": 221.0,
+    "q95": 455.0
+   },
+   "5-15cm": {
+    "q05": 85.0,
+    "q50": 244.0,
+    "q95": 457.0
+   },
+   "15-30cm": {
+    "q05": 83.0,
+    "q50": 254.0,
+    "q95": 455.0
+   }
+  },
+  "bdod": {
+   "0-5cm": {
+    "q05": 87.0,
+    "q50": 135.0,
+    "q95": 171.0
+   },
+   "5-15cm": {
+    "q05": 92.0,
+    "q50": 138.5,
+    "q95": 172.0
+   },
+   "15-30cm": {
+    "q05": 95.0,
+    "q50": 141.0,
+    "q95": 173.0
+   }
+  },
+  "cfvo": {
+   "0-5cm": {
+    "q05": 0.0,
+    "q50": 80.0,
+    "q95": 550.0
+   },
+   "5-15cm": {
+    "q05": 0.0,
+    "q50": 105.0,
+    "q95": 550.0
+   },
+   "15-30cm": {
+    "q05": 0.0,
+    "q50": 80.0,
+    "q95": 535.0
+   },
+   "30-60cm": {
+    "q50": 95.0
+   },
+   "60-100cm": {
+    "q50": 97.5
+   }
+  },
+  "wv0033": {
+   "0-5cm": {
+    "q05": 110.0,
+    "q50": 308.0,
+    "q95": 436.0
+   },
+   "5-15cm": {
+    "q05": 111.0,
+    "q50": 319.0,
+    "q95": 442.0
+   },
+   "15-30cm": {
+    "q05": 117.0,
+    "q50": 324.5,
+    "q95": 450.0
+   },
+   "30-60cm": {
+    "q05": 113.0,
+    "q50": 323.0,
+    "q95": 451.5
+   },
+   "60-100cm": {
+    "q05": 108.0,
+    "q50": 330.0,
+    "q95": 452.0
+   }
+  },
+  "wv1500": {
+   "0-5cm": {
+    "q05": 80.0,
+    "q50": 183.0,
+    "q95": 314.0
+   },
+   "5-15cm": {
+    "q05": 79.0,
+    "q50": 187.0,
+    "q95": 316.0
+   },
+   "15-30cm": {
+    "q05": 87.0,
+    "q50": 192.0,
+    "q95": 320.0
+   },
+   "30-60cm": {
+    "q05": 74.0,
+    "q50": 228.0,
+    "q95": 339.5
+   },
+   "60-100cm": {
+    "q05": 64.0,
+    "q50": 228.0,
+    "q95": 339.5
+   }
+  }
+ },
+ "texture_0_100cm": {
+  "clay": 33.2,
+  "sand": 30.7,
+  "silt": 36.1,
+  "usda_class": "clay loam",
+  "source": "SoilGrids 2.0 mean maps, 0–100 cm thickness-weighted, normalised to 100 %"
+ },
+ "cfvo_0_100cm_fraction": {
+  "value": 0.094,
+  "unit": "fraction (volume)",
+  "source": "SoilGrids 2.0 cfvo Q0.5, 0–100 cm thickness-weighted",
+  "type": "model",
+  "verified": false
+ },
+ "awc_alternatives": {
+  "soilgrids_wv0033_wv1500": {
+   "value": 98.5,
+   "unit": "mm/m",
+   "source": "SoilGrids 2.0 wv0033−wv1500, cfvo düzeltmeli, 0–100 cm ağırlıklı",
+   "type": "model",
+   "verified": false,
+   "range_q05_q95": [
+    34.9,
+    105.8
+   ]
+  },
+  "saxton_rawls_2006": {
+   "value": 126.9,
+   "unit": "mm/m",
+   "source": "Saxton & Rawls (2006) pedotransfer from SoilGrids mean texture + SOC, cfvo düzeltmeli, 0–100 cm",
+   "type": "model",
+   "verified": false
+  }
+ }
+}

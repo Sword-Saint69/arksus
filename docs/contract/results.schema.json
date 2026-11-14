@@ -14,10 +14,8 @@
       "type": "string"
     },
     "location_id": {
-      "enum": [
-        "karapinar",
-        "develi"
-      ]
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
     },
     "soil": {
       "type": "object",

@@ -113,7 +113,7 @@ cost_tl_per_da:
 - `soil.yaml` (Ömer) derinlik sınıflarını `depth_classes: [{id, depth_m, label: {en, tr}}]` olarak tutar (`depth_m` sayı veya V). Dosya yoksa export PLAN_MVP §4.1'deki 0.6 / 0.9 / 1.2 m değerlerini kullanır.
 - `references.yaml` anahtarları (Ömer `validate.py`'de bunları okur): `trial_yields_kg_per_da.{after_fallow, after_lentil, after_chickpea}`, `pse_range.{low, high}` (oran, 0–1), `mgm_annual_precip_mm.{karapinar, develi}` (+ `station`), `heat_threshold_c`. Hepsi V.
 
-Derinlik sınıfı id'leri sabit: `shallow`, `medium`, `deep`. Rotasyon id'leri sabit: `fallow_wheat`, `chickpea_wheat`, `lentil_wheat`. Lokasyon id'leri sabit: `karapinar`, `develi`. Ürün id'leri sabit: `wheat`, `chickpea`, `lentil`, `fallow`.
+Derinlik sınıfı id'leri sabit: `shallow`, `medium`, `deep`. Rotasyon id'leri sabit: `fallow_wheat`, `chickpea_wheat`, `lentil_wheat`. **Lokasyon id'leri sabit değil (14 Kas, SÖZLEŞME DEĞİŞTİ):** liste `engine/config/locations.yaml`'dan gelir (13 İç Anadolu ilçesi; `karapinar` ve `develi` korunur). Biçim `^[a-z][a-z0-9_]*$`. Web listeyi `site_index.locations`'tan okur, sabit liste yazmaz; `defaults.values` her lokasyon için bir anahtar taşır. Ürün id'leri sabit: `wheat`, `chickpea`, `lentil`, `fallow`.
 
 ---
 

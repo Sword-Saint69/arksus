@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import json
 
-from nobetsu import build, export
+from nobetsu import build, config, export
 from tests.test_contract import check_invariants, validate_dir
 
 
 def test_mock_build_writes_valid_contract(tmp_path):
     build.build(mock=True, out_dir=str(tmp_path))
     files = validate_dir(tmp_path)
-    assert len(files) == 3 + 3 * 2
+    assert len(files) == 3 + 3 * len(config.location_ids())
     check_invariants(tmp_path)
     site = json.loads((tmp_path / "site_index.json").read_text(encoding="utf-8"))
     assert site["mock"] is True

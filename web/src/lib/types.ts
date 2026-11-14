@@ -1,7 +1,8 @@
 // Contract types — PLAN_MVP §4, ARAYUZLER §8. Owner: Gümüş (Rol B).
 // Do not edit locally. Changes go through Gümüş: ARAYUZLER.md + this file + docs/contract/*.schema.json + mock JSON, one PR.
 
-export type LocationId = 'karapinar' | 'develi';
+/** Location ids come from site_index.locations (engine/config/locations.yaml); not a fixed list since 14 Nov. */
+export type LocationId = string;
 export type RotationId = 'fallow_wheat' | 'chickpea_wheat' | 'lentil_wheat';
 export type DepthId = 'shallow' | 'medium' | 'deep';
 export type CropId = 'wheat' | 'chickpea' | 'lentil' | 'fallow';

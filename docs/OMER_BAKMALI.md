@@ -75,3 +75,18 @@ Düzeldi (Ömer, `omer` 46b2e28): üç test kendi `refs` değerini ayarlıyor; `
 Kontrol etmeni istediğim iki şey (hata olduğunu söylemiyorum, emin olmak için):
 - [ ] **Çiçeklenmede sıcak gün ortancası her rotasyonda 0** (eşik artık 31 °C, POWER `T2M_MAX`). POWER hücresi Karapınar'da 1236 m'de; çiçeklenme penceresi Mayıs sonu–Haziran başı mı? Sıfır mı çıkmalı, yoksa pencere/eşik eşleşmesinde bir sorun mu var?
 - [ ] **Nohuttan sonra buğday ekiminde su ≈ 0 mm** (Temmuz ortası hasat → Ekim ekimi). Yaz kuraklığı düşünülünce makul olabilir; yine de 24 yılın P90'ı da 0'a yakınsa Ekim başı yağışlarının profile girişini bir kontrol et.
+
+## 6. 13 İç Anadolu lokasyonu — SÖZLEŞME DEĞİŞTİ: lokasyonlar açık liste (14 Kas)
+
+Proje 2 noktadan **13 ile (her ilden bir kuru tarım ilçesi)** genişletildi. Lokasyon id'leri artık sabit değil; liste `engine/config/locations.yaml`'dan gelir (`config.location_ids()`), biçim `^[a-z][a-z0-9_]*$`. Sıra: `karapinar, develi, polatli, eskisehir, aksaray, karaman, nigde, nevsehir, kaman, kirikkale, cankiri, gemerek, bogazliyan`.
+Her nokta için POWER önbelleği, `data/soilgrids/{loc}.json` (doku sınıfı, cfvo, Saxton–Rawls dahil) ve `references.yaml` → `mgm_annual_precip_mm.{loc}` (ilçenin ya da en yakın WMO 1991–2020 istasyonu) hazır.
+
+Senin tarafında yapılması gerekenler:
+- [ ] **`validate.py`**: `LOCATION_NAMES` sabit sözlüğü → isimleri `config.load("locations")`'tan al (şu an yeni lokasyonlar id ile görünür, çökme yok). `precip_vs_mgm` 13 lokasyonu tek satırda yazıyor olabilir; çok uzunsa kısalt (ör. fark yüzdeleri listesi, en büyük sapma).
+- [ ] **`soil.yaml` → `fallback_awc_mm_per_m`**: lokasyon anahtarlı; bilinmeyen lokasyonda `runner.py:185` `KeyError`. Tek bir varsayılan + isteğe bağlı lokasyon geçersiz kılma yap (SoilGrids dosyası olduğu için şu an tetiklenmiyor).
+- [ ] **`crops.yaml` takvimi**: tek (Konya) takvim var. Gemerek (Sivas), Boğazlıyan (Yozgat), Çankırı ve Develi daha yüksek/soğuk; ekim-hasat tarihleri farklı olabilir. En az iki bölge takvimi (sıcak-alçak / soğuk-yüksek) ya da açıkça "Konya takvimi, assumption" notu — karar senin.
+- [ ] **Tam koşu** 13 lokasyonla (~13 × 10 sn) ve kendi testlerin; `trial_ratio` Karapınar'da kalabilir (deneme Konya'da).
+
+**13 lokasyonla gerçek koşu sonucu (14 Kas, Gümüş):** 42 dosya şemadan geçti, kütle dengesi 2808 sekansta 1,6e-12 mm. İki önemli gözlem:
+- [ ] **POWER yağış sapması bazı ilçelerde büyük** (`precip_vs_mgm`): Karaman **+83 %**, Eskişehir **+39 %**, Karapınar **+36 %**; diğer 10 ilçe −14…+13 %. Bu ilçelerde su ve nadas avantajı olduğundan büyük çıkıyor. Seçenekler: (a) sadece kanıt panelinde göster ve kartta "bu ilçede uydu yağışı istasyondan X % yüksek" uyarısı, (b) basit istasyon düzeltmesi: günlük POWER yağışını `MGM_normal / POWER_ortalama` oranıyla ölçekle (PLAN'da "etkinlik sonrası" listesinde). (b) motor girdisini değiştirir, karar senin; istersen ölçek katsayısını `references.yaml`'dan okuyabilirsin, değerleri ben veririm.
+- [ ] **Çıplak gün her ilçede aynı** (nadas 460, mercimek 310): tek takvim kullanıldığı için beklenen; §6'daki bölge takvimi kararı bunu da çözer.

@@ -28,7 +28,14 @@ describe('contract', () => {
       ['mass_balance', 'et0_fao56_ex18', 'pse_literature', 'trial_ratio', 'precip_vs_mgm']);
   });
 
-  for (const loc of ['karapinar', 'develi'] as const) {
+  it('locations are a non-empty list with unique ids, and defaults cover each one', () => {
+    const ids = site.locations.map((l) => l.id);
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) expect(defaults.values[id]).toBeDefined();
+  });
+
+  for (const loc of site.locations.map((l) => l.id)) {
     it(`${loc}: results, ledger, smap fit the types and economics runs`, () => {
       const results = read<ResultsFile>(`results/${loc}.json`);
       const ledger = read<LedgerFile>(`ledger/${loc}.json`);

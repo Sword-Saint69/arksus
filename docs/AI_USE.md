@@ -26,6 +26,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) + WebSearch/web-fetch — Muhammet'in Gümüş'e giden araştırma görevleri: fiyat, destek, deneme verimleri, nadas etkinliği, WMO yağış normalleri, erozyon kaynağı, strateji metinleri, sözlük; kaynak PDF'leri pdftotext ile okundu — `docs/SOURCES.md`, `engine/config/{defaults,references,rotations}.yaml`
 - Claude Code (Opus 5.5) — İsmail için devir notu (hazır veri, tipler, economics API, gösterim kuralları) — `docs/ISMAIL_BAKMALI.md`
 - Claude Code (Opus 5.5) — M2: AWC yuvarlama düzeltmesi + testi, gerçek veri üretimi ve kontrolü, ilk sonuç özeti — `engine/nobetsu/export.py`, `engine/tests/test_export.py`, `web/public/data/**`
+- Claude Code (Opus 5.5) — 13 İç Anadolu lokasyonuna genişletme: WMO istasyon normalleri, ESA WorldCover ile tarla noktası seçimi, sözleşme açık lokasyon listesi, POWER/SoilGrids çekimi, gerçek veri, AppEEARS 13 nokta isteği — `engine/config/{locations,references,defaults}.yaml`, `docs/contract/`, `web/src/lib/{types,contract.test}.ts`, `data/**`, `web/public/data/**`
 
 ## Ortak (plan ve görev dağılımı)
 - Claude — görev dağılımı, kişi rehberleri, arayüz sözleşmesi taslağı, proje özeti — `TASKS.md`, `AGENTS.md`, `docs/ARAYUZLER.md`, `docs/PROJE_OZETI.md`, `docs/team/*`

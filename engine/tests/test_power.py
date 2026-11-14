@@ -71,7 +71,7 @@ def test_unknown_unit_raises():
         power.parse(fake_raw(units={**UNITS, "T2M_MAX": "K"}), "karapinar")
 
 
-@pytest.mark.parametrize("loc", ["karapinar", "develi"])
+@pytest.mark.parametrize("loc", config.location_ids())
 def test_cached_power_data(loc):
     if not power.cache_path(loc).exists():
         pytest.skip(f"no cache for {loc}: run python -m nobetsu.power")

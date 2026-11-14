@@ -1,25 +1,147 @@
-# Owner: Gümüş (Rol B). ARAYUZLER §4. Location ids are fixed: karapinar, develi.
-# Coordinates: a cropland point just outside the district centre (not the town itself).
-# coord_verified: false = not yet checked on satellite imagery that the point falls on a rainfed field.
-# Elevation is NOT set here; it comes from the NASA POWER response header.
+# Owner: Gümüş (Rol B). ARAYUZLER §4. 13 Central Anatolia points, one per province (14 Nov: location list opened).
+# Each point: rainfed-farming district, cropland checked with ESA WorldCover 2021 (does NOT separate irrigated from rainfed),
+# 3–10 km from the WMO 1991–2020 normals station used for precip_vs_mgm. Elevation comes from the NASA POWER header.
 locations:
-  - id: karapinar
-    name: "Karapınar"
-    district: "Karapınar"
-    province: "Konya"
-    lat: 37.72
-    lon: 33.48
-    coord_verified: false
-    note:
-      en: "Rainfed cropland point west of Karapınar town (Konya closed basin). Representative of the district, not a specific field."
-      tr: "Karapınar ilçe merkezinin batısında kuru tarım alanında bir nokta (Konya kapalı havzası). İlçeyi temsil eder, belirli bir tarla değildir."
-  - id: develi
-    name: "Develi"
-    district: "Develi"
-    province: "Kayseri"
-    lat: 38.43
-    lon: 35.47
-    coord_verified: false
-    note:
-      en: "Rainfed cropland point north of Develi town (Develi plain). Representative of the district, not a specific field."
-      tr: "Develi ilçe merkezinin kuzeyinde kuru tarım alanında bir nokta (Develi ovası). İlçeyi temsil eder, belirli bir tarla değildir."
+- id: karapinar
+  name: Karapınar
+  district: Karapınar
+  province: Konya
+  lat: 37.72
+  lon: 33.48
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %69 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Karapınar 17902'
+  note:
+    en: Rainfed cropland west of Karapınar town (Konya closed basin), the 1960s wind-erosion area. Representative of the district, not a specific field.
+    tr: Karapınar ilçe merkezinin batısında kuru tarım alanı (Konya kapalı havzası), 1960'ların rüzgâr erozyonu bölgesi. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: develi
+  name: Develi
+  district: Develi
+  province: Kayseri
+  lat: 38.43
+  lon: 35.47
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %89 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Kayseri Bölge 17196 (~29 km)'
+  note:
+    en: Cropland north of Develi town (Develi plain). Representative of the district, not a specific field.
+    tr: Develi ilçe merkezinin kuzeyinde tarım alanı (Develi ovası). İlçeyi temsil eder, belirli bir tarla değildir.
+- id: polatli
+  name: Polatlı
+  district: Polatlı
+  province: Ankara
+  lat: 39.583
+  lon: 32.197
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Polatlı 17728'
+  note:
+    en: Cropland near Polatlı, one of Ankara's main rainfed wheat districts. Representative of the district, not a specific field.
+    tr: Polatlı yakınında tarım alanı; Ankara'nın başlıca kuru buğday ilçelerinden. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: eskisehir
+  name: Eskişehir
+  district: Merkez
+  province: Eskişehir
+  lat: 39.806
+  lon: 30.568
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Eskişehir Bölge 17126'
+  note:
+    en: Cropland north of Eskişehir city. Representative of the district, not a specific field.
+    tr: Eskişehir şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: aksaray
+  name: Aksaray
+  district: Merkez
+  province: Aksaray
+  lat: 38.371
+  lon: 33.964
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Aksaray 17192'
+  note:
+    en: Cropland west of Aksaray city (Tuz Gölü basin). Representative of the district, not a specific field.
+    tr: Aksaray şehir merkezinin batısında tarım alanı (Tuz Gölü havzası). İlçeyi temsil eder, belirli bir tarla değildir.
+- id: karaman
+  name: Karaman
+  district: Merkez
+  province: Karaman
+  lat: 37.234
+  lon: 33.22
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Karaman 17246'
+  note:
+    en: Cropland north of Karaman city. Representative of the district, not a specific field.
+    tr: Karaman şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: nigde
+  name: Niğde
+  district: Merkez–Bor
+  province: Niğde
+  lat: 37.918
+  lon: 34.628
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %90 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Niğde 17250'
+  note:
+    en: Cropland south-west of Niğde city, towards Bor. Representative of the district, not a specific field.
+    tr: Niğde şehir merkezinin güneybatısında, Bor yönünde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: nevsehir
+  name: Nevşehir
+  district: Merkez
+  province: Nevşehir
+  lat: 38.576
+  lon: 34.616
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %97 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Nevşehir 17193'
+  note:
+    en: Cropland south-west of Nevşehir city. Representative of the district, not a specific field.
+    tr: Nevşehir şehir merkezinin güneybatısında tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: kaman
+  name: Kaman
+  district: Kaman
+  province: Kırşehir
+  lat: 39.392
+  lon: 33.741
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Kaman 17756'
+  note:
+    en: Cropland near Kaman (Kırşehir). Representative of the district, not a specific field.
+    tr: Kaman (Kırşehir) yakınında tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: kirikkale
+  name: Kırıkkale
+  district: Merkez
+  province: Kırıkkale
+  lat: 39.911
+  lon: 33.536
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %99 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Kırıkkale 17135'
+  note:
+    en: Cropland north of Kırıkkale city. Representative of the district, not a specific field.
+    tr: Kırıkkale şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: cankiri
+  name: Çankırı
+  district: Merkez
+  province: Çankırı
+  lat: 40.568
+  lon: 33.646
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Çankırı 17080'
+  note:
+    en: Cropland south of Çankırı city; northern, wetter edge of the region. Representative of the district, not a specific field.
+    tr: Çankırı şehir merkezinin güneyinde tarım alanı; bölgenin kuzey, daha yağışlı ucu. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: gemerek
+  name: Gemerek
+  district: Gemerek
+  province: Sivas
+  lat: 39.172
+  lon: 36.115
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Gemerek 17162'
+  note:
+    en: Cropland near Gemerek (Sivas); high, cold eastern edge of the region. Representative of the district, not a specific field.
+    tr: Gemerek (Sivas) yakınında tarım alanı; bölgenin yüksek ve soğuk doğu ucu. İlçeyi temsil eder, belirli bir tarla değildir.
+- id: bogazliyan
+  name: Boğazlıyan
+  district: Boğazlıyan
+  province: Yozgat
+  lat: 39.217
+  lon: 35.253
+  coord_verified: true
+  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Boğazlıyan 17760'
+  note:
+    en: Cropland near Boğazlıyan, a major wheat district of Yozgat. Representative of the district, not a specific field.
+    tr: Boğazlıyan yakınında tarım alanı; Yozgat'ın büyük buğday ilçelerinden. İlçeyi temsil eder, belirli bir tarla değildir.

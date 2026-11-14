@@ -67,6 +67,105 @@ mgm_annual_precip_mm:            # check: precip_vs_mgm (WMO 1991–2020 climate
     type: official
     verified: true
     as_of: "2026-11-14"
+  polatli:
+    station: "Polatlı (WMO 17728; 39.5833 K, 32.1625 D, 886 m; noktaya ~3.0 km)"
+    value: 369.26
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Polatlı 17728, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Polatli_17728.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  eskisehir:
+    station: "Eskişehir Bölge (WMO 17126; 39.7656 K, 30.5503 D, 801 m; noktaya ~4.7 km)"
+    value: 356.73
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Eskişehir Bölge 17126, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Eskisehir_Bolge_17126.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  aksaray:
+    station: "Aksaray (WMO 17192; 38.3706 K, 33.9986 D, 970 m; noktaya ~3.0 km)"
+    value: 344.75
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Aksaray 17192, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Aksaray_17192.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  karaman:
+    station: "Karaman (WMO 17246; 37.1933 K, 33.2203 D, 1018 m; noktaya ~4.5 km)"
+    value: 326.6
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Karaman 17246, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Karaman_17246.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  nigde:
+    station: "Niğde (WMO 17250; 37.9586 K, 34.6794 D, 1211 m; noktaya ~6.4 km)"
+    value: 347.05
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Niğde 17250, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Nigde_17250.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  nevsehir:
+    station: "Nevşehir (WMO 17193; 38.6164 K, 34.7025 D, 1260 m; noktaya ~8.7 km)"
+    value: 412.07
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Nevşehir 17193, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Nevsehir_17193.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  kaman:
+    station: "Kaman (WMO 17756; 39.3653 K, 33.7064 D, 1075 m; noktaya ~4.2 km)"
+    value: 455.32
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Kaman 17756, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Kaman_17756.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  kirikkale:
+    station: "Kırıkkale (WMO 17135; 39.8433 K, 33.5181 D, 751 m; noktaya ~7.6 km)"
+    value: 385.56
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Kırıkkale 17135, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Kirikkale_17135.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  cankiri:
+    station: "Çankırı (WMO 17080; 40.6083 K, 33.6103 D, 755 m; noktaya ~5.4 km)"
+    value: 424.77
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Çankırı 17080, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Cankiri_17080.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  gemerek:
+    station: "Gemerek (WMO 17162; 39.185 K, 36.0806 D, 1182 m; noktaya ~3.4 km)"
+    value: 398.45
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Gemerek 17162, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Gemerek_17162.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
+  bogazliyan:
+    station: "Boğazlıyan (WMO 17760; 39.1897 K, 35.2533 D, 1070 m; noktaya ~3.0 km)"
+    value: 344.35
+    unit: "mm/year"
+    source: "WMO Climate Normals 1991–2020, Boğazlıyan 17760, Precipitation_Total annual (30/30 yıl), NOAA NCEI arşivi"
+    source_url: "https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/Bogazliyan_17760.csv"
+    type: official
+    verified: true
+    as_of: "2026-11-14"
 
 heat_threshold_c:                # T2M_MAX threshold for heat days at wheat flowering (PLAN_MVP §5.8)
   value: 31

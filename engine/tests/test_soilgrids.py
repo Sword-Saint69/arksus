@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from nobetsu import soilgrids as sg
+from nobetsu import config, soilgrids as sg
 
 
 def test_conversions():
@@ -54,7 +54,7 @@ def test_saxton_rawls_behaves_physically():
     assert (fc_sand - wp_sand) < (fc_loam - wp_loam)
 
 
-@pytest.mark.parametrize("loc", ["karapinar", "develi"])
+@pytest.mark.parametrize("loc", config.location_ids())
 def test_pulled_values_within_physical_bounds(loc):
     path = sg.out_path(loc)
     if not path.exists():
@@ -67,7 +67,8 @@ def test_pulled_values_within_physical_bounds(loc):
     raw = rec["raw_mapped"]
     mean_sum = sum(sg.depth_weighted({d: raw[t][d]["mean"] for d in sg.CARD_DEPTHS}, sg.CARD_DEPTHS) for t in sg.TEXTURE) / 10
     assert abs(mean_sum - 100) <= 3                                                    # mean maps: compositional
-    assert abs(p["clay"]["q50"] + p["sand"]["q50"] + p["silt"]["q50"] - 100) <= 10     # Q0.5 maps: independent
+    # Q0.5 maps are predicted independently, so their sum drifts (87–92 % seen across the 13 points); loose sanity bound only
+    assert abs(p["clay"]["q50"] + p["sand"]["q50"] + p["silt"]["q50"] - 100) <= 15
     assert 0.5 <= p["bdod"]["q50"] <= 2.2
     assert 0 <= p["cfvo"]["q50"] <= 100
     assert 20 <= rec["awc_mm_per_m"]["value"] <= 300
