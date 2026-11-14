@@ -125,7 +125,8 @@ export class ProcessSim {
 
     this.camera.position.set(0.5, 2.6, 7.4);
     this.controls = new OrbitControls(this.camera, canvas);
-    this.controls.target.set(0, -0.35, 0);
+    // Aim a little above the blocks so the labels over them stay inside the frame.
+    this.controls.target.set(0, 0.15, 0);
     this.controls.enableDamping = true;
     this.controls.minDistance = 4;
     this.controls.maxDistance = 16;
@@ -416,7 +417,7 @@ export class ProcessSim {
     const span = n * PLOT_W + (n - 1) * GAP + 0.8;
     const vHalf = THREE.MathUtils.degToRad(this.camera.fov / 2);
     const hHalf = Math.atan(Math.tan(vHalf) * this.camera.aspect);
-    const dist = Math.max((span / 2) / Math.tan(hHalf), (SOIL_H + 2.2) / 2 / Math.tan(vHalf)) * 1.08;
+    const dist = Math.max((span / 2) / Math.tan(hHalf), (SOIL_H + 3.4) / 2 / Math.tan(vHalf)) * 1.08;
     const dir = this.camera.position.clone().sub(this.controls.target).normalize();
     this.camera.position.copy(this.controls.target).addScaledVector(dir, dist);
     this.controls.maxDistance = Math.max(16, dist * 1.6);

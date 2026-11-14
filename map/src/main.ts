@@ -37,6 +37,20 @@ const scene = new THREE.Scene();
 const params = new URLSearchParams(location.hash.slice(1));
 // Inside the farmer site (iframe) the site's own header carries the brand.
 if (params.get('embed') === '1') document.body.classList.add('embedded');
+// Opened on its own from the site: offer the way back. Only http(s) links are
+// accepted, so a crafted link cannot turn the button into a script URL.
+const backUrl = (() => {
+  const b = params.get('back');
+  try { return b && /^https?:$/.test(new URL(b).protocol) ? b : null; } catch { return null; }
+})();
+if (backUrl) {
+  const a = document.createElement('a');
+  a.className = 'back-to-site';
+  a.href = backUrl;
+  a.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg><span data-i18n="backToSite">${t('backToSite')}</span>`;
+  document.querySelector('.topbar')!.prepend(a);
+  document.querySelector<HTMLAnchorElement>('.brand')!.href = backUrl;
+}
 const terrain = new Terrain(renderer, BASEMAPS.find((b) => b.id === params.get('b')) ?? BASEMAPS[0]);
 scene.add(terrain.group);
 // The map is limited to Turkey (15 Nov): no tiles beyond this box, the camera
@@ -122,6 +136,11 @@ Promise.all([loadProvinces(), loadIslands(), pilots.init().catch((e) => { consol
     restoreSelectionFromHash();
     refreshInspector();
     wake();
+    // Links from the site can ask for the 3D process right away: #s=pilot:<id>&d=<depth>&sim=1
+    const d = params.get('d');
+    if (d === 'shallow' || d === 'medium' || d === 'deep') { pilots.depth = d; refreshInspector(); }
+    const simFor = active?.kind === 'pilot' ? active : null;
+    if (params.get('sim') === '1' && simFor) openSim(simFor);
   });
 
 vectors.fields.onData = (b) => { overlay.invalidate(b); wake(); };

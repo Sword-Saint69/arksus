@@ -3,6 +3,7 @@ import { useAuth } from '@/auth/AuthContext';
 import { t, tx, type Key, type Lang } from '@/strings';
 import { ROTATION_COLOR } from '@/utils/series';
 import type { RotationId } from '@/lib/types';
+import { simRoute } from '@/utils/mapUrl';
 
 /** Landing page: what NöbetSu answers, in a farmer's words, and how to start. */
 export function Home({ data, lang }: { data: SiteData; lang: Lang }) {
@@ -58,6 +59,18 @@ export function Home({ data, lang }: { data: SiteData; lang: Lang }) {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 pt-10 sm:px-6" aria-labelledby="sim">
+        <div className="grid items-center gap-5 rounded-2xl border border-line bg-[#eef4f7] p-6 md:grid-cols-[1fr_auto]">
+          <div>
+            <h2 id="sim" className="text-xl font-semibold">{t(lang, 'simTitle')}</h2>
+            <p className="mt-1 text-muted">{t(lang, 'simBody')}</p>
+          </div>
+          <a href={simRoute(data.site.locations[0].id, 'medium')} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#3d7ea6] px-5 font-semibold text-white">
+            ▶ {t(lang, 'simWatch')}
+          </a>
         </div>
       </section>
 

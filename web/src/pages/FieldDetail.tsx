@@ -6,6 +6,7 @@ import type { RotationId } from '@/lib/types';
 import { t, tx, type Key, type Lang } from '@/strings';
 import { fmtNum, fmtPct } from '@/utils/format';
 import { ROTATION_COLOR } from '@/utils/series';
+import { simRoute } from '@/utils/mapUrl';
 
 /**
  * One field in plain words: the most suitable crop order, why, and three facts
@@ -79,6 +80,13 @@ export function FieldDetail({ data, lang, id }: { data: SiteData; lang: Lang; id
         </section>
       )}
 
+      <a href={simRoute(field.locationId, field.depthId)} className="group flex items-center gap-4 rounded-2xl border border-line bg-[#eef4f7] p-5 hover:border-[#3d7ea6]">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#3d7ea6] text-xl text-white" aria-hidden="true">▶</span>
+        <span>
+          <span className="block font-semibold">{t(lang, 'simForField')}</span>
+          <span className="block text-sm text-muted">{t(lang, 'simWatch')} · {t(lang, 'simWatchSub')}</span>
+        </span>
+      </a>
       <p className="rounded-lg border border-line bg-paper px-3 py-2 text-xs text-muted">{t(lang, 'honest')}</p>
       {field.note && <p className="text-sm text-muted">“{field.note}”</p>}
       <div className="grid gap-2 sm:grid-cols-2">

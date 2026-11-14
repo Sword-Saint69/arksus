@@ -422,3 +422,11 @@ input[type=range] { width: 100%; accent-color: var(--primary); height: 28px; }
 
 /* Embedded in the farmer site: its header already shows the brand. */
 .embedded .brand { display: none; }
+
+/* Prominent entry to the 3D process at the top of the district panel. */
+.sim-cta { display: grid; justify-items: start; gap: 1px; width: 100%; min-height: 54px; margin: 0 0 12px; padding: 8px 14px; text-align: left; font-size: 15px; }
+.sim-cta small { font-weight: 400; font-size: 12px; opacity: .85; }
+
+/* "Back to the site" when the map is opened on its own from the farmer site. */
+.back-to-site { display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: var(--radius); text-decoration: none; color: var(--primary); font-weight: 600; white-space: nowrap; }
+.back-to-site .icon { transform: rotate(180deg); }

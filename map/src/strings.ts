@@ -223,6 +223,8 @@ const S = {
   reset: { tr: 'Varsayılana dön', en: 'Reset to defaults' },
   // Process simulation (three.js)
   simOpen: { tr: 'Süreci 3B izle', en: 'Watch the process in 3D' },
+  simCtaSub: { tr: 'Üç tarlada iki yılın suyu, haftalık', en: 'Two years of water in three fields, week by week' },
+  backToSite: { tr: 'Siteye dön', en: 'Back to the site' },
   simTitle: { tr: '{name}: iki yıl, üç tarla', en: '{name}: two years, three fields' },
   simSub: {
     tr: 'Model çıktısı: haftalık su defteri ({depth}). Toprak kutusundaki mavi, bitkinin kullanabileceği suyun doluluğu. Bitki boyları temsilidir.',

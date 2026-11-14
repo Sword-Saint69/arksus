@@ -199,6 +199,7 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     <h2 class="sel-title">${esc(loc.name)}</h2>
     <ol class="crumbs"><li>${esc(loc.province)}</li><li>${esc(loc.district)}</li></ol>
     <p class="pilot-note">${esc(tx(loc.note))}</p>
+    <button class="btn primary sim-cta" data-act="simulate">▶ ${t('simOpen')}<small>${t('simCtaSub')}</small></button>
     <dl class="metrics">
       <div class="metric"><dt>${t('elevation')} ${badge('model')}</dt><dd>${fmtNum(loc.elevation_m)}<small>m</small></dd></div>
       <div class="metric"><dt>${t('center')}</dt><dd style="font-size:13px">${loc.lat.toFixed(2)}, ${loc.lon.toFixed(2)}</dd></div>
@@ -219,7 +220,6 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     <p class="sec-sub">${d.smap && d.smap.available ? 'SMAP' : t('smapComing')}</p>
     ${evidenceHtml(d)}
     <div class="actions" style="margin-top:14px">
-      <button class="btn primary wide" data-act="simulate">▶ ${t('simOpen')}</button>
       <button class="btn" data-act="focus">${icon('i-target')}${t('focus')}</button>
       <button class="btn" data-act="copy" data-ll="${loc.lat}, ${loc.lon}">${icon('i-copy')}${t('coords')}</button>
     </div>

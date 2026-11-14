@@ -12,6 +12,7 @@ import { t, tx, type Lang } from '@/strings';
 import { PRIORITY_IDS, weightsFor, type PriorityId } from '@/utils/priorities';
 import { PRECIP_WARN_PCT, precipGapPct } from '@/utils/precip';
 import { fmtNum } from '@/utils/format';
+import { simRoute } from '@/utils/mapUrl';
 
 type Props = { data: SiteData; lang: Lang; query: URLSearchParams };
 
@@ -69,6 +70,9 @@ export function Analysis({ data, lang, query }: Props) {
             </p>
           )}
           <p className="mt-3 text-xs text-faint">{t(lang, 'regionalNote')}</p>
+          <a href={simRoute(location.id, depthId)} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#3d7ea6] px-4 text-sm font-semibold text-white">
+            ▶ {t(lang, 'simWatch')} <span className="font-normal opacity-90">· {t(lang, 'simWatchSub')}</span>
+          </a>
         </section>
 
         {loc.status === 'loading' && <p className="text-sm text-muted">{t(lang, 'loading')}</p>}
