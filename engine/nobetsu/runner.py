@@ -368,10 +368,12 @@ def run_landscape(location_id: str, weather: pd.DataFrame, soilgrids: dict | Non
                           init_fraction=float(soil_cfg["initial_fill_fraction"]["value"]))
         cols[f"aw_mm_{tag}"] = out["aw_mm"]
         cols[f"crop_{tag}"] = sched["crop"]
+        cols[f"kcb_{tag}"] = sched["kcb"]
         errors.append(wb.mass_balance_error(out))
 
     land = pd.DataFrame(cols, index=index)
     land["aw_mm"] = (land["aw_mm_a"] + land["aw_mm_b"]) / 2.0
+    land["kcb"] = (land["kcb_a"] + land["kcb_b"]) / 2.0   # landscape crop cover proxy (NDVI check)
     land["fullness_pct"] = (land["aw_mm"] / soil.capacity_mm * 100.0).clip(0.0, 100.0)
     land.attrs.update(cycle=cycle, capacity_mm=soil.capacity_mm, awc_used=awc,
                       max_mass_balance_error_mm=float(max(errors)), location_id=location_id)
