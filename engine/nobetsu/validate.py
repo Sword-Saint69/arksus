@@ -173,8 +173,27 @@ def power_annual_mean_mm(weather: pd.DataFrame) -> float:
     return float(annual.loc[full_years].mean())
 
 
-def check_precip(weathers, refs):
+def precip_common_years(weather: pd.DataFrame, imerg_monthly: pd.Series) -> tuple[list[int], float, float]:
+    """Calendar years complete in both POWER (every day) and IMERG (12 non-missing months),
+    and the mean annual total of each over exactly those years."""
+    p = weather["precip_mm"]
+    days = p.groupby(p.index.year).size()
+    power_years = {int(y) for y, n in days.items() if n == (366 if pd.Timestamp(year=int(y), month=1, day=1).is_leap_year else 365)}
+    s = imerg_monthly.dropna()
+    months = s.groupby(s.index.year).size()
+    imerg_years = {int(y) for y, n in months.items() if n == 12}
+    years = sorted(power_years & imerg_years)
+    if not years:
+        raise ValueError("no calendar year complete in both POWER and IMERG")
+    power_mm = float(p[p.index.year.isin(years)].groupby(p.index.year[p.index.year.isin(years)]).sum().mean())
+    imerg_mm = float(s[s.index.year.isin(years)].groupby(s.index.year[s.index.year.isin(years)]).sum().mean())
+    return years, power_mm, imerg_mm
+
+
+def check_precip(weathers, refs, imerg=None):
+    """POWER (and, when cached, NASA GPM IMERG) annual precipitation vs MGM station normals."""
     mgm = refs.get("mgm_annual_precip_mm", {})
+    imerg = imerg or {}
     parts, ref_parts = [], []
     for loc, w in weathers.items():
         node = mgm.get(loc)
@@ -183,32 +202,55 @@ def check_precip(weathers, refs):
             continue
         power = power_annual_mean_mm(w)
         station = node.get("station") or "nearest MGM station"
-        parts.append(f"{_name(loc)}: POWER {power:.0f} mm/yr vs MGM {normal:g} mm/yr ({(power - normal) / normal * 100:+.0f} %)")
+        text = f"{_name(loc)}: POWER {power:.0f} mm/yr vs MGM {normal:g} mm/yr ({(power - normal) / normal * 100:+.0f} %)"
+        if loc in imerg:
+            try:
+                years, power_c, imerg_c = precip_common_years(w, imerg[loc])
+            except ValueError:
+                years = []
+            if years:
+                text += (f"; IMERG {imerg_c:.0f} mm/yr ({(imerg_c - normal) / normal * 100:+.0f} %), "
+                         f"POWER {power_c:.0f} mm/yr over the same {years[0]}–{years[-1]} ({len(years)} yr)")
+        parts.append(text)
         ref_parts.append(f"{_name(loc)}: {station}, 1991–2020 normal")
     if not parts:
         return _check("precip_vs_mgm", "pending", "", "",
                       "Waiting for the MGM 1991–2020 precipitation normals.",
                       "MGM 1991–2020 yağış normalleri bekleniyor.")
-    return _check(
-        "precip_vs_mgm", "info", "; ".join(parts), "; ".join(ref_parts),
-        "NASA POWER is satellite- and model-derived (~50 km); MGM stations measure one point on the ground. "
-        "The two cover different years. This shows how far apart they are; correcting POWER with station data "
-        "is on the post-event list.",
-        "NASA POWER uydu ve model kaynaklıdır (~50 km); MGM istasyonu yerde tek bir noktayı ölçer. "
-        "İkisi farklı yılları kapsar. Bu kontrol aradaki farkı gösterir; POWER'ı istasyon verisiyle düzeltmek "
-        "etkinlik sonrası listesinde.",
-    )
+    has_imerg = any("IMERG" in p for p in parts)
+    if has_imerg:
+        from . import imerg as imerg_mod
+        ref_parts.append(f"IMERG: {imerg_mod.SOURCE}, cell containing each point")
+    en = ("NASA POWER is satellite- and model-derived (~50 km); MGM stations measure one point on the ground. "
+          "The two cover different years. This shows how far apart they are; correcting POWER with station data "
+          "is on the post-event list.")
+    tr = ("NASA POWER uydu ve model kaynaklıdır (~50 km); MGM istasyonu yerde tek bir noktayı ölçer. "
+          "İkisi farklı yılları kapsar. Bu kontrol aradaki farkı gösterir; POWER'ı istasyon verisiyle düzeltmek "
+          "etkinlik sonrası listesinde.")
+    if has_imerg:
+        en += (" NASA GPM IMERG (~10 km) is a second satellite estimate. Its monthly product is adjusted with rain "
+               "gauges, so it is not fully independent of station data. The engine still uses POWER.")
+        tr += (" NASA GPM IMERG (~10 km) ikinci bir uydu tahminidir. Aylık ürünü yağış ölçerlerle düzeltildiği için "
+               "istasyon verisinden tam bağımsız değildir. Motor hâlâ POWER kullanır.")
+    return _check("precip_vs_mgm", "info", "; ".join(parts), "; ".join(ref_parts), en, tr)
 
 
-def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs: dict) -> list[dict]:
-    """The five MVP checks in the fixed contract order (PLAN_MVP §4.5)."""
+def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs: dict,
+               imerg: dict[str, pd.Series] | None = None) -> list[dict]:
+    """The five MVP checks in the fixed contract order (PLAN_MVP §4.5).
+
+    imerg: monthly GPM IMERG series per location; None reads data/imerg/{id}.json where present.
+    """
     refs = refs or {}
+    if imerg is None:
+        from . import imerg as imerg_mod
+        imerg = imerg_mod.load_cached(weather.keys())
     checks = [
         check_mass_balance(outputs),
         check_et0(),
         check_pse(outputs, refs),
         check_trial(outputs, refs),
-        check_precip(weather, refs),
+        check_precip(weather, refs, imerg),
     ]
     assert [c["id"] for c in checks] == list(CHECK_IDS)
     return checks

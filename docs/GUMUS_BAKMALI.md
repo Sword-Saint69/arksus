@@ -155,3 +155,11 @@ Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi 
   - Develi: baseline 0,55 / 0,50 / 0,50 → dry20 0,44 / 0,40 / 0,40.
   - Kuraklıkta nadas avantajı (nadas − nohut buğday oranı) 0,06'dan 0,07'ye çıkıyor: kuru iklimde nadasın su değeri biraz artıyor.
 - **Sınır (UI notuna ekle):** ısınma bitki gelişimini hızlandırır, ama takvimler sabit (ekim/hasat tarihi değişmiyor). Bu yüzden `warm` senaryolarının etkisi muhtemelen olduğundan küçük görünüyor. "Projeksiyon değil, duyarlılık testi" etiketi şart.
+
+## 17. NASA GPM IMERG yağış karşılaştırması (14 Kas, branch `omer`)
+
+- **Ne:** `engine/nobetsu/imerg.py` (yeni) GPM IMERG Final aylık V07'yi (0,1°) NSF NCAR GDEX aynasından (d736000, CC BY 4.0) **Earthdata girişi olmadan** çeker → `data/imerg/{id}.json` (aylık mm, 2000-06 → 2025-09, 13 konum, toplam 260 KB). `python -m nobetsu.imerg`.
+- **Sahiplik sorusu:** veri çekme modülleri ve `data/**` sende. Kabul edersen `imerg.py` ve `data/imerg/` senin olsun (AGENTS tablosuna ekle); ben yalnız `validate.py` tarafını tutarım.
+- **`build.py` değişikliği gerekmiyor:** `run_checks(..., imerg=None)` önbellek varsa kendisi okur. `make data` sonrası `precip_vs_mgm` değerine IMERG sütunu eklenir. Kontrol id'si ve şema aynı (value/reference zaten string).
+- **Sonuç (2001–2024 ortak yıllar, MGM 1991–2020 normaline göre):** IMERG 13 noktanın 12'sinde istasyondan yağışlı (+1 … +71 %); ortalama mutlak sapma IMERG ~%29, POWER ~%18. Yalnız Karapınar (+38 → +28) ve Karaman (+85 → +33) noktalarında IMERG daha yakın. **Bu yüzden motor girdisi POWER kalıyor;** IMERG sadece kanıt panelinde ikinci uydu kaynağı.
+- [ ] `make data` çalıştırıp `validation.json`'u yenile (web/public/data senin).

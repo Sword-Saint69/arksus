@@ -12,6 +12,13 @@ ORDER = ["mass_balance", "et0_fao56_ex18", "pse_literature", "trial_ratio", "pre
 YEARS = [2005, 2010, 2015]
 
 
+@pytest.fixture(autouse=True)
+def _no_real_imerg_cache(monkeypatch):
+    """Keep these tests independent of data/imerg/*.json (IMERG is tested in test_imerg.py)."""
+    from nobetsu import imerg
+    monkeypatch.setattr(imerg, "load_cached", lambda ids: {})
+
+
 @pytest.fixture(scope="module")
 def weathers():
     return {loc: synthetic_weather("2000-01-01", "2026-07-31", location_id=loc, seed=i,
