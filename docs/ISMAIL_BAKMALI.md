@@ -17,11 +17,11 @@ Web tarafına başlarken `main`'i çek; aşağıdakiler hazır. Gümüş'ün dos
 
 ## 2. İskeleti kurarken (benim testlerim de çalışsın diye)
 
-- [ ] `package.json`'da `"test": "vitest"` olsun. `make test`, `cd web && npm test -- --run` çağırıyor.
-- [ ] `devDependencies`: `vitest`, `typescript`, `@types/node`. Testler vitest 2.1.9 + TypeScript 5.6 `strict` ile geçti.
-- [ ] `contract.test.ts` dosyaları `node:fs` ile okuyor ve `__dirname` kullanıyor. `src/lib/*.test.ts` için vitest ortamı **`node`** olmalı (`jsdom` değil). Bileşen testlerin `jsdom` istiyorsa `environmentMatchGlobs` ile ayır.
-- [ ] `tsconfig`'te `strict: true` kalabilir; `types.ts` ve `economics.ts` sorunsuz derleniyor.
-- [ ] `web/src/lib/` altına kendi dosyanı koyma (çakışma olmasın); yardımcıların için `src/utils/` gibi başka bir klasör kullan.
+- [x] `package.json`'da `"test": "vitest"` olsun. `make test`, `cd web && npm test -- --run` çağırıyor.
+- [x] `devDependencies`: `vitest`, `typescript`, `@types/node`. Testler vitest 2.1.9 + TypeScript 5.6 `strict` ile geçti.
+- [x] `contract.test.ts` dosyaları `node:fs` ile okuyor ve `__dirname` kullanıyor. `src/lib/*.test.ts` için vitest ortamı **`node`** olmalı (`jsdom` değil). Bileşen testlerin `jsdom` istiyorsa `environmentMatchGlobs` ile ayır.
+- [x] `tsconfig`'te `strict: true` kalabilir; `types.ts` ve `economics.ts` sorunsuz derleniyor.
+- [x] `web/src/lib/` altına kendi dosyanı koyma (çakışma olmasın); yardımcıların için `src/utils/` gibi başka bir klasör kullan.
 
 ## 3. Veriyi yükleme
 

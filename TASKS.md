@@ -64,7 +64,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 
 ## İsmail — Web arayüzü
 
-- [ ] **T+0–1: Web iskeleti** — `web/` içinde Vite + React + TS + Tailwind + shadcn/ui + Recharts + vitest; Vercel bağlantısı (root = `web`); boş sayfa Vercel'de açılıyor → M0
+- [ ] **T+0–1: Web iskeleti** — `web/` içinde Vite + React + TS + Tailwind + shadcn/ui + Recharts + vitest; Vercel bağlantısı (root = `web`); boş sayfa Vercel'de açılıyor → M0 — ⏳ kalan: Vercel bağlantısı (root = `web`, `vercel.json` hazır); iskelet ve testler `ismail/web`'de
 - [ ] **T+1–4: Mock veriyle tek sayfa** — başlık + lokasyon/derinlik seçimi + 3 rotasyon kartı + mock bandı + rozetler → Vercel'de → M1
 - [ ] **T+4–6: Grafik A (24 iklim, 2 yıllık net, şerit grafik)**
 - [ ] **T+6–8: Grafik B (haftalık su defteri, yıl seçici)**
