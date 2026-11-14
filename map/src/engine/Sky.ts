@@ -3,11 +3,11 @@ import * as THREE from 'three';
 // Gradient sky dome that shares its horizon colour with the terrain fog, so a
 // pitched view fades into the sky instead of ending at a hard tile edge. From
 // orbit it darkens to space, which also frames the flat world square.
-export function createSky(fogColor: THREE.Color) {
+export function createSky(fogColor: THREE.Color, opts: { zenith?: string; space?: string } = {}) {
   const uniforms = {
     uHorizon: { value: fogColor },
-    uZenith: { value: new THREE.Color('#2a4a6b') },
-    uSpace: { value: new THREE.Color('#05090e') },
+    uZenith: { value: new THREE.Color(opts.zenith ?? '#2a4a6b') },
+    uSpace: { value: new THREE.Color(opts.space ?? '#05090e') },
     uAltitude: { value: 0 },
   };
   const mat = new THREE.ShaderMaterial({

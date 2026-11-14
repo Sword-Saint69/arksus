@@ -50,6 +50,10 @@ export type SharedUniforms = {
   uFogColor: { value: THREE.Color };
   uFogDensity: { value: number };
   uLabelsOn: { value: number };
+  uMask: { value: THREE.Texture | null };
+  uMaskBox: { value: THREE.Vector4 };
+  uMaskOn: { value: number };
+  uOutside: { value: THREE.Color };
 };
 
 export function createSharedUniforms(): SharedUniforms {
@@ -59,6 +63,11 @@ export function createSharedUniforms(): SharedUniforms {
     uFogColor: { value: new THREE.Color('#a9bccc') },
     uFogDensity: { value: 0 },
     uLabelsOn: { value: 1 },
+    // Turkey mask (see Terrain.setMask): x0, z0, width, depth of the mask in scene metres.
+    uMask: { value: null },
+    uMaskBox: { value: new THREE.Vector4(0, 0, 1, 1) },
+    uMaskOn: { value: 0 },
+    uOutside: { value: new THREE.Color('#e9e6dc') },
   };
 }
 
@@ -72,7 +81,11 @@ uniform float uSize;
 uniform float uMercScale;
 uniform float uExaggeration;
 uniform float uSkirt;
+uniform sampler2D uMask;
+uniform vec4 uMaskBox;
+uniform float uMaskOn;
 varying vec2 vUv;
+varying vec2 vMaskUv;
 varying vec3 vNormal;
 varying float vDist;
 varying float vHeight;
@@ -84,6 +97,11 @@ float heightAt(vec2 uv) {
 void main() {
   vec2 uv = position.xz;
   float k = uMercScale * uExaggeration;
+  // Where the map is limited to Turkey, everything outside the border is flat.
+  vec4 wpos = modelMatrix * vec4(uv.x * uSize, 0.0, uv.y * uSize, 1.0);
+  vMaskUv = (wpos.xz - uMaskBox.xy) / uMaskBox.zw;
+  float inside = uMaskOn > 0.5 ? texture2D(uMask, clamp(vMaskUv, 0.0, 1.0)).a : 1.0;
+  k *= smoothstep(0.15, 0.85, inside);
   float hm = heightAt(uv);
   // Finite differences over one elevation texel, but never coarser than 1/32 of
   // the tile, so a tile drawn from a far ancestor still gets per-vertex relief.
@@ -111,6 +129,10 @@ uniform sampler2D uLab;
 uniform vec3 uLabT;
 uniform float uLabOn;
 uniform float uLabelsOn;
+uniform sampler2D uMask;
+uniform float uMaskOn;
+uniform vec3 uOutside;
+varying vec2 vMaskUv;
 uniform sampler2D uOver;
 uniform float uOverOn;
 uniform vec3 uSun;
@@ -141,6 +163,13 @@ void main() {
     col = mix(col, l.rgb, l.a);
   }
 
+  if (uMaskOn > 0.5) {
+    float inside = texture2D(uMask, clamp(vMaskUv, 0.0, 1.0)).a;
+    // A thin ink line where the mask crosses 0.5 draws the national border and coast.
+    float rim = 1.0 - smoothstep(0.0, 0.35, abs(inside - 0.5));
+    col = mix(uOutside, col, smoothstep(0.35, 0.65, inside));
+    col = mix(col, vec3(0.16, 0.22, 0.19), rim * 0.55);
+  }
   float f = 1.0 - exp(-pow(vDist * uFogDensity, 2.0));
   col = mix(col, uFogColor, clamp(f, 0.0, 1.0));
   gl_FragColor = vec4(col, 1.0);

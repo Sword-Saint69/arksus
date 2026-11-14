@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:map": "cd ../map && npm ci && VITE_NOBETSU_DATA=/data npx vite build --base /harita/ --outDir ../web/dist/harita --emptyOutDir",
+    "build:all": "npm run build && npm run build:map",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest"

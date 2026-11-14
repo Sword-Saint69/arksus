@@ -221,11 +221,47 @@ const S = {
   textureClass: { tr: 'Doku sınıfı (0–100 cm)', en: 'Texture class (0–100 cm)' },
   awcAlt: { tr: 'Diğer su kapasitesi tahminleri (kullanılmıyor)', en: 'Other water-capacity estimates (not used)' },
   reset: { tr: 'Varsayılana dön', en: 'Reset to defaults' },
+  // Process simulation (three.js)
+  simOpen: { tr: 'Süreci 3B izle', en: 'Watch the process in 3D' },
+  simCtaSub: { tr: 'Üç tarlada iki yılın suyu, haftalık', en: 'Two years of water in three fields, week by week' },
+  backToSite: { tr: 'Siteye dön', en: 'Back to the site' },
+  simTitle: { tr: '{name}: iki yıl, üç tarla', en: '{name}: two years, three fields' },
+  simSub: {
+    tr: 'Model çıktısı: haftalık su defteri ({depth}). Toprak kutusundaki mavi, bitkinin kullanabileceği suyun doluluğu. Bitki boyları temsilidir.',
+    en: 'Model output: the weekly water ledger ({depth}). The blue in each soil block is how full the plant-available water store is. Plant heights are illustrative.',
+  },
+  simBaselineOnly: { tr: 'Simülasyon geçmiş iklimle; senaryolar için su defteri yok.', en: 'The simulation uses the past climate; there is no ledger for the scenarios.' },
+  simStartYear: { tr: 'Başlangıç yılı', en: 'Start year' },
+  simMedianYear: { tr: 'ortanca yıl', en: 'median year' },
+  simPlay: { tr: 'Oynat', en: 'Play' },
+  simPause: { tr: 'Duraklat', en: 'Pause' },
+  simSpeed: { tr: 'Hız', en: 'Speed' },
+  simWeek: { tr: 'Hafta', en: 'Week' },
+  simClose: { tr: 'Kapat', en: 'Close' },
+  simLoading: { tr: 'Su defteri yükleniyor…', en: 'Loading the water ledger…' },
+  simFailed: { tr: 'Su defteri yüklenemedi.', en: 'The water ledger could not be loaded.' },
+  simYear: { tr: '{n}. yıl', en: 'Year {n}' },
+  simStore: { tr: 'Toprakta su', en: 'Soil water' },
+  simRain: { tr: 'Yağış', en: 'Rain' },
+  simEt: { tr: 'Buharlaşma + terleme', en: 'Evapotranspiration' },
+  simDeep: { tr: 'Derine sızan', en: 'Deep drainage' },
+  simTotals: { tr: 'Toplam şimdiye kadar', en: 'Totals so far' },
+  stage_fallow: { tr: 'Nadas: sürülmüş, çıplak', en: 'Fallow: tilled, bare' },
+  stage_bare: { tr: 'Çıplak toprak', en: 'Bare soil' },
+  stage_wheat: { tr: 'Buğday', en: 'Wheat' },
+  stage_chickpea: { tr: 'Nohut', en: 'Chickpea' },
+  stage_lentil: { tr: 'Mercimek', en: 'Lentil' },
+  simLegendRain: { tr: 'yağmur', en: 'rain' },
+  simLegendEt: { tr: 'buharlaşma', en: 'evaporation' },
+  simLegendDeep: { tr: 'derine sızma', en: 'drainage' },
 } as const;
 
 export type Key = keyof typeof S;
 
 let lang: Lang = ((): Lang => {
+  // The farmer site opens the map with &lang= so both speak the same language.
+  const fromLink = new URLSearchParams(location.hash.slice(1)).get('lang');
+  if (fromLink === 'tr' || fromLink === 'en') return fromLink;
   try {
     const saved = localStorage.getItem('terrashift.lang');
     if (saved === 'tr' || saved === 'en') return saved;

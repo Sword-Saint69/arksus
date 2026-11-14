@@ -65,12 +65,12 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 ## İsmail — Web arayüzü
 
 - [ ] **T+0–1: Web iskeleti** — `web/` içinde Vite + React + TS + Tailwind + shadcn/ui + Recharts + vitest; Vercel bağlantısı (root = `web`); boş sayfa Vercel'de açılıyor → M0 — ⏳ kalan: Vercel bağlantısı (root = `web`, `vercel.json` hazır); iskelet ve testler `ismail/web`'de
-- [ ] **T+1–4: Mock veriyle tek sayfa** — başlık + lokasyon/derinlik seçimi + 3 rotasyon kartı + mock bandı + rozetler → Vercel'de → M1
-- [ ] **T+4–6: Grafik A (24 iklim, 2 yıllık net, şerit grafik)**
+- [ ] **T+1–4: Mock veriyle tek sayfa** — başlık + lokasyon/derinlik seçimi + 3 rotasyon kartı + mock bandı + rozetler → Vercel'de → M1 — ⏳ kalan: Vercel; sayfa gerçek veriyle `ismail/web`'de (öneri kartı, kartlar, rozetler, 13 ilçe)
+- [x] **T+4–6: Grafik A (24 iklim, 2 yıllık net, şerit grafik)** — ✅ 01:41 (ismail/web; 14 Kas kararıyla 2 yıllık net yerine buğday verim oranı)
 - [ ] **T+6–8: Grafik B (haftalık su defteri, yıl seçici)**
 - [ ] **T+8–9: "Senin rakamların" giriş paneli economics.ts'e bağlı; gerçek veriye geçiş** → M2
-- [ ] **T+9–10.5: Öncelik kaydırıcıları + "Neden bu strateji?" çekmecesi** — M3'te düşürülmez
-- [ ] **T+10.5–12: Toprak sağlığı bölümü** — ilçe toprak kartı, "uydunun söyleyemedikleri" kutusu, toprak doluluk eğrisi, SMAP paneli (veri yoksa "yakında") — M3'te düşürülmez
+- [x] **T+9–10.5: Öncelik kaydırıcıları + "Neden bu strateji?" çekmecesi** — M3'te düşürülmez — ✅ 01:37 (ismail/web; 4 kaydırıcı, §11)
+- [x] **T+10.5–12: Toprak sağlığı bölümü** — ilçe toprak kartı, "uydunun söyleyemedikleri" kutusu, toprak doluluk eğrisi, SMAP paneli (veri yoksa "yakında") — M3'te düşürülmez — ✅ 01:41 (ismail/web)
 - [ ] **T+12–13.5: Grafik C (tarla takvimi), flip ızgarası, kanıt paneli, sözlük ipuçları, footer** — zaman yetmezse önce flip ızgarası, sonra Grafik C düşer
 - [ ] **T+13.5–14: Telefon (375 px) geçişi, rozetler, metin cilası** → M3
 - [ ] **T+14–15: Genişletme E4 (Türkçe dil düğmesi)**

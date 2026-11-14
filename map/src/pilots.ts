@@ -5,7 +5,7 @@
 // 15 Nov: climate scenarios (E2), the decision module (priorities → ranking, guardrails,
 // close call, price robustness, flip table) and the evidence panel (validation.json).
 
-import type { DefaultsFile, DepthId, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
+import type { DefaultsFile, DepthId, LedgerFile, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
 import {
   decide, flipTable, inputsFromDefaults, priceRobustness, summarize,
   type Decision, type DecisionInputs, type FlipCell, type PriceRobustness, type Weights,
@@ -13,7 +13,10 @@ import {
 import { pilotFeature, type Feature } from './vector/features';
 import type { PilotData } from './ui/inspector';
 
-const base = `${import.meta.env.BASE_URL}data/nobetsu`;
+// Standalone, the map serves the contract data itself under data/nobetsu. Built into the
+// farmer site (/harita/), VITE_NOBETSU_DATA points at the site's own /data so the ~30 MB
+// of results and ledgers is deployed once.
+const base = (import.meta.env.VITE_NOBETSU_DATA as string | undefined) ?? `${import.meta.env.BASE_URL}data/nobetsu`;
 const getJSON = <T>(path: string) => fetch(`${base}/${path}`).then((r) => {
   if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
   return r.json() as Promise<T>;
@@ -32,6 +35,7 @@ export class Pilots {
   private inputs: DecisionInputs | null = null;
   private results = new Map<string, ResultsFile>();   // key: `${id}__${scenario}`
   private smap = new Map<string, SmapFile>();
+  private ledgers = new Map<string, Promise<LedgerFile>>();
   private loading = new Map<string, Promise<void>>();
   onLoaded: () => void = () => {};
 
@@ -89,6 +93,27 @@ export class Pilots {
       moneyPending: false, scenario: this.scenario, weights: this.weights, decision, robustness, flip,
       validation: this.validation,
     };
+  }
+
+  /** Weekly water ledger for the process simulation (baseline climate only, per contract). */
+  ledger(id: string): Promise<LedgerFile> {
+    let p = this.ledgers.get(id);
+    if (!p) {
+      p = getJSON<LedgerFile>(`ledger/${id}.json`);
+      p.catch(() => this.ledgers.delete(id));
+      this.ledgers.set(id, p);
+    }
+    return p;
+  }
+
+  /** Baseline results for a district (the simulation always shows the historical climate). */
+  async baselineResults(id: string): Promise<ResultsFile> {
+    const key = `${id}__baseline`;
+    const hit = this.results.get(key);
+    if (hit) return hit;
+    const r = await getJSON<ResultsFile>(resultsPath(id, 'baseline'));
+    this.results.set(key, r);
+    return r;
   }
 
   /** Nearest pilot point and its ground distance, if within reach of the district. */

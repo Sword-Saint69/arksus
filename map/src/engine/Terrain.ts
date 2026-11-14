@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import { BASEMAPS, LABELS, TERRAIN, type RasterSource } from '../sources';
-import { HALF, WORLD, mercScale, mercToScene, mercToTile, tileBBox, tileSize, sceneToMerc } from '../geo';
+import { HALF, WORLD, bboxIntersects, mercScale, mercToScene, mercToTile, tileBBox, tileSize, sceneToMerc, type BBox } from '../geo';
 import { ELEV_RES, elevationStore, imageryStore, scheduler, type Elevation, type TileStore } from './TileStore';
 import { createSharedUniforms, createTileGeometry, createTileMaterial, type SharedUniforms } from './terrainMaterial';
 import type { OverlayManager } from './Overlay';
@@ -25,6 +25,8 @@ export class Terrain {
   readonly elevation: TileStore<Elevation>;
   overlay: OverlayManager | null = null;
   lodPx = 300;
+  /** When set, tiles outside this mercator box are never drawn or fetched. */
+  region: BBox | null = null;
   /** Tiles drawn last frame, for the overlay and loading UI. */
   rendered: RenderTile[] = [];
 
@@ -73,6 +75,7 @@ export class Terrain {
 
     const visit = (z: number, x: number, y: number) => {
       const b = tileBBox(z, x, y);
+      if (this.region && !bboxIntersects(b, this.region)) return;
       const k = mercScale(Math.min(Math.abs(b.minY), Math.abs(b.maxY))) * exag;
       const minS = mercToScene(b.minX, b.maxY);
       this.box.min.set(minS.x, 0, minS.z);
@@ -186,6 +189,36 @@ export class Terrain {
     return { mesh, mat, lastFrame: -1 };
   }
 
+  /**
+   * Limit the map to one country: `canvas` holds the country filled in alpha over
+   * the mercator box `b` (row 0 = north). The shader flattens and greys whatever
+   * falls outside, and the CPU height queries agree so picking stays exact.
+   */
+  setMask(canvas: HTMLCanvasElement, b: BBox) {
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.flipY = false;
+    tex.minFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    const nw = mercToScene(b.minX, b.maxY);
+    this.shared.uMask.value = tex;
+    this.shared.uMaskBox.value.set(nw.x, nw.z, b.maxX - b.minX, b.maxY - b.minY);
+    this.shared.uMaskOn.value = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+    this.maskData = { data: ctx.getImageData(0, 0, canvas.width, canvas.height).data, w: canvas.width, h: canvas.height, b };
+  }
+  private maskData: { data: Uint8ClampedArray; w: number; h: number; b: BBox } | null = null;
+
+  /** 0 outside the mask, 1 inside (nearest pixel; matches the shader's ramp closely enough for picking). */
+  private maskAt(mx: number, my: number): number {
+    const m = this.maskData;
+    if (!m) return 1;
+    const u = (mx - m.b.minX) / (m.b.maxX - m.b.minX), v = (m.b.maxY - my) / (m.b.maxY - m.b.minY);
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) return 0;
+    const a = m.data[(Math.floor(v * m.h) * m.w + Math.floor(u * m.w)) * 4 + 3] / 255;
+    return Math.min(1, Math.max(0, (a - 0.15) / 0.7));
+  }
+
   // Height queries ---------------------------------------------------------
 
   /** Ground height in metres at a mercator point, bilinear like the GPU sampler. */
@@ -214,7 +247,7 @@ export class Terrain {
   /** Height in scene units (exaggerated, mercator-stretched) under a scene point. */
   sceneHeight(sx: number, sz: number): number {
     const m = sceneToMerc(sx, sz);
-    return this.heightM(m.x, m.y) * mercScale(m.y) * this.shared.uExaggeration.value;
+    return this.heightM(m.x, m.y) * mercScale(m.y) * this.shared.uExaggeration.value * this.maskAt(m.x, m.y);
   }
 
   /** March a ray against the terrain; returns the hit in scene space or null. */

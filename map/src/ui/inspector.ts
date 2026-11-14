@@ -44,6 +44,7 @@ export type InspectorActions = {
   setScenario: (id: string) => void;
   setWeight: (k: keyof Weights, v: number) => void;
   resetWeights: () => void;
+  simulate: (f: Feature) => void;
 };
 
 const icon = (id: string) => `<svg class="icon" aria-hidden="true"><use href="#${id}"/></svg>`;
@@ -198,6 +199,7 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     <h2 class="sel-title">${esc(loc.name)}</h2>
     <ol class="crumbs"><li>${esc(loc.province)}</li><li>${esc(loc.district)}</li></ol>
     <p class="pilot-note">${esc(tx(loc.note))}</p>
+    <button class="btn primary sim-cta" data-act="simulate">▶ ${t('simOpen')}<small>${t('simCtaSub')}</small></button>
     <dl class="metrics">
       <div class="metric"><dt>${t('elevation')} ${badge('model')}</dt><dd>${fmtNum(loc.elevation_m)}<small>m</small></dd></div>
       <div class="metric"><dt>${t('center')}</dt><dd style="font-size:13px">${loc.lat.toFixed(2)}, ${loc.lon.toFixed(2)}</dd></div>
@@ -368,6 +370,7 @@ function wire(root: HTMLElement, ctx: InspectorContext, act: InspectorActions) {
       case 'export-all': act.exportGeoJSON(ctx.selection.filter((s) => s.kind !== 'pilot')); break;
       case 'clear': act.clear(); break;
       case 'reset-weights': act.resetWeights(); break;
+      case 'simulate': act.simulate(f!); break;
     }
   }));
   root.querySelectorAll<HTMLSelectElement>('[data-scenario]').forEach((s) => s.addEventListener('change', () => act.setScenario(s.value)));

@@ -385,3 +385,48 @@ input[type=range] { width: 100%; accent-color: var(--primary); height: 28px; }
 .st-fail { background: #f8e1de; color: #8a2a1d; }
 .st-info { background: #e4eef6; color: #275b80; }
 .st-pending { background: #fff; color: #8a5a12; border-style: dashed; }
+
+/* Process simulation (three.js modal) ---------------------------------------------- */
+.sim { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(31, 42, 36, 0.38); }
+.sim-panel { width: min(1180px, 100%); height: min(780px, 100%); display: grid; grid-template-rows: auto 1fr auto; background: var(--panel-solid); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+.sim-head { display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.sim-head h2 { margin: 0; font-size: 18px; }
+.sim-head p { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; max-width: 760px; }
+.sim-close { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 0; border-radius: 10px; background: var(--raise); }
+.sim-close:hover { background: var(--raise-2); }
+.sim-stage { position: relative; min-height: 0; }
+.sim-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sim-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sim-label { position: absolute; left: 0; top: 0; display: grid; gap: 2px; width: 196px; padding: 8px 10px; border-radius: 10px; background: rgba(251, 250, 246, 0.94); border: 1px solid var(--line-2); border-top: 4px solid var(--c); box-shadow: 0 4px 14px rgba(0,0,0,.12); font-size: 12px; }
+.sim-label b { font-size: 13px; }
+.sim-label .sim-stage-name { font-weight: 600; color: var(--primary); }
+.sim-label em { font-style: normal; font-family: var(--mono); color: var(--water); font-weight: 600; }
+.sim-label small { color: var(--muted); font-size: 11px; }
+.sim-legend { position: absolute; left: 12px; bottom: 10px; margin: 0; padding: 6px 10px; list-style: none; display: flex; gap: 12px; font-size: 12px; color: var(--muted); background: rgba(251,250,246,.85); border-radius: 99px; }
+.sim-legend li { display: flex; align-items: center; gap: 6px; }
+.sim-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.sim-bar { display: grid; grid-template-columns: auto auto 1fr auto; gap: 12px 16px; align-items: center; padding: 12px 18px; border-top: 1px solid var(--line); }
+.sim-bar label { display: grid; gap: 2px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.sim-bar select { height: 36px; border-radius: 8px; border: 1px solid var(--line-2); background: #fff; padding: 0 8px; font-size: 13px; }
+.sim-range input { width: 100%; accent-color: var(--primary); height: 28px; }
+.sim-date { font-family: var(--mono); font-size: 12px; color: var(--text); font-weight: 500; }
+.sim-play { min-width: 112px; }
+@media (max-width: 760px) {
+  .sim { padding: 0; }
+  .sim-panel { border-radius: 0; height: 100%; }
+  .sim-bar { grid-template-columns: 1fr 1fr; }
+  .sim-range { grid-column: span 2; }
+  .sim-label { width: 112px; font-size: 10.5px; padding: 6px 8px; }
+  .sim-label small { display: none; }
+}
+
+/* Embedded in the farmer site: its header already shows the brand. */
+.embedded .brand { display: none; }
+
+/* Prominent entry to the 3D process at the top of the district panel. */
+.sim-cta { display: grid; justify-items: start; gap: 1px; width: 100%; min-height: 54px; margin: 0 0 12px; padding: 8px 14px; text-align: left; font-size: 15px; }
+.sim-cta small { font-weight: 400; font-size: 12px; opacity: .85; }
+
+/* "Back to the site" when the map is opened on its own from the farmer site. */
+.back-to-site { display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: var(--radius); text-decoration: none; color: var(--primary); font-weight: 600; white-space: nowrap; }
+.back-to-site .icon { transform: rotate(180deg); }

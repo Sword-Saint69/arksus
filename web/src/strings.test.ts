@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { S } from './strings';
 
-// AGENTS.md "Para gösterilmez" and "Öneri dili": these never appear in UI text.
-const FORBIDDEN = [/profit guaranteed/i, /kâr garantili/i, /\bcertain\b/i, /\bkesin\b/i, /\bbanned\b/i, /\byasak\b/i, /\bTL\b/, /\bprice\b/i, /\bfiyat/i, /\bkâr\b/i, /\bprofit\b/i];
+// AGENTS.md "Para gösterilmez" and "Öneri dili": no amounts of money and none of
+// the forbidden phrases. Saying a price "moves ±20 %" is allowed (§14); a TL
+// figure, profit or cost is not.
+const FORBIDDEN = [/profit guaranteed/i, /kâr garantili/i, /\bcertain\b/i, /\bkesin/i, /\bbanned\b/i, /\byasak\b/i, /\bTL\b/, /\bkâr\b/i, /\bprofit\b/i, /\bcost\b/i, /\bmaliyet/i, /\bgelir/i, /\bincome\b/i];
 
 describe('strings', () => {
   it('every key has both languages filled', () => {

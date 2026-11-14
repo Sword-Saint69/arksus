@@ -5,8 +5,9 @@ import { join, normalize, resolve } from 'node:path';
 // NöbetSu data lives in ../web/public/data (owned by the web/contract side).
 // Serve it under /data/nobetsu in dev and copy it into the build, instead of
 // keeping a second copy in this folder.
-const DATA = resolve(__dirname, '../web/public/data');
-const FILES = ['site_index.json', 'defaults.json', 'validation.json', 'results', 'smap'];
+const DATA = resolve(import.meta.dirname, '../web/public/data');
+// ledger/ is ~2 MB per district and only fetched when the process simulation opens.
+const FILES = ['site_index.json', 'defaults.json', 'validation.json', 'results', 'smap', 'ledger'];
 
 function nobetsuData(): Plugin {
   return {
@@ -21,6 +22,7 @@ function nobetsuData(): Plugin {
       });
     },
     writeBundle(options) {
+      if (process.env.VITE_NOBETSU_DATA) return; // the host site serves the data (see pilots.ts)
       const out = join(options.dir ?? 'dist', 'data/nobetsu');
       for (const f of FILES) cpSync(join(DATA, f), join(out, f), { recursive: true });
     },
