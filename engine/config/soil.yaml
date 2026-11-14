@@ -1,0 +1,64 @@
+# Soil parameters for the water balance engine (owner: Ömer, Rol A).
+# Every numeric parameter is a value object (V): value, unit, source, type, verified.
+# Seed values are from FAO-56 tables as remembered and are NOT yet checked against the
+# book: verified: false until someone opens the table and confirms.
+
+depth_classes:   # ids and depths are frozen by the contract (PLAN_MVP §4.1)
+  - id: shallow
+    depth_m: 0.6
+    label: { en: "Shallow (<60 cm)", tr: "Sığ (<60 cm)" }
+  - id: medium
+    depth_m: 0.9
+    label: { en: "Medium (60–90 cm)", tr: "Orta (60–90 cm)" }
+  - id: deep
+    depth_m: 1.2
+    label: { en: "Deep (>90 cm)", tr: "Derin (>90 cm)" }
+
+evaporation:
+  ze_m:
+    value: 0.10
+    unit: "m"
+    source: "FAO-56 Chapter 7: depth of the surface evaporation layer, 0.10–0.15 m"
+    type: literature
+    verified: false
+  tew_mm:
+    value: 20.0
+    unit: "mm"
+    source: "FAO-56 Table 19, loam, TEW for Ze = 0.10 m (range 16–22 mm); dominant texture of the pilot points not yet confirmed"
+    type: assumption
+    verified: false
+  rew_mm:
+    value: 9.0
+    unit: "mm"
+    source: "FAO-56 Table 19, loam, REW (range 8–10 mm); dominant texture of the pilot points not yet confirmed"
+    type: assumption
+    verified: false
+
+# Used only when data/soilgrids/{location_id}.json is missing (ARAYUZLER §3).
+fallback_awc_mm_per_m:
+  karapinar:
+    value: 150.0
+    unit: "mm/m"
+    source: "FAO-56 Table 19, loam, θFC − θWP range 0.13–0.18 m3/m3; texture not confirmed"
+    type: assumption
+    verified: false
+  develi:
+    value: 150.0
+    unit: "mm/m"
+    source: "FAO-56 Table 19, loam, θFC − θWP range 0.13–0.18 m3/m3; texture not confirmed"
+    type: assumption
+    verified: false
+
+initial_fill_fraction:
+  value: 0.5
+  unit: "fraction of available water"
+  source: "PLAN_MVP §5.3 sequence design: spin-up wheat starts at 50 % of available water"
+  type: assumption
+  verified: false
+
+wind_exposure_percentile:
+  value: 75
+  unit: "percentile of daily WS2M_MAX over the full record"
+  source: "PLAN_MVP §5.8: stated threshold choice for the wind-exposure count"
+  type: assumption
+  verified: false
