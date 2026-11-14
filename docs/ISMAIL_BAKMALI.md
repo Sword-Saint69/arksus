@@ -135,3 +135,10 @@ Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **
 - [ ] Öneri kartının altına küçük bir satır: `priceRobustness(results, site, depthId, inp, weights)` →
   - `stable: true` → "Bu öneri fiyatlar ±%20 değişse de değişmiyor." / "This holds if prices move ±20 %."
   - `stable: false` → her `sensitive_to` için: "Nohut fiyatı %20 artarsa öneri Nohut → Buğday olur." (fiyat ya da TL yazma; sadece ürün, yön ve yüzde). Nohut fiyatı en belirsiz parametre olduğu için bu satır önemli.
+
+## 15. Gübre önerisi: yeni dosya ve fonksiyonlar (15 Kas)
+
+- [ ] `docs/GUBRE.md`'yi oku: simülasyonda gübre kartı için tüm akış, alanlar ve gösterim kuralları orada.
+- [ ] `fertilizer.json` + `fertilizer.ts` (`soilFromResults`, `recommend`); bileşende hesap yok, sadece çağrı.
+- [ ] Para yok, `null` sayı değildir, her sayının rozeti `source.type`; pancar/patates/soğanda kuru tarım seçeneğini gri göster.
+
