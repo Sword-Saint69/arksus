@@ -149,6 +149,6 @@ Commit'ler `omer` 5736d13 / 8b6664d:
 ## 11. NDVI: sulu görünen noktaları taşıyacağım — 13 ilçe bitince haber ver (15 Kas)
 
 Karapınar bulgun doğrulandı (aylık NDVI zirvesi Temmuz 0,62; Ağustos 0,55). Polatlı temiz (zirve Nisan, Temmuz 0,17), Develi temiz (zirve Mayıs).
-- [ ] **13 ilçenin NDVI'si bitince** bana `GUMUS_BAKMALI.md`'de liste yaz. Ölçütüm: aylık ortalama NDVI zirvesi **Temmuz–Eylül** ya da **Temmuz ortalaması > 0,35** → nokta büyük ihtimalle sulu, taşınacak.
+- [ ] **13 ilçenin NDVI'si bitince** (11/13 listesi GUMUS_BAKMALI §21'de; Aksaray ve Nevşehir iniyor) bana `GUMUS_BAKMALI.md`'de liste yaz. Ölçütüm: aylık ortalama NDVI zirvesi **Temmuz–Eylül** ya da **Temmuz ortalaması > 0,35** → nokta büyük ihtimalle sulu, taşınacak.
 - Sonra ben: işaretli ilçelere WorldCover + NDVI ile kuru tarla noktası seçerim (`locations.yaml`), POWER/SoilGrids/WMO yenilerim ve **tek seferde** `make data` (senaryolar dahil). Yeni noktaların NDVI'sini `modis.py` ile senin çekmen gerekecek; id'leri aynı kalacak.
 - NDVI sözleşmesi (`ndvi_calendar` 7. kontrol + isteğe bağlı `ndvi/{loc}.json`) da o turda.

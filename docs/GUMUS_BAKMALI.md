@@ -195,3 +195,25 @@ OMER_BAKMALI §6'daki (b) seçeneği. Motor girdisi değişti; senden yalnız **
 - **Etki (orta derinlik, 24 yıl ortancası, scratch koşu):** faktörler Karaman 0,55 · Eskişehir 0,72 · Karapınar 0,73 · Boğazlıyan 0,88 … Nevşehir/Kaman 1,16. Karapınar nadas sonrası ekimde su 104 → 45 mm, buğday Ya/Ym 0,54 → 0,42; Kaman 62 → 95 mm. **Konya denemesine yaklaştı:** nohut/nadas 0,89 → 0,85 (deneme 0,80), mercimek/nadas 0,90 → 0,86 (deneme 0,87). Kütle dengesi geçiyor.
 - **Dikkat:** Karaman nadas su biriktirme verimi %30 çıktı, literatür aralığı %11–29'un hemen üstünde (`pse_literature`, info). Develi'nin istasyonu ~29 km uzakta (Kayseri Bölge); nokta taşıma turunda istasyon da değişecekse normal güncellenmeli.
 - [ ] `make data` (senaryolar dahil) — nokta taşımayla aynı turda yapman yeterli.
+
+## 21. NDVI sulu nokta listesi — 11/13 ilçe (15 Kas; Aksaray ve Nevşehir iniyor)
+
+Senin ölçütün (OMER_BAKMALI §11): aylık ortalama NDVI zirvesi Temmuz–Eylül **ya da** Temmuz ortalaması > 0,35. MOD13Q1, 2013–2024, noktanın 250 m pikseli. "Kuruma" = zirveden sonra NDVI'nin zirve–dip ortasının altına indiği ilk ay.
+
+| İlçe | Rakım (POWER) | Zirve ayı | Zirve | Tem | Ağu | Kuruma | Karar |
+|---|---|---|---|---|---|---|---|
+| **Karaman** | 1394 | 7 | 0,79 | 0,79 | 0,71 | 9 | **taşı** — Haziran'da 0,25'ten Temmuz'da 0,79'a: yaz ürünü, açıkça sulu |
+| **Karapınar** | 1236 | 7 | 0,62 | 0,62 | 0,55 | 10 | **taşı** — bütün yaz yeşil (§18) |
+| **Eskişehir** | 878 | 7 | 0,57 | 0,57 | 0,55 | 10 | **taşı** |
+| **Niğde** | 1420 | 8 | 0,49 | 0,44 | 0,49 | 11 | **taşı** — zirve Ağustos |
+| **Gemerek** | 1620 | 7 | 0,53 | 0,53 | 0,49 | 10 | **taşı** (sınırda: yüksek rakımda buğday geç olgunlaşır ama Ağustos 0,49 hasat edilmiş tarla için çok yüksek) |
+| **Boğazlıyan** | 1166 | 6 | 0,59 | 0,53 | 0,49 | 9 | **taşı** (sınırda: zirve Haziran ama Temmuz–Ağustos yeşil kalıyor) |
+| Develi | 1577 | 5 | 0,39 | 0,32 | 0,23 | 8 | kalsın — kuru tarım deseni |
+| Polatlı | 1037 | 4 | 0,52 | 0,17 | 0,16 | 6 | kalsın |
+| Kaman | 1055 | 5 | 0,60 | 0,25 | 0,19 | 7 | kalsın |
+| Kırıkkale | 959 | 5 | 0,52 | 0,19 | 0,16 | 7 | kalsın |
+| Çankırı | 959 | 5 | 0,48 | 0,19 | 0,17 | 7 | kalsın |
+| Aksaray, Nevşehir | | | | | | | iniyor; bitince eklerim |
+
+- [ ] 6 ilçe taşınacak: Karaman, Karapınar, Eskişehir, Niğde, Gemerek, Boğazlıyan. Yeni koordinatları yazınca NDVI'lerini çekip aynı tabloyla kontrol ederim (beklenen: zirve Nisan–Mayıs, Temmuz < 0,30).
+- **Takvim notu (bende):** temiz kuru tarım noktalarında zirve Nisan–Mayıs; en yüksek temiz nokta Develi (1577 m) Mayıs zirvesi ama kuruma Ağustos, alçak ilçelerde Haziran–Temmuz. Yani yükseklikte ~1 ay gecikme işareti var, ama tek nokta. Gemerek ve Boğazlıyan taşınınca 3 soğuk nokta olur; ikinci takvime o zaman karar veririm.
