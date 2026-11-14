@@ -73,8 +73,8 @@ Düzeldi (Ömer, `omer` 46b2e28): üç test kendi `refs` değerini ayarlıyor; `
 | Çıplak gün / rüzgâra açık (Karapınar) | 460 / 88 | 332 / 54 | 310 / 48 |
 
 Kontrol etmeni istediğim iki şey (hata olduğunu söylemiyorum, emin olmak için):
-- [ ] **Çiçeklenmede sıcak gün ortancası her rotasyonda 0** (eşik artık 31 °C, POWER `T2M_MAX`). POWER hücresi Karapınar'da 1236 m'de; çiçeklenme penceresi Mayıs sonu–Haziran başı mı? Sıfır mı çıkmalı, yoksa pencere/eşik eşleşmesinde bir sorun mu var?
-- [ ] **Nohuttan sonra buğday ekiminde su ≈ 0 mm** (Temmuz ortası hasat → Ekim ekimi). Yaz kuraklığı düşünülünce makul olabilir; yine de 24 yılın P90'ı da 0'a yakınsa Ekim başı yağışlarının profile girişini bir kontrol et.
+- [x] **Çiçeklenmede sıcak gün ortancası her rotasyonda 0** (eşik artık 31 °C, POWER `T2M_MAX`). POWER hücresi Karapınar'da 1236 m'de; çiçeklenme penceresi Mayıs sonu–Haziran başı mı? Sıfır mı çıkmalı, yoksa pencere/eşik eşleşmesinde bir sorun mu var?
+- [x] **Nohuttan sonra buğday ekiminde su ≈ 0 mm** (Temmuz ortası hasat → Ekim ekimi). Yaz kuraklığı düşünülünce makul olabilir; yine de 24 yılın P90'ı da 0'a yakınsa Ekim başı yağışlarının profile girişini bir kontrol et.
 
 ## 6. 13 İç Anadolu lokasyonu — SÖZLEŞME DEĞİŞTİ: lokasyonlar açık liste (14 Kas)
 
@@ -82,9 +82,9 @@ Proje 2 noktadan **13 ile (her ilden bir kuru tarım ilçesi)** genişletildi. L
 Her nokta için POWER önbelleği, `data/soilgrids/{loc}.json` (doku sınıfı, cfvo, Saxton–Rawls dahil) ve `references.yaml` → `mgm_annual_precip_mm.{loc}` (ilçenin ya da en yakın WMO 1991–2020 istasyonu) hazır.
 
 Senin tarafında yapılması gerekenler:
-- [ ] **`validate.py`**: `LOCATION_NAMES` sabit sözlüğü → isimleri `config.load("locations")`'tan al (şu an yeni lokasyonlar id ile görünür, çökme yok). `precip_vs_mgm` 13 lokasyonu tek satırda yazıyor olabilir; çok uzunsa kısalt (ör. fark yüzdeleri listesi, en büyük sapma).
-- [ ] **`soil.yaml` → `fallback_awc_mm_per_m`**: lokasyon anahtarlı; bilinmeyen lokasyonda `runner.py:185` `KeyError`. Tek bir varsayılan + isteğe bağlı lokasyon geçersiz kılma yap (SoilGrids dosyası olduğu için şu an tetiklenmiyor).
-- [ ] **`crops.yaml` takvimi**: tek (Konya) takvim var. Gemerek (Sivas), Boğazlıyan (Yozgat), Çankırı ve Develi daha yüksek/soğuk; ekim-hasat tarihleri farklı olabilir. En az iki bölge takvimi (sıcak-alçak / soğuk-yüksek) ya da açıkça "Konya takvimi, assumption" notu — karar senin.
+- [x] **`validate.py`**: `LOCATION_NAMES` sabit sözlüğü → isimleri `config.load("locations")`'tan al (şu an yeni lokasyonlar id ile görünür, çökme yok). `precip_vs_mgm` 13 lokasyonu tek satırda yazıyor olabilir; çok uzunsa kısalt (ör. fark yüzdeleri listesi, en büyük sapma).
+- [x] **`soil.yaml` → `fallback_awc_mm_per_m`**: lokasyon anahtarlı; bilinmeyen lokasyonda `runner.py:185` `KeyError`. Tek bir varsayılan + isteğe bağlı lokasyon geçersiz kılma yap (SoilGrids dosyası olduğu için şu an tetiklenmiyor).
+- [x] **`crops.yaml` takvimi**: tek (Konya) takvim var. Gemerek (Sivas), Boğazlıyan (Yozgat), Çankırı ve Develi daha yüksek/soğuk; ekim-hasat tarihleri farklı olabilir. En az iki bölge takvimi (sıcak-alçak / soğuk-yüksek) ya da açıkça "Konya takvimi, assumption" notu — karar senin.
 - [ ] **Tam koşu** 13 lokasyonla (~13 × 10 sn) ve kendi testlerin; `trial_ratio` Karapınar'da kalabilir (deneme Konya'da).
 
 **13 lokasyonla gerçek koşu sonucu (14 Kas, Gümüş):** 42 dosya şemadan geçti, kütle dengesi 2808 sekansta 1,6e-12 mm. İki önemli gözlem:
@@ -94,3 +94,9 @@ Senin tarafında yapılması gerekenler:
 ## 7. Bilgi: sitede para kalktı, karar modülü geldi (14 Kas)
 
 Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları puanlayıp öneri veriyor; senin çıktılarından `wheat.yield_ratio`, `first_crop.yield_ratio`, `water_at_wheat_sowing_mm`, `wind_exposed_bare_days` kullanılıyor. Engeller: ortanca buğday oranı < 0,85 × nadas sonrası buğday ya da ilk yıl ürünü ortanca oranı < 0,30 → öneri dışı. Bu yüzden **verim oranlarının ve takvimin doğruluğu artık önerinin kendisini belirliyor**; soğuk ilçeler için takvim (§6) önceliğini artırıyor.
+
+Ömer yanıtı (15 Kas, `omer` 5736d13 / 8b6664d):
+- §5 sıcak gün = 0 hata değil: pencere ~23 May–6 Haz; POWER `T2M_MAX` > 31 °C bu pencerede 24 yılın ortancasında 0 (Karapınar en çok 8, Develi 3 gün); Haziran tamamında Karapınar ortanca 3,5, Temmuz 17. Yani eşik/pencere doğru eşleşiyor, sıcak stres çiçeklenmeden sonra başlıyor.
+- §5 nohut sonrası su ≈ 0 makul: P10/P50/P90 Karapınar 0 / 0,1 / 3,4 mm, Develi 0 / 0 / 4,8. 15 Tem–14 Eki yağışı Karapınar ortanca 26, P90 48 mm; küçük yaz yağışları çıplak toprakta buharlaşıyor (anız malçı yok varsayımı bunu biraz artırır).
+- §6 isimler `locations.yaml`'dan; SMAP metni "noktalar"; yedek AWC `default` + `overrides` (yeni id'de KeyError yok). `precip_vs_mgm` satırını kısaltmadım (IMERG sütunu da eklendi); İsmail uzun bulursa söylesin.
+- §6 takvim: kaynak bulunamadı (Sivas/Yozgat/Çankırı); 13 ilçe tek takvim, `crops.yaml`'da açıkça assumption. MODIS NDVI 13 ilçe inince kuruma ayı farkına bakıp ikinci takvime karar vereceğim.
