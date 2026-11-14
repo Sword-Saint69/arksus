@@ -202,10 +202,12 @@ def precip_common_years(weather: pd.DataFrame, imerg_monthly: pd.Series) -> tupl
     return years, power_mm, imerg_mm
 
 
-def check_precip(weathers, refs, imerg=None):
-    """POWER (and, when cached, NASA GPM IMERG) annual precipitation vs MGM station normals."""
+def check_precip(weathers, refs, imerg=None, factors=None):
+    """POWER (and, when cached, NASA GPM IMERG) annual precipitation vs MGM station normals.
+    `factors`: {loc: runner.precip_correction_factor(...)} when the engine uses station-scaled rain."""
     mgm = refs.get("mgm_annual_precip_mm", {})
     imerg = imerg or {}
+    factors = factors or {}
     parts, ref_parts = [], []
     for loc, w in weathers.items():
         node = mgm.get(loc)
@@ -223,6 +225,8 @@ def check_precip(weathers, refs, imerg=None):
             if years:
                 text += (f"; IMERG {imerg_c:.0f} mm/yr ({(imerg_c - normal) / normal * 100:+.0f} %), "
                          f"POWER {power_c:.0f} mm/yr over the same {years[0]}–{years[-1]} ({len(years)} yr)")
+        if factors.get(loc):
+            text += f"; engine uses POWER × {factors[loc]['factor']:.2f}"
         parts.append(text)
         ref_parts.append(f"{_name(loc)}: {station}, 1991–2020 normal")
     if not parts:
@@ -239,12 +243,27 @@ def check_precip(weathers, refs, imerg=None):
     tr = ("NASA POWER uydu ve model kaynaklıdır (~50 km); MGM istasyonu yerde tek bir noktayı ölçer. "
           "İkisi farklı yılları kapsar. Bu kontrol aradaki farkı gösterir; POWER'ı istasyon verisiyle düzeltmek "
           "etkinlik sonrası listesinde.")
+    if any(factors.values()):
+        en += (" The engine scales daily POWER rain so that its mean annual total matches the station normal "
+               "(linear scaling, Teutschbein & Seibert 2012); wet days stay as in POWER. The station normal covers "
+               "1991–2020, POWER 2000 onward.")
+        tr += (" Motor, günlük POWER yağışını yıllık ortalaması istasyon normaline eşit olacak şekilde ölçekler "
+               "(doğrusal ölçekleme, Teutschbein ve Seibert 2012); yağışlı günler POWER'daki gibi kalır. İstasyon "
+               "normali 1991–2020, POWER 2000 sonrasıdır.")
     if has_imerg:
         en += (" NASA GPM IMERG (~10 km) is a second satellite estimate. Its monthly product is adjusted with rain "
                "gauges, so it is not fully independent of station data. The engine still uses POWER.")
         tr += (" NASA GPM IMERG (~10 km) ikinci bir uydu tahminidir. Aylık ürünü yağış ölçerlerle düzeltildiği için "
                "istasyon verisinden tam bağımsız değildir. Motor hâlâ POWER kullanır.")
     return _check("precip_vs_mgm", "info", "; ".join(parts), "; ".join(ref_parts), en, tr)
+
+
+def _engine_factors(weather, refs) -> dict:
+    """Station factors the engine applies (empty when scenarios.yaml precip_correction is off)."""
+    from nobetsu import runner
+    if not runner._precip_correction_enabled():
+        return {}
+    return {loc: runner.precip_correction_factor(loc, w, refs) for loc, w in weather.items()}
 
 
 def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs: dict,
@@ -262,7 +281,7 @@ def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs:
         check_et0(),
         check_pse(outputs, refs),
         check_trial(outputs, refs),
-        check_precip(weather, refs, imerg),
+        check_precip(weather, refs, imerg, _engine_factors(weather, refs)),
     ]
     assert [c["id"] for c in checks] == list(CHECK_IDS)
     return checks

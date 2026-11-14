@@ -281,13 +281,59 @@ def run_sequence(weather: pd.DataFrame, start_year: int, rotation: dict, depth: 
     return row, series, wb.mass_balance_error(out)
 
 
+def _references() -> dict:
+    return _load_config("references") or {}
+
+
+def _precip_correction_enabled() -> bool:
+    cfg = (_load_config("scenarios") or {}).get("precip_correction") or {}
+    return bool((cfg.get("enabled") or {}).get("value", False))
+
+
+def precip_correction_factor(location_id: str, weather: pd.DataFrame, refs: dict | None = None) -> dict | None:
+    """Station factor for POWER precipitation: MGM/WMO 1991–2020 annual normal ÷ POWER mean annual
+    precipitation over complete calendar years (scenarios.yaml precip_correction). None without a normal."""
+    from nobetsu.validate import power_annual_mean_mm
+    node = ((refs if refs is not None else _references()).get("mgm_annual_precip_mm") or {}).get(location_id)
+    normal = node.get("value") if isinstance(node, dict) else None
+    if not normal:
+        return None
+    power = power_annual_mean_mm(weather)
+    if power <= 0:
+        return None
+    return {"factor": float(normal) / power, "mgm_mm": float(normal), "power_mm": power,
+            "station": node.get("station") or "nearest MGM station"}
+
+
+def apply_precip_correction(weather: pd.DataFrame, location_id: str, refs: dict | None = None) -> pd.DataFrame:
+    """Daily precipitation × station factor; wet days unchanged; input not modified. Idempotent:
+    weather already carrying attrs['precip_correction'] is returned as is."""
+    if weather.attrs.get("precip_correction"):
+        return weather
+    f = precip_correction_factor(location_id, weather, refs)
+    if f is None:
+        return weather
+    w = weather.copy()
+    w.attrs = dict(weather.attrs)
+    w["precip_mm"] = weather["precip_mm"] * f["factor"]
+    w.attrs["precip_correction"] = f
+    return w
+
+
+def _maybe_correct(location_id: str, weather: pd.DataFrame, precip_correction: bool | None) -> pd.DataFrame:
+    use = _precip_correction_enabled() if precip_correction is None else bool(precip_correction)
+    return apply_precip_correction(weather, location_id, _references()) if use else weather
+
+
 def run_location(location_id: str, weather: pd.DataFrame, soilgrids: dict | None,
-                 start_years=None) -> dict:
+                 start_years=None, precip_correction: bool | None = None) -> dict:
     """EngineOutput for one location (ARAYUZLER §5).
 
     `start_years` is for tests and partial runs only; the default is the contract's
     2001…2024 (216 sequences with three rotations and three depth classes).
+    `precip_correction`: None = scenarios.yaml switch; True/False forces it (station-scaled POWER rain).
     """
+    weather = _maybe_correct(location_id, weather, precip_correction)
     crops_cfg = _load_config("crops")
     soil_cfg = _load_config("soil")
     rotation_list = _rotation_list()
@@ -315,6 +361,7 @@ def run_location(location_id: str, weather: pd.DataFrame, soilgrids: dict | None
         "sequences": sequences,
         "ledger": ledger,
         "diagnostics": {"max_mass_balance_error_mm": float(max_err), "n_sequences": len(sequences)},
+        "precip_correction": weather.attrs.get("precip_correction"),   # None when POWER rain is used as is
     }
 
 
@@ -345,7 +392,8 @@ def _continuous_schedule(cycle: list[str], phase: int, index: pd.DatetimeIndex, 
 
 
 def run_landscape(location_id: str, weather: pd.DataFrame, soilgrids: dict | None, *,
-                  start: str = "2013-10-01", depth_id: str = "medium", cycle: list[str] | None = None) -> pd.DataFrame:
+                  start: str = "2013-10-01", depth_id: str = "medium", cycle: list[str] | None = None,
+                  precip_correction: bool | None = None) -> pd.DataFrame:
     """Daily available water of a landscape made of two parcels running the baseline
     rotation one year apart (in any year half the land is fallow, half is wheat), averaged.
 
@@ -354,6 +402,7 @@ def run_landscape(location_id: str, weather: pd.DataFrame, soilgrids: dict | Non
     the two parcels (aw_mm_a/b, crop_a/b); attrs: cycle, capacity_mm, awc_used,
     max_mass_balance_error_mm.
     """
+    weather = _maybe_correct(location_id, weather, precip_correction)
     crops_cfg = _load_config("crops")
     soil_cfg = _load_config("soil")
     cycle = list(cycle or _rotation_list()[0]["crops"])
@@ -406,7 +455,8 @@ def apply_scenario(weather: pd.DataFrame, scenario: dict) -> pd.DataFrame:
 
 
 def run_scenarios(location_id: str, weather: pd.DataFrame, soilgrids: dict | None,
-                  scenario_ids: list[str] | None = None, start_years=None) -> dict[str, dict]:
+                  scenario_ids: list[str] | None = None, start_years=None,
+                  precip_correction: bool | None = None) -> dict[str, dict]:
     """{scenario_id: EngineOutput} — run_location() on each scenario's weather.
 
     The wind-exposure threshold is recomputed per run from the scenario weather, but wind is
@@ -417,5 +467,10 @@ def run_scenarios(location_id: str, weather: pd.DataFrame, soilgrids: dict | Non
     unknown = [i for i in ids if i not in defined]
     if unknown:
         raise KeyError(f"unknown scenario ids: {unknown}")
-    return {sid: run_location(location_id, apply_scenario(weather, defined[sid]), soilgrids, start_years=start_years)
+    # Station correction first, on the unscaled record: correcting after a "dry" step would undo it
+    # (the factor is computed from the record's own mean). apply_scenario keeps the attrs, so
+    # run_location sees the weather as already corrected and does not scale it again.
+    base = _maybe_correct(location_id, weather, precip_correction)
+    return {sid: run_location(location_id, apply_scenario(base, defined[sid]), soilgrids, start_years=start_years,
+                              precip_correction=bool(base.attrs.get("precip_correction")))
             for sid in ids}

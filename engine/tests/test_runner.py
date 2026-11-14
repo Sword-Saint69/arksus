@@ -33,7 +33,8 @@ def _rows(output, **where):
 
 
 def test_top_level_shape(output):
-    assert list(output.keys()) == ["location_id", "awc_used", "sequences", "ledger", "diagnostics"]
+    assert list(output.keys()) == ["location_id", "awc_used", "sequences", "ledger", "diagnostics", "precip_correction"]
+    assert output["precip_correction"] is None          # off in tests (conftest)
     assert output["location_id"] == "karapinar"
     assert len(output["sequences"]) == 216
     assert len(output["ledger"]) == 216
