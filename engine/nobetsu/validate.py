@@ -26,7 +26,19 @@ TRIAL_LOCATION_ID = "karapinar"        # the previous-crop trial is in Konya
 EX18 = dict(lat_deg=50.0 + 48.0 / 60.0, elevation_m=100.0, doy=187, tmax_c=21.5, tmin_c=12.3,
             rh_max=84.0, rh_min=63.0, u10_ms=10.0 / 3.6, sun_hours=9.25, expected_mm=3.9)
 
-LOCATION_NAMES = {"karapinar": "Karapınar", "develi": "Develi"}
+_LOCATION_NAMES: dict[str, str] | None = None
+
+
+def location_names() -> dict[str, str]:
+    """{id: display name} from engine/config/locations.yaml (the list is open); read once."""
+    global _LOCATION_NAMES
+    if _LOCATION_NAMES is None:
+        try:
+            from nobetsu import config
+            _LOCATION_NAMES = {l["id"]: l.get("name", l["id"]) for l in config.load("locations")["locations"]}
+        except (ImportError, FileNotFoundError, KeyError, TypeError):
+            _LOCATION_NAMES = {}
+    return _LOCATION_NAMES
 
 
 def _v(node):
@@ -39,7 +51,7 @@ def _check(check_id, status, value, reference, en, tr):
 
 
 def _name(loc):
-    return LOCATION_NAMES.get(loc, loc)
+    return location_names().get(loc, loc)
 
 
 def _rows(outputs, location_id=None, depth_id=REFERENCE_DEPTH_ID, rotation_id=None):
@@ -335,8 +347,8 @@ def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dic
         )
     if not parts:
         return _check("smap_anomaly", "pending", "", "",
-                      "Waiting for NASA SMAP L4 root-zone data for the two points.",
-                      "İki nokta için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
+                      "Waiting for NASA SMAP L4 root-zone data for the points.",
+                      "Noktalar için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
     return _check(
         "smap_anomaly", "info", "; ".join(parts),
         "NASA SMAP L4 SPL4SMGP v8 root-zone wetness, 9 km cell, monthly means",
@@ -348,4 +360,78 @@ def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dic
         "SMAP'in aylık anomalileri arasındaki Spearman korelasyonu. Islak ve kuru dönemlerin zamanlamasını "
         "kontrol eder, mutlak uyumu değil: SMAP 9 km'lik karışık bir hücrenin uydu destekli modelidir ve "
         "bizim rotasyonlarımızı bilmez.",
+    )
+
+
+# --- MODIS NDVI vs the engine's crop calendar ------------------------------------------------
+# Not part of run_checks(): a new check id (`ndvi_calendar`) needs Gümüş to extend
+# validation.schema.json first (same situation as `smap_anomaly`).
+
+NDVI_MIN_MONTHS = 24
+SUMMER_MONTHS = (6, 7, 8, 9)
+
+
+def ndvi_comparison(landscape: pd.DataFrame, ndvi: pd.Series) -> dict:
+    """Seasonal timing of the model's crop cover (landscape kcb: half fallow, half wheat each
+    year) against MODIS NDVI of the 250 m pixel at the point.
+
+    Both are averaged per calendar month over the overlapping full months. NDVI and kcb have
+    different units, so only timing and rank order are compared (Spearman ρ, peak month).
+    A summer NDVI peak suggests the pixel is not rainfed winter cereal (e.g. irrigated summer crops).
+    """
+    days = landscape["kcb"].groupby(landscape.index.to_period("M")).size()
+    full = days[days == days.index.days_in_month].index.to_timestamp()
+    model = landscape["kcb"].resample("MS").mean()
+    model = model.loc[model.index.isin(full)]
+    n = ndvi.dropna()
+    n_month = n.groupby(n.index.to_period("M")).mean()
+    n_month.index = n_month.index.to_timestamp()
+    both = pd.concat({"model": model, "ndvi": n_month}, axis=1, join="inner").dropna()
+    out = {"n_months": int(len(both))}
+    if len(both) < 3:
+        return out
+    clim_m = both["model"].groupby(both.index.month).mean()
+    clim_n = both["ndvi"].groupby(both.index.month).mean()
+    pm, pn = int(clim_m.idxmax()), int(clim_n.idxmax())
+    off = abs(pn - pm) % 12
+    out.update(
+        first_month=both.index[0].date().isoformat(),
+        last_month=both.index[-1].date().isoformat(),
+        spearman_seasonal=spearman(clim_m, clim_n),
+        model_peak_month=pm, ndvi_peak_month=pn,
+        peak_offset_months=int(min(off, 12 - off)),
+        ndvi_low_months=[int(m) for m in clim_n.nsmallest(3).index],
+        ndvi_peak=float(clim_n.max()), ndvi_low=float(clim_n.min()),
+        ndvi_summer_peak=pn in SUMMER_MONTHS,
+    )
+    return out
+
+
+def check_ndvi_calendar(landscapes: dict[str, pd.DataFrame], ndvis: dict[str, pd.Series]) -> dict:
+    """Candidate check (validation.json item format); `info` or `pending`."""
+    parts = []
+    for loc, land in landscapes.items():
+        if loc not in ndvis:
+            continue
+        s = ndvi_comparison(land, ndvis[loc])
+        if s["n_months"] < NDVI_MIN_MONTHS:
+            continue
+        flag = " — summer peak: pixel may not be rainfed cereal" if s["ndvi_summer_peak"] else ""
+        parts.append(
+            f"{_name(loc)}: NDVI peak month {s['ndvi_peak_month']} vs model crop-cover peak {s['model_peak_month']} "
+            f"({s['peak_offset_months']} mo apart), seasonal ρ = {s['spearman_seasonal']:.2f}, "
+            f"lowest NDVI months {s['ndvi_low_months']} ({s['n_months']} months){flag}"
+        )
+    if not parts:
+        return _check("ndvi_calendar", "pending", "", "",
+                      "Waiting for MODIS NDVI at the points.", "Noktalar için MODIS NDVI bekleniyor.")
+    from . import modis as modis_mod
+    return _check(
+        "ndvi_calendar", "info", "; ".join(parts), f"{modis_mod.SOURCE}; one pixel at each point",
+        "Compares when the satellite sees green land with when the model has crops (half the land fallow, "
+        "half wheat each year). It checks the calendar's timing, not yields. One 250 m pixel can mix "
+        "several fields, roads or villages.",
+        "Uydunun yeşil gördüğü aylarla modelde bitki olan ayları karşılaştırır (her yıl arazinin yarısı "
+        "nadas, yarısı buğday). Takvimin zamanlamasını kontrol eder, verimi değil. Tek bir 250 m piksel "
+        "birkaç tarlayı, yolu veya köyü karıştırabilir.",
     )

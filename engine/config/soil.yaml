@@ -50,21 +50,17 @@ evaporation:
     type: assumption
     verified: true
     source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
+# Used only when data/soilgrids/{loc}.json is missing. `default` applies to every location
+# (the list is open since the 13-district change); `overrides` may set a sourced value per id.
 fallback_awc_mm_per_m:
-  karapinar:
+  default:
     value: 155.0
     unit: mm/m
     source: 'FAO-56 Table 19, loam: θFC − θWP 0.13–0.18 m3/m3 (midpoint). Used only when data/soilgrids/{loc}.json is missing; texture not known then'
     type: assumption
     verified: true
     source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
-  develi:
-    value: 155.0
-    unit: mm/m
-    source: 'FAO-56 Table 19, loam: θFC − θWP 0.13–0.18 m3/m3 (midpoint). Used only when data/soilgrids/{loc}.json is missing; texture not known then'
-    type: assumption
-    verified: true
-    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
+  overrides: {}
 initial_fill_fraction:
   value: 0.5
   unit: fraction of available water

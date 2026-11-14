@@ -18,6 +18,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) + web-fetch/WebSearch — Muhammet'in takvim ve doğrulama kaynağı araştırması (deneme makalesi, nadas etkinliği, MGM normalleri, sıcaklık eşiği; PDF'ler tam metinden okundu), takvimlerin crops.yaml'a geçirilmesi — `engine/config/crops.yaml`, `engine/tests/test_rotations.py`, `docs/GUMUS_BAKMALI.md`
 - Claude Code (Opus 5.5) — E1 SMAP karşılaştırması: iki parselli arazi koşusu, aylık anomali + Spearman, testleri; validate testlerinin gerçek referanslardan ayrılması — `engine/nobetsu/{runner,validate}.py`, `engine/tests/test_{smapcheck,validate}.py`
 - Claude Code (Opus 5.5) + WebSearch/tarayıcı — NASA GPM IMERG aylık yağış: GDEX aynasından kayıtsız çekim, precip_vs_mgm'e IMERG sütunu, testleri — `engine/nobetsu/imerg.py`, `engine/nobetsu/validate.py`, `engine/tests/test_{imerg,validate}.py`, `data/imerg/*.json`
+- Claude Code (Opus 5.5) + tarayıcı — MODIS NDVI (ORNL API) çekimi, model takvimi ile NDVI karşılaştırması, Karapınar noktası bulgusu, testleri — `engine/nobetsu/modis.py`, `engine/nobetsu/{runner,validate}.py`, `engine/tests/test_ndvicheck.py`, `data/modis/*.json`
 - Claude Code (Opus 5.5) — E2 kurak/sıcak senaryolar: scenarios.yaml, apply_scenario / run_scenarios, testleri — `engine/config/scenarios.yaml`, `engine/nobetsu/runner.py`, `engine/tests/test_scenarios.py`
 
 ## Gümüş

@@ -6,6 +6,14 @@
 # calendar research that TASKS.md assigns to Muhammet): wheat Gültekin et al. 2017 (Konya),
 # chickpea Topalak 2016 (Konya), lentil TTAE + FAO-56 Table 11. Still assumptions: the wheat
 # and chickpea stage split, the wheat flowering window, and using Konya calendars for Develi.
+#
+# 13 DISTRICTS (15 Nov, OMER_BAKMALI §6): one calendar (Konya) for all 13 districts — an
+# ASSUMPTION for the colder/higher ones (Gemerek, Boğazlıyan, Çankırı, Develi). Searched, not
+# found: a sourced sowing/harvest calendar for Sivas, Yozgat or Çankırı dryland wheat. Only
+# support for sowing: Yozgat farmers "normally finish sowing by 15 October" (Anadolu Ajansı,
+# 2025, aa.com.tr/tr/ekonomi/yozgatta-kuraklik-nedeniyle-bugday-ekimi-kasim-ayina-sarkti/3745682),
+# consistent with 15 Oct. No harvest-date source. Next check: MODIS NDVI dry-down month per
+# district (validate.ndvi_comparison) — a second calendar only if the satellite shows a lag.
 # Ky for chick pea and lentil is FAO-56's own default for crops without a Table 24 value.
 #
 # The engine has no crop-specific branches. An entry WITHOUT a `sowing` key means the
@@ -18,7 +26,7 @@ wheat:
     value: 10-15
     unit: MM-DD
     source: 'Gültekin et al. 2017, KSÜ Doğa Bil. Derg. 20(Özel Sayı):283–287, doi:10.18016/ksudobil.349258 (Bahri Dağdaş, Konya, dryland): sowing later than October lowers yields in the region (citing Topal
-      1993). Mid-October chosen inside that window. Same date used for Develi (no Kayseri source found)'
+      1993). Mid-October chosen inside that window. Same date used for all 13 districts (assumption outside Konya; Yozgat: farmers normally finish sowing by 15 Oct, Anadolu Ajansı 2025)'
     source_url: https://dergipark.org.tr/en/download/article-file/390551
     type: literature
     verified: true

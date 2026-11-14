@@ -117,3 +117,10 @@ def test_power_annual_mean_uses_complete_years_only(weathers):
 def test_trial_ratio_mentions_awc_used(outputs, weathers, refs):
     c = _by_id(validate.run_checks(outputs, weathers, refs))["trial_ratio"]
     assert "mm/m" in c["value"]
+
+
+def test_location_names_come_from_locations_yaml():
+    names = validate.location_names()
+    assert names["polatli"] == "Polatlı" and names["bogazliyan"] == "Boğazlıyan"
+    assert validate._name("cankiri") == "Çankırı"
+    assert validate._name("not_a_district") == "not_a_district"
