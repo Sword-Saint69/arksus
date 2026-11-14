@@ -100,15 +100,15 @@ Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları pu
 `omer` main'e alındı (204 test yeşil). Senin §15–§17 isteklerin:
 - **E2:** `results/{loc}__{scenario_id}.json` + `site_index.scenarios` (id, label, precip_factor, temp_shift_c; baseline ilk) + `results.scenario_id`. `build.py` `run_scenarios` ile baseline dışındaki 5 senaryoyu yazıyor (`--no-scenarios` ile atlanabilir). `scenarios.yaml` AGENTS tablosunda senin.
 - **E1:** `validation.json` artık tam 6 kontrol; `build.py` `run_landscape` + `check_smap_anomaly` çağırıyor, SMAP gelene kadar `pending`.
-  - [ ] `check_smap_anomaly`'nin `pending` metni "İki nokta için…" diyor; artık 13 nokta var, metni genelleştir ("Waiting for NASA SMAP L4 root-zone data.").
+  - [x] `check_smap_anomaly`'nin `pending` metni "İki nokta için…" diyor; artık 13 nokta var, metni genelleştir ("Waiting for NASA SMAP L4 root-zone data.").
 - **IMERG:** `imerg.py`, `data/imerg/`, `test_imerg.py` AGENTS tablosunda artık Gümüş'te. `make data` yenilendi.
 
 ## 9. Repo denetiminden senin dosyalarında kalanlar (15 Kas)
 
-- [ ] `validate.py:29` `LOCATION_NAMES` hâlâ 2 ilçe → 11 ilçe kontrollerde id olarak görünüyor (`polatli` gibi). İsimleri `config.load("locations")`'tan al (§6).
-- [ ] `validate.py` `check_smap_anomaly` pending metni "two points / İki nokta" → 13 nokta (§8).
-- [ ] `soil.yaml` `fallback_awc_mm_per_m` sadece karapinar/develi → SoilGrids dosyası olmayan bir ilçede `runner.py:185` `KeyError` (§6).
-- [ ] `scenarios.yaml`: `dry10`/`dry20` vb. `type: assumption` ama `verified: true`; AGENTS kuralında assumption = `verified: false`. Tanım oldukları için savunulabilir; kararını not et.
+- [x] `validate.py:29` `LOCATION_NAMES` hâlâ 2 ilçe → 11 ilçe kontrollerde id olarak görünüyor (`polatli` gibi). İsimleri `config.load("locations")`'tan al (§6).
+- [x] `validate.py` `check_smap_anomaly` pending metni "two points / İki nokta" → 13 nokta (§8).
+- [x] `soil.yaml` `fallback_awc_mm_per_m` sadece karapinar/develi → SoilGrids dosyası olmayan bir ilçede `runner.py:185` `KeyError` (§6).
+- [x] `scenarios.yaml`: `dry10`/`dry20` vb. `type: assumption` ama `verified: true`; AGENTS kuralında assumption = `verified: false`. Tanım oldukları için savunulabilir; kararını not et.
 - Bilgi: AGENTS tablosunda `test_scenarios.py`, `test_smapcheck.py` ve `scenarios.yaml` artık senin satırında; `map/**` Biar'a yazıldı.
 
 ## 10. Kim ne yaptı — 15 Kas itibarıyla özet (karışmasın diye)
@@ -144,3 +144,4 @@ Commit'ler `omer` 5736d13 / 8b6664d:
 - §5 nohut sonrası su ≈ 0 makul: P10/P50/P90 Karapınar 0 / 0,1 / 3,4 mm, Develi 0 / 0 / 4,8. 15 Tem–14 Eki yağışı Karapınar ortanca 26, P90 48 mm; küçük yaz yağışları çıplak toprakta buharlaşıyor (anız malçı yok varsayımı bunu biraz artırır).
 - §6 isimler `locations.yaml`'dan; SMAP metni "noktalar"; yedek AWC `default` + `overrides` (yeni id'de KeyError yok). `precip_vs_mgm` satırını kısaltmadım (IMERG sütunu da eklendi); İsmail uzun bulursa söylesin.
 - §6 takvim: kaynak bulunamadı (Sivas/Yozgat/Çankırı); 13 ilçe tek takvim, `crops.yaml`'da açıkça assumption. MODIS NDVI 13 ilçe inince kuruma ayı farkına bakıp ikinci takvime karar vereceğim.
+- §9 `scenarios.yaml`: tüm adımlar `verified: false` yapıldı (AGENTS kuralı: assumption = doğrulanmamış; tanım olmaları değişmiyor).
