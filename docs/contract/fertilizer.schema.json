@@ -1,0 +1,918 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/fertilizer.schema.json",
+  "title": "fertilizer",
+  "description": "Fertilizer rules (15 Nov, docs/GUBRE.md): TAGEM Central Anatolia soil-test tables + advice. The browser computes kg/da with web/src/lib/fertilizer.ts. No money.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "soil_table_by",
+    "soil_layer",
+    "conversions",
+    "soil_supply",
+    "fertilizer_efficiency",
+    "thresholds",
+    "banding",
+    "min_dose_kg_per_da",
+    "products",
+    "crops",
+    "advice"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "soil_table_by": {
+      "type": "object",
+      "required": [
+        "n",
+        "p2o5",
+        "k2o"
+      ],
+      "properties": {
+        "n": {
+          "const": "om_pct"
+        },
+        "p2o5": {
+          "const": "p2o5_kg_per_da"
+        },
+        "k2o": {
+          "const": "k2o_kg_per_da"
+        }
+      },
+      "additionalProperties": false
+    },
+    "soil_layer": {
+      "type": "object",
+      "required": [
+        "mass_kg_per_da"
+      ],
+      "properties": {
+        "mass_kg_per_da": {
+          "$ref": "#/$defs/V"
+        }
+      },
+      "additionalProperties": false
+    },
+    "conversions": {
+      "type": "object",
+      "required": [
+        "p_to_p2o5",
+        "k_to_k2o",
+        "soc_to_om"
+      ],
+      "properties": {
+        "p_to_p2o5": {
+          "$ref": "#/$defs/V"
+        },
+        "k_to_k2o": {
+          "$ref": "#/$defs/V"
+        },
+        "soc_to_om": {
+          "$ref": "#/$defs/V"
+        }
+      },
+      "additionalProperties": false
+    },
+    "soil_supply": {
+      "type": "object",
+      "required": [
+        "n_available_fraction",
+        "n_uptake_fraction",
+        "p_uptake_fraction",
+        "k_uptake_fraction"
+      ],
+      "properties": {
+        "n_available_fraction": {
+          "$ref": "#/$defs/V"
+        },
+        "n_uptake_fraction": {
+          "$ref": "#/$defs/V"
+        },
+        "p_uptake_fraction": {
+          "$ref": "#/$defs/V"
+        },
+        "k_uptake_fraction": {
+          "$ref": "#/$defs/V"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fertilizer_efficiency": {
+      "type": "object",
+      "required": [
+        "n",
+        "p2o5",
+        "k2o"
+      ],
+      "properties": {
+        "n": {
+          "$ref": "#/$defs/V"
+        },
+        "p2o5": {
+          "$ref": "#/$defs/V"
+        },
+        "k2o": {
+          "$ref": "#/$defs/V"
+        }
+      },
+      "additionalProperties": false
+    },
+    "thresholds": {
+      "type": "object",
+      "required": [
+        "ph_alkaline",
+        "lime_high_pct",
+        "om_low_pct",
+        "total_n_low_pct",
+        "zn_low_ppm"
+      ],
+      "properties": {
+        "ph_alkaline": {
+          "$ref": "#/$defs/V"
+        },
+        "lime_high_pct": {
+          "$ref": "#/$defs/V"
+        },
+        "om_low_pct": {
+          "$ref": "#/$defs/V"
+        },
+        "total_n_low_pct": {
+          "$ref": "#/$defs/V"
+        },
+        "zn_low_ppm": {
+          "$ref": "#/$defs/V"
+        }
+      },
+      "additionalProperties": false
+    },
+    "banding": {
+      "type": "object",
+      "required": [
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "min_dose_kg_per_da": {
+      "$ref": "#/$defs/V"
+    },
+    "products": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "label",
+          "n",
+          "p2o5",
+          "k2o",
+          "source",
+          "type",
+          "verified"
+        ],
+        "properties": {
+          "label": {
+            "$ref": "#/$defs/text"
+          },
+          "n": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "p2o5": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "k2o": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "so3": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "zn": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "band_minus_kg": {
+            "type": "number",
+            "minimum": 0
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/$defs/badge"
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "crops": {
+      "type": "object",
+      "required": [
+        "wheat",
+        "barley",
+        "chickpea",
+        "lentil",
+        "sugar_beet",
+        "potato",
+        "onion"
+      ],
+      "properties": {
+        "wheat": {
+          "$ref": "#/$defs/crop"
+        },
+        "barley": {
+          "$ref": "#/$defs/crop"
+        },
+        "chickpea": {
+          "$ref": "#/$defs/crop"
+        },
+        "lentil": {
+          "$ref": "#/$defs/crop"
+        },
+        "sugar_beet": {
+          "$ref": "#/$defs/crop"
+        },
+        "potato": {
+          "$ref": "#/$defs/crop"
+        },
+        "onion": {
+          "$ref": "#/$defs/crop"
+        }
+      },
+      "additionalProperties": false
+    },
+    "advice": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/advice"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "badge": {
+      "enum": [
+        "measured",
+        "model",
+        "official",
+        "statistic",
+        "literature",
+        "assumption",
+        "user"
+      ]
+    },
+    "V": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "type": "string"
+        }
+      }
+    },
+    "text": {
+      "type": "object",
+      "required": [
+        "en",
+        "tr"
+      ],
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "tr": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "when": {
+      "type": "object",
+      "properties": {
+        "flags_any": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "alkaline",
+              "high_lime",
+              "low_om",
+              "low_total_n",
+              "saline",
+              "zn_low",
+              "zn_likely_low"
+            ]
+          }
+        },
+        "flags_all": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "alkaline",
+              "high_lime",
+              "low_om",
+              "low_total_n",
+              "saline",
+              "zn_low",
+              "zn_likely_low"
+            ]
+          }
+        }
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "gt": {
+            "type": "number"
+          },
+          "gte": {
+            "type": "number"
+          },
+          "lt": {
+            "type": "number"
+          },
+          "lte": {
+            "type": "number"
+          },
+          "eq": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "in": {
+            "type": "array"
+          },
+          "missing": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      }
+    },
+    "advice": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "soiltable": {
+      "type": "object",
+      "required": [
+        "rows",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "max",
+              "kg_per_da"
+            ],
+            "properties": {
+              "max": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "kg_per_da": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "crop": {
+      "type": "object",
+      "required": [
+        "label",
+        "in_rotations",
+        "default_target_yield_kg_per_da",
+        "soil_tables",
+        "uptake_kg_per_t",
+        "salinity_threshold_ec_ds_m",
+        "n_split",
+        "base_products",
+        "top_products",
+        "k_product",
+        "advice"
+      ],
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "in_rotations": {
+          "type": "boolean"
+        },
+        "default_target_yield_kg_per_da": {
+          "type": "object",
+          "required": [
+            "rainfed",
+            "limited",
+            "irrigated"
+          ],
+          "properties": {
+            "rainfed": {
+              "$ref": "#/$defs/V"
+            },
+            "limited": {
+              "$ref": "#/$defs/V"
+            },
+            "irrigated": {
+              "$ref": "#/$defs/V"
+            }
+          },
+          "additionalProperties": false
+        },
+        "soil_tables": {
+          "type": "object",
+          "required": [
+            "n",
+            "p2o5",
+            "k2o"
+          ],
+          "properties": {
+            "n": {
+              "type": "object",
+              "required": [],
+              "properties": {
+                "rainfed": {
+                  "$ref": "#/$defs/soiltable"
+                },
+                "limited": {
+                  "$ref": "#/$defs/soiltable"
+                },
+                "irrigated": {
+                  "$ref": "#/$defs/soiltable"
+                }
+              },
+              "additionalProperties": false
+            },
+            "p2o5": {
+              "type": "object",
+              "required": [],
+              "properties": {
+                "rainfed": {
+                  "$ref": "#/$defs/soiltable"
+                },
+                "limited": {
+                  "$ref": "#/$defs/soiltable"
+                },
+                "irrigated": {
+                  "$ref": "#/$defs/soiltable"
+                }
+              },
+              "additionalProperties": false
+            },
+            "k2o": {
+              "type": "object",
+              "required": [],
+              "properties": {
+                "rainfed": {
+                  "$ref": "#/$defs/soiltable"
+                },
+                "limited": {
+                  "$ref": "#/$defs/soiltable"
+                },
+                "irrigated": {
+                  "$ref": "#/$defs/soiltable"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "fixed_n_kg_per_da": {
+          "type": "object",
+          "required": [
+            "inoculated"
+          ],
+          "properties": {
+            "inoculated": {
+              "$ref": "#/$defs/V"
+            }
+          },
+          "additionalProperties": false
+        },
+        "n_response": {
+          "type": "object",
+          "required": [
+            "a",
+            "b",
+            "c"
+          ],
+          "properties": {
+            "a": {
+              "$ref": "#/$defs/V"
+            },
+            "b": {
+              "$ref": "#/$defs/V"
+            },
+            "c": {
+              "$ref": "#/$defs/V"
+            }
+          },
+          "additionalProperties": false
+        },
+        "n_cap_kg_per_da": {
+          "$ref": "#/$defs/V"
+        },
+        "uptake_kg_per_t": {
+          "type": "object",
+          "required": [
+            "n",
+            "p2o5",
+            "k2o"
+          ],
+          "properties": {
+            "n": {
+              "$ref": "#/$defs/V"
+            },
+            "p2o5": {
+              "$ref": "#/$defs/V"
+            },
+            "k2o": {
+              "$ref": "#/$defs/V"
+            }
+          },
+          "additionalProperties": false
+        },
+        "salinity_threshold_ec_ds_m": {
+          "$ref": "#/$defs/V"
+        },
+        "n_split": {
+          "type": "object",
+          "required": [
+            "rainfed",
+            "limited",
+            "irrigated"
+          ],
+          "properties": {
+            "rainfed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "timing",
+                  "fraction",
+                  "label"
+                ],
+                "properties": {
+                  "timing": {
+                    "enum": [
+                      "pre_plant",
+                      "base",
+                      "top_1",
+                      "top_2",
+                      "foliar"
+                    ]
+                  },
+                  "fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "label": {
+                    "$ref": "#/$defs/text"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "limited": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "timing",
+                  "fraction",
+                  "label"
+                ],
+                "properties": {
+                  "timing": {
+                    "enum": [
+                      "pre_plant",
+                      "base",
+                      "top_1",
+                      "top_2",
+                      "foliar"
+                    ]
+                  },
+                  "fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "label": {
+                    "$ref": "#/$defs/text"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "irrigated": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "timing",
+                  "fraction",
+                  "label"
+                ],
+                "properties": {
+                  "timing": {
+                    "enum": [
+                      "pre_plant",
+                      "base",
+                      "top_1",
+                      "top_2",
+                      "foliar"
+                    ]
+                  },
+                  "fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "label": {
+                    "$ref": "#/$defs/text"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "base_products": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "product"
+            ],
+            "properties": {
+              "product": {
+                "type": "string"
+              },
+              "when": {
+                "$ref": "#/$defs/when"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "top_products": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "product"
+            ],
+            "properties": {
+              "product": {
+                "type": "string"
+              },
+              "when": {
+                "$ref": "#/$defs/when"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "k_product": {
+          "type": "string"
+        },
+        "guide_table": {
+          "type": "object",
+          "required": [
+            "by",
+            "rows",
+            "source",
+            "type",
+            "verified"
+          ],
+          "properties": {
+            "by": {
+              "const": "target_yield_kg_per_da"
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "min",
+                  "max",
+                  "doses"
+                ],
+                "properties": {
+                  "min": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "max": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "water": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "enum": [
+                        "rainfed",
+                        "limited",
+                        "irrigated"
+                      ]
+                    }
+                  },
+                  "doses": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "product",
+                        "timing",
+                        "min_kg_per_da",
+                        "max_kg_per_da"
+                      ],
+                      "properties": {
+                        "product": {
+                          "type": "string"
+                        },
+                        "timing": {
+                          "enum": [
+                            "pre_plant",
+                            "base",
+                            "top_1",
+                            "top_2",
+                            "foliar"
+                          ]
+                        },
+                        "min_kg_per_da": {
+                          "type": "number"
+                        },
+                        "max_kg_per_da": {
+                          "type": "number"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "note": {
+                    "$ref": "#/$defs/text"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "source": {
+              "type": "string"
+            },
+            "source_url": {
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/badge"
+            },
+            "verified": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "advice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/advice"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
