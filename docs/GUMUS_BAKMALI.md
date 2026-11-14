@@ -196,7 +196,7 @@ OMER_BAKMALI §6'daki (b) seçeneği. Motor girdisi değişti; senden yalnız **
 - **Dikkat:** Karaman nadas su biriktirme verimi %30 çıktı, literatür aralığı %11–29'un hemen üstünde (`pse_literature`, info). Develi'nin istasyonu ~29 km uzakta (Kayseri Bölge); nokta taşıma turunda istasyon da değişecekse normal güncellenmeli.
 - [ ] `make data` (senaryolar dahil) — nokta taşımayla aynı turda yapman yeterli.
 
-## 21. NDVI sulu nokta listesi — 11/13 ilçe (15 Kas; Aksaray ve Nevşehir iniyor)
+## 21. NDVI sulu nokta listesi — 13/13 ilçe (15 Kas)
 
 Senin ölçütün (OMER_BAKMALI §11): aylık ortalama NDVI zirvesi Temmuz–Eylül **ya da** Temmuz ortalaması > 0,35. MOD13Q1, 2013–2024, noktanın 250 m pikseli. "Kuruma" = zirveden sonra NDVI'nin zirve–dip ortasının altına indiği ilk ay.
 
@@ -213,7 +213,8 @@ Senin ölçütün (OMER_BAKMALI §11): aylık ortalama NDVI zirvesi Temmuz–Eyl
 | Kaman | 1055 | 5 | 0,60 | 0,25 | 0,19 | 7 | kalsın |
 | Kırıkkale | 959 | 5 | 0,52 | 0,19 | 0,16 | 7 | kalsın |
 | Çankırı | 959 | 5 | 0,48 | 0,19 | 0,17 | 7 | kalsın |
-| Aksaray, Nevşehir | | | | | | | iniyor; bitince eklerim |
+| **Nevşehir** | 1259 | 7 | 0,47 | 0,47 | 0,39 | 9 | **taşı** — zirve Temmuz |
+| **Aksaray** | 993 | 6 | 0,60 | 0,51 | 0,35 | 8 | **taşı** (sınırda: zirve Haziran, Temmuz 0,51 > 0,35; Ağustos'ta düşüyor) |
 
-- [ ] 6 ilçe taşınacak: Karaman, Karapınar, Eskişehir, Niğde, Gemerek, Boğazlıyan. Yeni koordinatları yazınca NDVI'lerini çekip aynı tabloyla kontrol ederim (beklenen: zirve Nisan–Mayıs, Temmuz < 0,30).
+- [ ] **8 ilçe taşınacak:** Karaman, Karapınar, Eskişehir, Niğde, Nevşehir, Gemerek, Boğazlıyan, Aksaray. Kalan 5 (Develi, Polatlı, Kaman, Kırıkkale, Çankırı) kuru tarım deseni. Yeni koordinatları yazınca NDVI'lerini çekip aynı tabloyla kontrol ederim (beklenen: zirve Nisan–Mayıs, Temmuz < 0,30).
 - **Takvim notu (bende):** temiz kuru tarım noktalarında zirve Nisan–Mayıs; en yüksek temiz nokta Develi (1577 m) Mayıs zirvesi ama kuruma Ağustos, alçak ilçelerde Haziran–Temmuz. Yani yükseklikte ~1 ay gecikme işareti var, ama tek nokta. Gemerek ve Boğazlıyan taşınınca 3 soğuk nokta olur; ikinci takvime o zaman karar veririm.
