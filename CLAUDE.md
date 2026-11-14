@@ -1,6 +1,6 @@
 @AGENTS.md
 
-- Kullanıcı hangi kişi olduğunu söylemediyse ilk mesajda sor; sonra `docs/team/` altındaki rehberine göre çalış.
+- Kullanıcı hangi kişi olduğunu söylemediyse ilk mesajda sor; rehber dosyasını (`docs/team/...`) sadece kullanıcı adını verirse oku.
 - Görev bitince `TASKS.md`'de sadece o kişinin bölümündeki satırı işaretle (AGENTS.md "Görev bitince").
 
 ## Dosya okuma kuralı (AGENTS.md "Başlamadan" adımlarının yerine geçer)
