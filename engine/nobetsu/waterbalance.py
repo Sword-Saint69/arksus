@@ -72,14 +72,16 @@ class SoilProfile:
             object.__setattr__(self, "tew_mm", self.awc_mm_per_m * self.ze_m)
 
     @classmethod
-    def from_config(cls, soil_cfg: dict, *, awc_mm_per_m: float, depth_m: float) -> "SoilProfile":
+    def from_config(cls, soil_cfg: dict, *, awc_mm_per_m: float, depth_m: float,
+                    tew_mm: float | None = None, rew_mm: float | None = None) -> "SoilProfile":
+        """TEW / REW from soil.yaml `evaporation` unless given (texture-based values)."""
         ev = soil_cfg["evaporation"]
         return cls(
             awc_mm_per_m=float(awc_mm_per_m),
             depth_m=float(depth_m),
             ze_m=float(ev["ze_m"]["value"]),
-            tew_mm=float(ev["tew_mm"]["value"]),
-            rew_mm=float(ev["rew_mm"]["value"]),
+            tew_mm=float(ev["tew_mm"]["value"] if tew_mm is None else tew_mm),
+            rew_mm=float(ev["rew_mm"]["value"] if rew_mm is None else rew_mm),
         )
 
     @property

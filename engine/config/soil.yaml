@@ -62,3 +62,265 @@ wind_exposure_percentile:
   source: "PLAN_MVP §5.8: stated threshold choice for the wind-exposure count"
   type: assumption
   verified: false
+
+# --- Available water from soil texture (awc_method: texture_table) ------------------
+# Why: SoilGrids 2.0 wv0033 − wv1500 gives 58.6 (Karapınar) and 67.4 (Develi) mm/m, far below
+# the FAO-56 Table 19 range for the clay-rich textures SoilGrids itself reports at these points
+# (decision 14 Nov, Ömer). The texture class comes from SoilGrids Q50 clay/sand/silt 0–30 cm
+# (USDA triangle); AWC, θFC, θWP and REW come from FAO-56 Table 19 for that class (range
+# midpoints). TEW = 1000·(θFC − 0.5·θWP)·Ze (FAO-56 Eq. 73). Values written from memory:
+# verified: false until checked against the book.
+awc_method:
+  value: texture_table   # texture_table | soilgrids
+  unit: "-"
+  source: "Team decision 14 Nov: SoilGrids AWC judged implausible for its own texture class; see comment above"
+  type: assumption
+  verified: false
+
+texture_table:
+  sand:
+    awc_mm_per_m:
+      value: 80.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, sand: θFC − θWP, midpoint of 0.05–0.11 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.12
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, sand: θFC, midpoint of 0.07–0.17"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.045
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, sand: θWP, midpoint of 0.02–0.07"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 4.5
+      unit: "mm"
+      source: "FAO-56 Table 19, sand: REW, midpoint of 2–7 mm"
+      type: literature
+      verified: false
+  loamy_sand:
+    awc_mm_per_m:
+      value: 90.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, loamy sand: θFC − θWP, midpoint of 0.06–0.12 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.15
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, loamy sand: θFC, midpoint of 0.11–0.19"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.065
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, loamy sand: θWP, midpoint of 0.03–0.10"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 6.0
+      unit: "mm"
+      source: "FAO-56 Table 19, loamy sand: REW, midpoint of 4–8 mm"
+      type: literature
+      verified: false
+  sandy_loam:
+    awc_mm_per_m:
+      value: 130.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, sandy loam: θFC − θWP, midpoint of 0.11–0.15 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.23
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, sandy loam: θFC, midpoint of 0.18–0.28"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.11
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, sandy loam: θWP, midpoint of 0.06–0.16"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 8.0
+      unit: "mm"
+      source: "FAO-56 Table 19, sandy loam: REW, midpoint of 6–10 mm"
+      type: literature
+      verified: false
+  loam:
+    awc_mm_per_m:
+      value: 155.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, loam: θFC − θWP, midpoint of 0.13–0.18 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.25
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, loam: θFC, midpoint of 0.20–0.30"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.12
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, loam: θWP, midpoint of 0.07–0.17"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 9.0
+      unit: "mm"
+      source: "FAO-56 Table 19, loam: REW, midpoint of 8–10 mm"
+      type: literature
+      verified: false
+  silt_loam:
+    awc_mm_per_m:
+      value: 160.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, silt loam: θFC − θWP, midpoint of 0.13–0.19 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.29
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silt loam: θFC, midpoint of 0.22–0.36"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.15
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silt loam: θWP, midpoint of 0.09–0.21"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 9.5
+      unit: "mm"
+      source: "FAO-56 Table 19, silt loam: REW, midpoint of 8–11 mm"
+      type: literature
+      verified: false
+  silt:
+    awc_mm_per_m:
+      value: 180.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, silt: θFC − θWP, midpoint of 0.16–0.20 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.32
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silt: θFC, midpoint of 0.28–0.36"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.17
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silt: θWP, midpoint of 0.12–0.22"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 9.5
+      unit: "mm"
+      source: "FAO-56 Table 19, silt: REW, midpoint of 8–11 mm"
+      type: literature
+      verified: false
+  silty_clay_loam:
+    awc_mm_per_m:
+      value: 155.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, silty clay loam: θFC − θWP, midpoint of 0.13–0.18 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.335
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silty clay loam: θFC, midpoint of 0.30–0.37"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.205
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silty clay loam: θWP, midpoint of 0.17–0.24"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 9.5
+      unit: "mm"
+      source: "FAO-56 Table 19, silty clay loam: REW, midpoint of 8–11 mm"
+      type: literature
+      verified: false
+  silty_clay:
+    awc_mm_per_m:
+      value: 160.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, silty clay: θFC − θWP, midpoint of 0.13–0.19 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.36
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silty clay: θFC, midpoint of 0.30–0.42"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.23
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, silty clay: θWP, midpoint of 0.17–0.29"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 10.0
+      unit: "mm"
+      source: "FAO-56 Table 19, silty clay: REW, midpoint of 8–12 mm"
+      type: literature
+      verified: false
+  clay:
+    awc_mm_per_m:
+      value: 160.0
+      unit: "mm/m"
+      source: "FAO-56 Table 19, clay: θFC − θWP, midpoint of 0.12–0.20 m3/m3"
+      type: literature
+      verified: false
+    theta_fc:
+      value: 0.36
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, clay: θFC, midpoint of 0.32–0.40"
+      type: literature
+      verified: false
+    theta_wp:
+      value: 0.22
+      unit: "m3/m3"
+      source: "FAO-56 Table 19, clay: θWP, midpoint of 0.20–0.24"
+      type: literature
+      verified: false
+    rew_mm:
+      value: 10.0
+      unit: "mm"
+      source: "FAO-56 Table 19, clay: REW, midpoint of 8–12 mm"
+      type: literature
+      verified: false
+
+# USDA classes that FAO-56 Table 19 does not list are mapped to the nearest listed class.
+texture_table_aliases:
+  clay_loam:
+    value: silty_clay_loam
+    unit: "-"
+    source: "Assumption: clay loam is not in FAO-56 Table 19; nearest listed class by clay content (27–40 %) is silty clay loam"
+    type: assumption
+    verified: false
+  sandy_clay_loam:
+    value: sandy_loam
+    unit: "-"
+    source: "Assumption: sandy clay loam is not in FAO-56 Table 19; nearest listed class by sand content is sandy loam"
+    type: assumption
+    verified: false
+  sandy_clay:
+    value: clay
+    unit: "-"
+    source: "Assumption: sandy clay is not in FAO-56 Table 19; nearest listed class by clay content (≥ 35 %) is clay"
+    type: assumption
+    verified: false

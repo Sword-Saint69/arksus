@@ -34,3 +34,12 @@ Ters yön (Ömer → Gümüş): `docs/GUMUS_BAKMALI.md`. Yeni madde eklendikçe 
 **Duyarlılık (senin motorun, gerçek hava, orta derinlik, 24 yıl ortancası):** nohut sonrası / nadas sonrası buğday Ya/Ym — AWC 60: Karapınar 0,98, Develi 0,96; AWC 160: 0,91 / 0,85. Konya denemesi 228/286 = 0,80. Yani 58 ile nadas avantajı neredeyse görünmüyor; senin tespitin doğru.
 
 **Kanıt paneli önerisi:** `validate.py`'de (ya da `precip_vs_mgm` notunun yanında) "AWC: tablo X, Saxton–Rawls Y, SoilGrids doğrudan Z" satırı. Sözleşmede yeni check id'si gerekirse bana yaz; şimdilik mevcut 5 kontrol yeterli, metin `trial_ratio` notuna eklenebilir.
+
+## 3. AWC uygulaması — eksik kalan taş düzeltmesi (14 Kas)
+
+`omer` → `main` birleştirildi (151 test yeşil; gerçek havayla `build.py` uçtan uca çalıştı, 9 dosya şemadan geçti). AWC'yi dokudan alman tamam. Sen `main`'i 16:47'de çekmişsin; §2'deki karar ondan sonra geldiği için bir madde eksik kaldı:
+
+- [ ] **Taş (kaba parça) düzeltmesi:** `AWC = Tablo 19 orta değeri × (1 − cfvo)`. Taşlar su tutmaz, tablo değeri ince toprak içindir. `data/soilgrids/{loc}.json` → `cfvo_0_100cm_fraction.value`: Karapınar **0,033**, Develi **0,217**. Develi şu an 155 mm/m; düzeltmeyle ≈ **121**, Karapınar 160 → ≈ **155**. Düzeltme `soil.yaml`'da açılıp kapanabilir olsun (ör. `awc_cfvo_correction: true`), kaynak metnine "taş düzeltmeli (cfvo X)" eklensin.
+- [ ] (İsteğe bağlı) Doku sınıfı için 0–100 cm hazır: `texture_0_100cm.usda_class` (ortalama haritalar, 100'e ölçekli). Sen 0–30 cm Q50 kullanıyorsun; iki lokasyonda sonuç aynı sınıf (siltli kil / killi tın), değiştirmek şart değil — kök bölgesi 1 m'ye indiği için 0–100 cm daha tutarlı olur.
+- Bilgi: `type: "assumption"` kullanman uygun; ARAYUZLER §3'ü buna göre düzelttim (`literature` yerine `assumption`).
+- Senin "SoilGrids'in kendi AWC'si de kartta gösterilsin" önerin: kabul. `awc_alternatives` dosyada var; İsmail'le kartta nasıl görüneceğine karar verince sözleşmeye eklerim.
