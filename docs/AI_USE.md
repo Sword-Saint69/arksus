@@ -8,6 +8,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 ## İsmail
 
 ## Ömer
+- Claude Code (Opus 5.5) — FAO-56 ET₀ modülü, Örnek 18 testleri, sentetik hava fixture'ı — `engine/nobetsu/et0.py`, `engine/tests/test_et0.py`, `engine/tests/fixtures.py`
 
 ## Gümüş
 

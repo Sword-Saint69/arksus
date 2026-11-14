@@ -82,7 +82,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 
 ## Ömer — Rol A: Motor ve bilim (kritik yol) *(geçici atama)*
 
-- [ ] **T+0–2: ET₀ (FAO-56 Penman–Monteith) + Örnek 18 testi** — ±0,1 mm/gün (iskeleti beklemeden başlanabilir)
+- [x] **T+0–2: ET₀ (FAO-56 Penman–Monteith) + Örnek 18 testi** — ±0,1 mm/gün (iskeleti beklemeden başlanabilir) — ✅ 16:09 (omer/et0)
 - [ ] **T+2–4: Su bütçesi motoru (iki katmanlı, dual-Kc) + motor testleri** — kütle dengesi < 0,01 mm; bir sekans çalışıyor (Karapınar, nadas→buğday, orta, 2010) → M1
 - [ ] **T+4–6: rotations.py + runner.py** — spin-up buğdayı, nadas / nohut / mercimek takvimleri, 24 sekans; `run_location()` ARAYUZLER §5 biçiminde
 - [ ] **T+6–7: yieldmodel.py** — sadece Ya/Ym oranı (önceki ürün çarpanı YOK)
