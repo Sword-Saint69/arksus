@@ -3,8 +3,8 @@
 Tek doğru kaynak: `docs/PLAN_MVP.md`. Kod bağlantıları: `docs/ARAYUZLER.md`. Görev listesi: `TASKS.md`.
 
 ## Başlamadan
-1. Kullanıcı kim? (Ömer / Gümüş / İsmail) → `docs/team/` altındaki rehberini oku. Bilmiyorsan sor.
-2. Sadece o görevin PLAN_MVP bölümünü + `docs/ARAYUZLER.md`'yi oku. Tüm repoyu tarama. `data/raw/**` okuma.
+1. Kullanıcı hangi `.md` dosyalarını verdiyse sadece onları oku (bkz. CLAUDE.md "Dosya okuma kuralı"); otomatik okuma yok.
+2. Tüm repoyu tarama. `data/raw/**` okuma.
 3. Çok dosyalı değişiklikten önce plan çıkar; önce test, sonra kod.
 
 ## Sert kurallar (PLAN_MVP §2)
