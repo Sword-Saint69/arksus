@@ -4,7 +4,7 @@
 
 ## Tek cümlede
 
-**Çiftçinin "Tarlamı bu yıl nadasa mı bırakayım, yoksa nohut ya da mercimek mi ekeyim?" sorusuna; su, toprak ve para tarafını birlikte, NASA'nın 24 yıllık iklim verisiyle gösteren bir web sitesi.**
+**Çiftçinin "Tarlamı bu yıl nadasa mı bırakayım, yoksa nohut ya da mercimek mi ekeyim?" sorusuna; su, toprak, verim ve çiftçinin kazancını birlikte tartıp, NASA'nın 24 yıllık iklim verisiyle **o arazi için en uygun seçeneği söyleyen** bir web sitesi. Sitede para gösterilmez.**
 
 Yarışma: NASA Space Apps 2026 — *Field Shift: Adapting Farms with NASA Data*.
 
@@ -17,7 +17,7 @@ Orta Anadolu'da (Konya, Kayseri) kuru tarımda çiftçi buğdaydan sonra tarlay�
 - **Kötü tarafı 2 — toprak:** Tarla bir yıldan uzun süre çıplak ve sürülmüş kalır. Rüzgâr toprağı uçurur. Karapınar'da 1960'larda yaşanan büyük rüzgâr erozyonunun resmi nedenlerinden biri nadas–hububat sistemi ve diskaro ile sık toprak işlemedir.
 - **Alternatif:** Nadas yerine **nohut** veya **mercimek** ekmek. Gelir getirir, havadan azot bağlar, toprağı daha kısa süre çıplak bırakır. Ama toprakta daha az su bırakır; buğday kurak yılda daha çok zorlanabilir.
 
-2025 kuraklığı ve düşük 2026 hububat fiyatlarıyla çiftçiler bu soruyu yine soruyor. **Bu üç tarafı (su, toprak, para) birlikte gösteren bir araç yok.** Biz onu yapıyoruz.
+2025 kuraklığı ve düşük 2026 hububat fiyatlarıyla çiftçiler bu soruyu yine soruyor. **Su, toprak, verim ve kazancı birlikte tartıp araziye göre seçenek söyleyen bir araç yok.** Biz onu yapıyoruz.
 
 ## Ne yapıyoruz?
 
@@ -25,36 +25,35 @@ Bir web sitesi. Kullanıcı şunları seçer:
 
 | Seçim | Seçenekler |
 |---|---|
-| İlçe | Konya–Karapınar, Kayseri–Develi |
+| İlçe | 13 ilçe: İç Anadolu'nun her ilinden bir kuru tarım ilçesi (Karapınar, Develi, Polatlı, Eskişehir, Aksaray, Karaman, Niğde, Nevşehir, Kaman, Kırıkkale, Çankırı, Gemerek, Boğazlıyan) |
 | Toprak derinliği | Sığ, orta, derin |
-| Öncelik | Su biriktir / gelir kazan / toprağı koru (kaydırıcılar) |
-| Kendi rakamları | Fiyat, maliyet, destek, beklenen en yüksek verim (hazır gelir, değiştirilebilir) |
+| Öncelik | Kazanç / buğday verimi / toprağı koru / su biriktir (kaydırıcılar) |
 
-Site üç seçeneği yan yana gösterir:
+Site üç seçeneği yan yana gösterir ve önceliklere göre **bu arazi için en uygun** olanı söyler (fiyat sadece arka planda kazanç tahmini için kullanılır; buğdayı düşüren ya da çoğu yıl başarısız olan seçenek, kazançlı olsa bile önerilmez):
 
 1. **Nadas → Buğday** (bugünkü uygulama, karşılaştırma noktası)
 2. **Nohut → Buğday**
 3. **Mercimek → Buğday**
 
-Her biri için: buğday ekiminde toprakta ne kadar su kaldı · tarla kaç gün çıplak kaldı, kaçı rüzgârlı ve kuruydu · buğday verimi aralığı · iki yıllık kâr/zarar aralığı ve zarar etme ihtimali · hangi durumda hangisi öne geçiyor (kurak/normal/ıslak yıl × toprak derinliği) · neden bu seçenek, kanıtı ne, neyi bilmiyoruz.
+Her biri için: buğday ekiminde toprakta ne kadar su kaldı · tarla kaç gün çıplak kaldı, kaçı rüzgârlı ve kuruydu · buğday verimi (su yeterli olsaydı alınacak verimin yüzdesi) · iki yılda kaç hasat · öneri, gerekçesi ve sonuçların yakın olup olmadığı · hangi durumda hangisi öne geçiyor (kurak/normal/ıslak yıl × toprak derinliği) · neden bu seçenek, kanıtı ne, neyi bilmiyoruz.
 
 **Tek bir yıl değil, geçmiş 24 yılın her biri için ayrı ayrı hesaplıyoruz** (2001–2024 başlangıçlı). Böylece "ortalama" değil, **aralık** görünür: kötü yılda ne olur, iyi yılda ne olur.
 
 ## Nasıl çalışıyor? (4 adım)
 
 ```
-1. NASA POWER        2. Su hesabı (motor)        3. Verim oranı           4. Para (sitede)
-günlük hava    ──►   toprağı bir su deposu  ──►  "su yeterse en       ──►  oran × çiftçinin
-(yağmur, sıcaklık,   gibi her gün hesaplar:      yüksek verimin           verimi × fiyatı
-rüzgâr, güneş)       yağmur girer, buharlaşma    yüzde kaçı?"             − maliyet + destek
-24+ yıl              ve bitki çıkarır            (0 ile 1 arası)
+1. NASA POWER        2. Su hesabı (motor)        3. Verim oranı           4. Öneri (sitede)
+günlük hava    ──►   toprağı bir su deposu  ──►  "su yeterse en       ──►  kazanç (iç hesap) + buğday
+(yağmur, sıcaklık,   gibi her gün hesaplar:      yüksek verimin           verimi + toprak + su puanı;
+rüzgâr, güneş)       yağmur girer, buharlaşma    yüzde kaçı?"             verimi bozan seçenek engellenir
+24+ yıl              ve bitki çıkarır            (0 ile 1 arası)          → "bu arazi için en uygun"
                      (FAO-56 yöntemi)
 ```
 
 - **1–3. adımlar** bilgisayarda bir kez çalışır (Python), sonuçları dosyaya yazar.
-- **4. adım** sitede çalışır. Çiftçi fiyatı değiştirdiği an kâr/zarar yeniden hesaplanır. Sunucu yok, veritabanı yok; site çok basit ve sağlam.
+- **4. adım** sitede çalışır. Çiftçi öncelik kaydırıcılarını değiştirdiği an öneri yeniden hesaplanır. Fiyat ve destek sadece arka planda kullanılır; ekranda para yok. Sunucu yok, veritabanı yok; site çok basit ve sağlam.
 
-Kullandığımız NASA verileri: **NASA POWER** (hava, ana veri), **NASA SMAP** (toprak nemi, uydu; gelirse), genişletmede **GRACE** (havzadaki toplam su kaybı). Toprak özellikleri için **SoilGrids** (ISRIC).
+Kullandığımız NASA verileri: **NASA POWER** (hava, ana veri), **NASA GPM IMERG** (ikinci uydu yağış tahmini, kontrol için), **NASA SMAP** (toprak nemi, uydu; istendi, bekleniyor), **MODIS NDVI** (Ömer çekiyor), genişletmede **GRACE** (havzadaki toplam su kaybı). Toprak özellikleri için **SoilGrids** (ISRIC).
 
 ## Ne DEĞİL?
 
@@ -70,7 +69,7 @@ Kullandığımız NASA verileri: **NASA POWER** (hava, ana veri), **NASA SMAP** 
 | **Muhammet** | Araştırma, doğrulama, sunum | Fiyat, maliyet, destek, verim, ekim tarihlerini resmi kaynaklardan bulur; strateji metinlerini yazar; slayt, video, proje sayfası, teslim |
 | **İsmail** | Web sitesi | Kullanıcının gördüğü her şey: kartlar, grafikler, kaydırıcılar, telefon uyumu |
 | **Ömer** *(geçici)* | Motor (Rol A) | Toprak su hesabını yapan Python kodu: "her gün toprakta ne kadar su var, bitki ne kadar zorlandı" |
-| **Gümüş** *(geçici)* | Veri ve bağlantı (Rol B) | NASA verisini indirir, motorun çıktısını siteye uygun dosyalara çevirir, para hesabı kodu, repo ve yayın |
+| **Gümüş** *(geçici)* | Veri ve bağlantı (Rol B) | NASA verisini indirir, motorun çıktısını siteye uygun dosyalara çevirir, karar (öneri) modülü, repo ve yayın |
 
 **Herkes nasıl birbirini beklemeden çalışıyor?**
 

@@ -18,8 +18,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Clay holds water and nutrients well, so clayey soils keep more of the rain saved during fallow; they crust and crack when dry.",
+    "tr": "Kil suyu ve besini iyi tutar; killi topraklar nadasta biriken yağmurun daha fazlasını saklar, kuruyunca kabuk bağlar ve çatlar."
    }
   },
   {
@@ -37,8 +37,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Sand drains fast and holds little water, so water saved by fallow is lost sooner in sandy soils.",
+    "tr": "Kum suyu hızlı geçirir ve az tutar; kumlu topraklarda nadasla biriken su daha çabuk kaybolur."
    }
   },
   {
@@ -56,8 +56,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Silt holds water well but crusts easily, and dry, bare silty soil is easily blown away by wind.",
+    "tr": "Silt suyu iyi tutar ama kolay kabuk bağlar; kuru ve çıplak siltli toprağı rüzgâr kolayca uçurur."
    }
   },
   {
@@ -75,8 +75,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "A pH above 7 means alkaline, often limy soil; wheat, chickpea and lentil grow in it, but phosphorus and zinc can be less available, which a soil test shows.",
+    "tr": "pH'nin 7'nin üzerinde olması bazik, çoğu zaman kireçli toprak demektir; buğday, nohut ve mercimek yetişir ama fosfor ve çinko daha az alınabilir, bunu toprak analizi gösterir."
    }
   },
   {
@@ -94,8 +94,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Organic carbon keeps soil crumbly and helps it hold water; bare fallow and frequent tillage slowly lower it, while plant cover and residues build it up.",
+    "tr": "Organik karbon toprağı gevşek tutar ve su tutmasına yardım eder; çıplak nadas ve sık toprak işleme onu yavaşça azaltır, bitki örtüsü ve artıklar artırır."
    }
   },
   {
@@ -113,8 +113,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Total nitrogen is the soil's nitrogen store; chickpea and lentil add some by fixation, but how much reaches the next wheat needs a soil test.",
+    "tr": "Toplam azot toprağın azot deposudur; nohut ve mercimek bağlama ile bir miktar ekler, ama sonraki buğdaya ne kadar kaldığını toprak analizi gösterir."
    }
   },
   {
@@ -132,8 +132,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Cation exchange capacity is how many nutrients the soil can hold on to; it is higher in clayey and organic soils.",
+    "tr": "Katyon değişim kapasitesi toprağın ne kadar besin tutabildiğidir; killi ve organik maddece zengin topraklarda daha yüksektir."
    }
   },
   {
@@ -151,8 +151,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Bulk density shows how compact the soil is; higher values leave less room for roots, air and water.",
+    "tr": "Hacim ağırlığı toprağın ne kadar sıkı olduğunu gösterir; yüksek değer kök, hava ve su için daha az boşluk demektir."
    }
   },
   {
@@ -170,8 +170,8 @@
    "type": "model",
    "how_obtained": "wcs",
    "meaning": {
-    "en": "[text pending]",
-    "tr": "[metin bekleniyor]"
+    "en": "Coarse fragments are stones and gravel; they hold no water, so more stones mean less stored water per metre of soil.",
+    "tr": "Kaba parçalar taş ve çakıldır; su tutmazlar, bu yüzden taş arttıkça toprağın metre başına sakladığı su azalır."
    }
   }
  ],

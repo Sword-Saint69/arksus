@@ -166,6 +166,56 @@
           "items": {
             "type": "string"
           }
+        },
+        "awc_alternatives": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "unit",
+              "source",
+              "type",
+              "verified"
+            ],
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "measured",
+                  "model",
+                  "official",
+                  "statistic",
+                  "literature",
+                  "assumption",
+                  "user"
+                ]
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "range_q05_q95": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "texture_class": {
+          "type": "string"
         }
       },
       "required": [
@@ -339,6 +389,10 @@
       },
       "minItems": 216,
       "maxItems": 216
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
     }
   },
   "required": [
@@ -347,7 +401,8 @@
     "generated_at",
     "location_id",
     "soil",
-    "sequences"
+    "sequences",
+    "scenario_id"
   ],
   "additionalProperties": false
 }

@@ -95,7 +95,51 @@ Senin tarafında yapılması gerekenler:
 
 Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları puanlayıp öneri veriyor; senin çıktılarından `wheat.yield_ratio`, `first_crop.yield_ratio`, `water_at_wheat_sowing_mm`, `wind_exposed_bare_days` kullanılıyor. Engeller: ortanca buğday oranı < 0,85 × nadas sonrası buğday ya da ilk yıl ürünü ortanca oranı < 0,30 → öneri dışı. Bu yüzden **verim oranlarının ve takvimin doğruluğu artık önerinin kendisini belirliyor**; soğuk ilçeler için takvim (§6) önceliğini artırıyor.
 
-Ömer yanıtı (15 Kas, `omer` 5736d13 / 8b6664d):
+## 8. E1, E2 ve IMERG sözleşmeleri kabul edildi (15 Kas)
+
+`omer` main'e alındı (204 test yeşil). Senin §15–§17 isteklerin:
+- **E2:** `results/{loc}__{scenario_id}.json` + `site_index.scenarios` (id, label, precip_factor, temp_shift_c; baseline ilk) + `results.scenario_id`. `build.py` `run_scenarios` ile baseline dışındaki 5 senaryoyu yazıyor (`--no-scenarios` ile atlanabilir). `scenarios.yaml` AGENTS tablosunda senin.
+- **E1:** `validation.json` artık tam 6 kontrol; `build.py` `run_landscape` + `check_smap_anomaly` çağırıyor, SMAP gelene kadar `pending`.
+  - [ ] `check_smap_anomaly`'nin `pending` metni "İki nokta için…" diyor; artık 13 nokta var, metni genelleştir ("Waiting for NASA SMAP L4 root-zone data.").
+- **IMERG:** `imerg.py`, `data/imerg/`, `test_imerg.py` AGENTS tablosunda artık Gümüş'te. `make data` yenilendi.
+
+## 9. Repo denetiminden senin dosyalarında kalanlar (15 Kas)
+
+- [ ] `validate.py:29` `LOCATION_NAMES` hâlâ 2 ilçe → 11 ilçe kontrollerde id olarak görünüyor (`polatli` gibi). İsimleri `config.load("locations")`'tan al (§6).
+- [ ] `validate.py` `check_smap_anomaly` pending metni "two points / İki nokta" → 13 nokta (§8).
+- [ ] `soil.yaml` `fallback_awc_mm_per_m` sadece karapinar/develi → SoilGrids dosyası olmayan bir ilçede `runner.py:185` `KeyError` (§6).
+- [ ] `scenarios.yaml`: `dry10`/`dry20` vb. `type: assumption` ama `verified: true`; AGENTS kuralında assumption = `verified: false`. Tanım oldukları için savunulabilir; kararını not et.
+- Bilgi: AGENTS tablosunda `test_scenarios.py`, `test_smapcheck.py` ve `scenarios.yaml` artık senin satırında; `map/**` Biar'a yazıldı.
+
+## 10. Kim ne yaptı — 15 Kas itibarıyla özet (karışmasın diye)
+
+**Gümüş (Rol B) yaptı:**
+- Sözleşme ve iskelet (M0): `engine/` paketi, `config.py`, `mock.py`, `export.py`, `build.py`, JSON şemaları, `types.ts`, `Makefile`.
+- Veri çekme: `power.py` (NASA POWER, 13 nokta), `soilgrids.py` (WCS, doku sınıfı, taş oranı, Saxton–Rawls, toprak kartı açıklamaları), WMO 1991–2020 yağış normalleri (13 istasyon), AppEEARS SMAP isteği (13 nokta, bekliyor) ve sonucu işleyecek `smap.py` (hazır, test edildi).
+- 13 ilçe: noktaların seçimi (WMO istasyonuna 3–10 km, ESA WorldCover ile tarla kontrolü), `locations.yaml`, sözleşmede lokasyonların açık liste olması.
+- AWC analizi: SoilGrids'in düşük çıkmasının nedeni (tarla kapasitesi), Saxton–Rawls çapraz kontrolü, motor duyarlılık denemesi; doku + FAO tablosu kararı (motor tarafını sen yaptın).
+- Karar modülü (`economics.ts`): sitede para yok; puan (kazanç iç hesap + buğday verimi + toprak + su), verimlilik engelleri, öneri, yakın sonuç, `flipTable`, `priceRobustness` (fiyat ±%20).
+- `defaults.yaml`: ulusal referans verim, fiyat, destek (iç parametre), ağırlıklar, engeller.
+- Muhammet'in Rol B'ye giden işleri: fiyatlar, destekler, deneme verimleri, nadas etkinliği, erozyon kaynağı, strateji metinleri, sözlük (`SOURCES.md`, `rotations.yaml`, `references.yaml`).
+- E1 sözleşmesi (6. kontrol `smap_anomaly`) ve `build.py` bağlantısı; E2 sözleşmesi (`results/{loc}__{senaryo}.json`, `site_index.scenarios`) ve 13 ilçe × 5 senaryo verisi; IMERG'i devraldım (`imerg.py`, `data/imerg/` artık bende).
+- Toprak kartı için `awc_alternatives` ve `texture_class` alanları.
+- M2 gerçek veri ve `v0.1` etiketi; README; PLAN_MVP ve PROJE_OZETI güncellemesi; `ROL_B_VERI.md`; İsmail'e devir notu (`ISMAIL_BAKMALI.md`).
+- Senin branch'lerini main'e aldım; birleştirmede düzelttiklerim: `engine/tests/__init__.py`, ledger 104 hafta, export çıktı yolu, test çakışmaları.
+
+**Ömer (Rol A) yaptı (senin notlarından):**
+- Motor: `et0.py` (FAO-56, Örnek 18), `waterbalance.py`, `rotations.py`, `runner.py`, `yieldmodel.py`, `indicators.py`, `validate.py` (5 kontrol).
+- AWC'yi dokudan seçme + taş düzeltmesi, FAO-56 değerlerini fao.org ile doğrulama, ekim/hasat takvimleri (Muhammet'in görevi, "Ömer yaptı").
+- E1 motor tarafı (`run_landscape`, `check_smap_anomaly`), E2 motor tarafı (`scenarios.yaml`, `run_scenarios`), IMERG modülünü yazdın (artık bende), validate testlerini gerçek dosyadan ayırdın.
+- Şu an: MODIS NDVI.
+
+**Sınır (dosya sahipliği, AGENTS.md):** motor modülleri, `crops/soil/scenarios.yaml` ve onların testleri sende; veri çekme modülleri (`power`, `soilgrids`, `smap`, `imerg`), `export`, `build`, sözleşme (`docs/contract`, `types.ts`, `ARAYUZLER.md`), `economics.ts`, `defaults/references/rotations/locations.yaml`, `data/**`, `web/public/data/**` bende.
+- **MODIS NDVI için:** çekme kodunu sen yaz; sitede gösterilecekse JSON alanını ve şemayı ben açayım (bana bu dosyada değil `GUMUS_BAKMALI.md`'de yaz: hangi alan, hangi biçim).
+
+**Sende açık kalanlar:** §6 (ilçe isimleri `validate.py`'de, `soil.yaml` yedek AWC, soğuk ilçeler için takvim), §8 (smap pending metni), §9 (denetim maddeleri). **Bende açık kalanlar:** SMAP verisi gelince `smap.py` + `make data`; İsmail başlayınca site ve `v0.2`.
+
+## Ömer yanıtı — §5, §6, §8, §9 (15 Kas)
+
+Commit'ler `omer` 5736d13 / 8b6664d:
 - §5 sıcak gün = 0 hata değil: pencere ~23 May–6 Haz; POWER `T2M_MAX` > 31 °C bu pencerede 24 yılın ortancasında 0 (Karapınar en çok 8, Develi 3 gün); Haziran tamamında Karapınar ortanca 3,5, Temmuz 17. Yani eşik/pencere doğru eşleşiyor, sıcak stres çiçeklenmeden sonra başlıyor.
 - §5 nohut sonrası su ≈ 0 makul: P10/P50/P90 Karapınar 0 / 0,1 / 3,4 mm, Develi 0 / 0 / 4,8. 15 Tem–14 Eki yağışı Karapınar ortanca 26, P90 48 mm; küçük yaz yağışları çıplak toprakta buharlaşıyor (anız malçı yok varsayımı bunu biraz artırır).
 - §6 isimler `locations.yaml`'dan; SMAP metni "noktalar"; yedek AWC `default` + `overrides` (yeni id'de KeyError yok). `precip_vs_mgm` satırını kısaltmadım (IMERG sütunu da eklendi); İsmail uzun bulursa söylesin.

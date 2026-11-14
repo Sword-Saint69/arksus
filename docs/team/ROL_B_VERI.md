@@ -1,133 +1,141 @@
-# Rol B — Veri, sözleşme, ekonomi, yayın
+# Rol B — Veri, sözleşme, karar modülü, yayın
 
 **Kim:** Gümüş *(geçici atama — Ömer ile değişirse bu satırı ve TASKS.md başlığını değiştirin)*
 **Branch öneki:** `gumus/` · **Görev listen:** `TASKS.md` → "Gümüş" bölümü
-**Okuman gerekenler:** `docs/PROJE_OZETI.md` → `docs/ARAYUZLER.md` (hepsi; sahibi sensin) → PLAN_MVP §2–§4, §5.1, §5.5, §5.6, §5.9, §5.10
+**Gerektiğinde oku (adını verince):** `docs/ARAYUZLER.md` (sahibi sensin) → PLAN_MVP §1, §4, §5.5, §5.6, §5.9, §5.10 → `README.md` "Quick start"
+**Güncelleme:** 15 Kas 2026
 
 ## İşin bir paragrafta
 
-Herkesin kodunu birbirine bağlayan kişisin. **Sözleşmenin sahibisin**: dosya biçimleri, alan adları ve fonksiyon imzaları senin kontrolünde (`docs/ARAYUZLER.md`, `types.ts`, şema). NASA POWER ve SoilGrids verisini çekip Ömer'e hazır verirsin; Ömer'in motor çıktısını sitenin okuyacağı JSON'lara çevirirsin; sitedeki para ve sıralama hesabını (`economics.ts`) yazarsın; Muhammet'in bulduğu değerleri ve metinleri YAML'lara geçirirsin; repo, Makefile, Vercel, etiketler ve merge düzeni de sende. İlk saatteki işin en kritik olanı: **herkes senin koyduğun mock dosyalar ve imzalarla çalışmaya başlayacak.**
+Herkesin kodunu birbirine bağlayan kişisin. **Sözleşmenin sahibisin**: dosya biçimleri, alan adları ve fonksiyon imzaları senin kontrolünde (`docs/ARAYUZLER.md`, `types.ts`, şemalar). NASA POWER, SoilGrids, SMAP ve IMERG verisini çekip Ömer'e hazır verirsin; Ömer'in motor çıktısını sitenin okuyacağı JSON'lara çevirirsin; sitedeki karar hesabını (`economics.ts`) yazarsın; Muhammet'in bulduğu değerleri ve metinleri YAML'lara geçirirsin; repo, Makefile, Vercel, etiketler ve merge düzeni de sende. **Sitede para yok**: fiyat ve destek sadece iç parametre.
 
-## Sahibi olduğun dosyalar
+## Proje şu an (15 Kas)
+
+- **13 ilçe**, İç Anadolu'daki her ilden bir kuru tarım ilçesi: Karapınar, Develi, Polatlı, Eskişehir, Aksaray, Karaman, Niğde, Nevşehir, Kaman, Kırıkkale, Çankırı, Gemerek, Boğazlıyan.
+- Lokasyon id'leri **açık liste**: `engine/config/locations.yaml`'dan gelir (biçim `^[a-z][a-z0-9_]*$`); web listeyi `site_index.locations`'tan okur. Noktalar bir WMO 1991–2020 istasyonuna 3–10 km uzaklıkta seçildi ve ESA WorldCover 2021 ile tarla olduğu kontrol edildi.
+- 3 rotasyon (`fallow_wheat`, `chickpea_wheat`, `lentil_wheat`) × 3 derinlik (`shallow`, `medium`, `deep`) × 24 başlangıç yılı (2001–2024).
+- **AWC** dokudan gelir (motor tarafı, Ömer): SoilGrids doku sınıfı → FAO-56 Tablo 19 orta değeri × (1 − iri taş payı). SoilGrids'in kendi AWC'si (`wv0033 − wv1500`) ve Saxton–Rawls tahmini `data/soilgrids/{loc}.json`'da karşılaştırma için durur.
+
+## Karar modülü (`web/src/lib/economics.ts`)
+
+| Ölçüt | Ne | Varsayılan ağırlık |
+|---|---|---|
+| `value` | iç: verim oranı × ulusal referans verim × fiyat + destek; **maliyet yok**, asla gösterilmez | 0,40 |
+| `yield` | ortanca buğday verim oranı | 0,30 |
+| `soil` | ortanca rüzgâra açık çıplak gün (az olan iyi) | 0,20 |
+| `water` | ortanca buğday ekiminde topraktaki su | 0,10 |
+
+- Referans verimler TEPGE/TÜİK ulusal ortalamaları: buğday 296, nohut 125, mercimek 169 kg/da. Fiyat ve destek `defaults.yaml`'da, iç parametre; ekrana çıkmaz.
+- **Engeller** (`decision.guardrails`): ortanca buğday oranı < 0,85 × nadas sonrası buğday → `wheat_yield_below_baseline`; ilk yıl ürünü ortanca oranı < 0,30 → `first_crop_fails`. Engellenen rotasyon puanı ne olursa olsun seçilmez.
+- `decide` çıktısı: `recommended`, `runner_up`, `close_call` (ilk iki uygun seçenek farkı < 0,05), 0–1 parçalı sıralama, `driver`, engel nedenleri. `flipTable`: derinlik × kurak/normal/ıslak yıl.
+- Metinde dil: "Önceliklerine göre bu arazi için en uygun". Ağırlıklar, engeller ve marj `assumption`, `verified: false`.
+
+## Sahibi olduğun dosyalar (AGENTS.md ile birebir)
 
 - Kök: `AGENTS.md`, `CLAUDE.md`, `Makefile`, `README.md`
-- `docs/ARAYUZLER.md`, `docs/contract/*.schema.json`
-- `engine/pyproject.toml`, `engine/nobetsu/{__init__,config,power,soilgrids,smap,mock,export,build}.py`
-- `engine/config/{locations,rotations,defaults,references}.yaml`
-- `engine/tests/test_{power,export,contract}.py`
-- `data/**` (POWER önbelleği, SoilGrids, SMAP), `web/public/data/**`
+- `docs/ARAYUZLER.md`, `docs/contract/**`
+- `engine/pyproject.toml`, `engine/config/{locations,rotations,defaults,references}.yaml`
+- `engine/nobetsu/{__init__,config,power,soilgrids,smap,imerg,mock,export,build}.py`
+- `engine/tests/test_{power,export,contract,soilgrids,imerg,smap}.py`, `data/imerg/`
+- `data/**`, `web/public/data/**`
 - `web/src/lib/{types,economics,economics.test,contract.test}.ts`
-- **Dokunmazsın:** Ömer'in modülleri (`et0, waterbalance, rotations, yieldmodel, indicators, runner, validate`), `crops.yaml`, `soil.yaml`; `web/` altındaki diğer her şey (İsmail). Ömer'in dosyalarını iskelette **boş bile oluşturma** — o kendisi ekler.
+- Herkesle ortak, **sadece kendi başlığının altı**: `TASKS.md`, `docs/STATUS.md`, `docs/AI_USE.md`
+- **Dokunmazsın:** Ömer'in modülleri (`et0, waterbalance, rotations, yieldmodel, indicators, runner, validate`), `crops.yaml`, `soil.yaml`, onların testleri ve `fixtures.py`; `web/` altındaki diğer her şey (İsmail); `docs/SOURCES.md`, `docs/pitch/**` (Muhammet).
+
+## Not dosyaları
+
+| Kimden → kime | Dosya | Sen ne yaparsın |
+|---|---|---|
+| Ömer → Gümüş | `docs/GUMUS_BAKMALI.md` | okursun, bitenleri `- [x]` ile işaretlersin; yazmazsın |
+| Gümüş → Ömer | `docs/OMER_BAKMALI.md` | yazarsın |
+| Gümüş → İsmail | `docs/ISMAIL_BAKMALI.md` | yazarsın; İsmail işaretler |
 
 ## Sözleşme sahibi olarak kuralların
 
-- M0'dan sonra değişiklik isteği gelirse: tek PR'da `ARAYUZLER.md` + `types.ts` + şema + mock JSON, aynı saat içinde. Gruba `SÖZLEŞME DEĞİŞTİ: ...` yaz.
+- Değişiklik isteği gelirse: tek PR'da `ARAYUZLER.md` + `types.ts` + şema + mock JSON, aynı saat içinde. Gruba `SÖZLEŞME DEĞİŞTİ: ...` yaz.
 - `make test` her zaman **mock ve gerçek** çıktıyı şemayla doğrular. Şema testi kırmızıysa merge yok.
 - Ömer ve İsmail'in PR'larını merge etmeden önce `main`'i çekip `make test && make web` çalıştır.
+- Fiyat ve destek ekrana gitmez; `defaults.json` sadece karar girdisidir (iç parametre).
 
-## Adım adım
+## Durum (yapıldı)
 
-### T+0–0:10 · Repo
-GitHub'da public repo `nobetsu` aç. Bu paketteki hazır dosyaları (`AGENTS.md`, `CLAUDE.md`, `TASKS.md`, `docs/…`) ve PLAN dosyalarını push et. Ömer, İsmail, Muhammet'i ekle. Link gruba.
+- **M0 sözleşme iskeleti:** `pyproject.toml`, `config.py`, `Makefile`, `types.ts`, şemalar, `mock.py`, `contract` testleri.
+- **`power.py`:** NASA POWER önbelleği, 13 nokta, `load_weather()`.
+- **`soilgrids.py`:** WCS çekimi, doku sınıfı, `cfvo`, Saxton–Rawls, toprak kartı anlam metinleri.
+- **`export.py` + `build.py`:** mock runner ile uçtan uca, şema doğrulamalı.
+- **M2 gerçek veri:** `mock: false`, etiket `v0.1`; sonra 13 ilçeye genişletildi.
+- **Muhammet'in Rol B araştırmaları YAML'da:** fiyatlar, destekler, doğrulama referansları (13 istasyonun WMO normalleri dahil), strateji metinleri, sözlük.
+- **Karar modülü** (`economics.ts` + vitest), maliyetler çıkarıldı; README ve PLAN_MVP güncellendi.
+- **E2 senaryo sözleşmesi:** `results/{loc}__{scenario}.json`, `site_index.scenarios`, 5 senaryo × 13 ilçe.
+- **E1:** 6. kontrol `smap_anomaly` sözleşmesi ve build bağlantısı (SMAP gelene kadar `pending`).
+- **IMERG** modülü artık sende; `precip_vs_mgm` içinde POWER'ın yanında.
+- **`smap.py`** AppEEARS CSV'sine hazır ve test edildi.
 
-### T+0:10–1 · Sözleşme iskeleti → M0
-- `engine/pyproject.toml` (requests, numpy, pandas, pyyaml, pytest, jsonschema), `engine/nobetsu/__init__.py`, `config.py` (`load(name) -> dict`), boş `power.py`, `export.py`, `build.py`, `mock.py`.
-- `Makefile`: `make test` (pytest + `cd web && npm test`), `make mock`, `make data`, `make web`.
-- `web/src/lib/types.ts`: PLAN §4'ün birebir TS karşılığı (6 dosya türü).
-- `docs/contract/*.schema.json` + `test_contract.py` (web/public/data altındaki her dosyayı doğrular) + `web/src/lib/contract.test.ts` (mock JSON'u tiplere atar).
-- `mock.py`: `fake_run_location()` ARAYUZLER §5 biçiminde sahte çıktı üretir; `build.py --mock` bunu `export.write_all(mock=True)`'dan geçirir → `make mock` 6 tür JSON'u yazar (2 lokasyon × 216 satır, tam boyut).
-- `web/src/lib/economics.ts`: ARAYUZLER §9 imzalarıyla **basit çalışan** sürüm (İsmail hemen kullanabilsin).
-- `web/` iskeletini İsmail kuruyor (Vite, Tailwind, vitest, Vercel). Sen sadece kendi dosyalarını eklersin; çakışma olmaz.
+## Kalanlar
 
-### T+0:30 · Koordinatlar
-`locations.yaml`'a Karapınar ve Develi'nin tarım alanı içindeki nokta koordinatlarını yaz (ilçe merkezinin hemen dışında, yerleşim değil tarla), Muhammet'e gönder.
+| İş | Neye bağlı | Not |
+|---|---|---|
+| SMAP verisi → `smap/{loc}.json`, `available: true` | AppEEARS (istek gönderildi, kuyrukta) | gelince aşağıdaki prompt 1 |
+| Site Vercel'de görünüyor (M2'nin son adımı) | İsmail'in web iskeleti | gerçek JSON hazır |
+| `v0.2` etiketi (M3) | site çalışınca | `git tag v0.2 && git push --tags` |
+| GitHub collaborator'ları eklemek | elle | Ömer, İsmail, Muhammet |
+| E3 GRACE havza su trendi | Earthdata indirmesi | genişletme, MVP değil |
+| Baklagil yılında toprak işleme sayısı | kaynak bulunamadı | `rotations.yaml`'da boş / `assumption` |
 
-### T+1 · SMAP isteği (5 dk)
-NASA AppEEARS (Earthdata hesabı) → nokta isteği: `SPL4SMGP` v8, `sm_rootzone`, `sm_rootzone_wetness`, `sm_surface_wetness`; iki nokta; 2015-04-01 → bugün. Sonuç saatler içinde gelir.
+## Komutlar (README "Quick start")
 
-### T+1–2 · `power.py` → Ömer'e haber
-ARAYUZLER §2: tek seferlik çekim (`community=AG`, `time-standard=LST`, `format=JSON`, 2000-01-01 → son tarih, 8 parametre), `data/raw/power_{loc}.json` önbelleği (commit et, küçük), birimleri başlıktan oku, `-999` → NaN, ≤ 3 gün doğrusal doldur, sabit sütun adları, `attrs`. `test_power.py`: önbellekten okur, sütunlar/birimler doğru, NaN yok. Bitince **Ömer'e "POWER hazır"** yaz.
+| Komut | Ne yapar |
+|---|---|
+| `make test` | pytest + vitest |
+| `make data` | önbellekten gerçek JSON |
+| `make mock` | aynı biçimde sahte JSON (commit etme) |
+| `make web` | web build |
 
-### T+2–2.75 · SoilGrids (45 dk sınır)
-WCS veya Earth Engine (REST değil): `clay, sand, silt, bdod, cfvo, phh2o, soc, nitrogen, cec, wv0033, wv1500`; 0–5, 5–15, 15–30 cm (su özellikleri 100 cm'e kadar); Q05/Q50/Q95; resmi dönüşüm çarpanları. `data/soilgrids/{loc}.json` (ARAYUZLER §3) ve `awc_mm_per_m`. Fiziksel sınır testi (pH 3–10, fraksiyonlar ≈ %100). **45 dakikada olmazsa bırak**, Muhammet'e "SoilGrids'i web haritasından elle oku" de; geldiğinde aynı dosyayı `how_obtained: manual_viewer` ile yaz.
-
-### T+2.75–4 · `economics.ts` + vitest → M1
-ARAYUZLER §9 ve §10: `percentile` (numpy type 7), `range`, `sequenceMoney`, `summarize`, `breakEvenYield`, `flipTable`, `rankByPriority`.
-Testler: tek sekans için elle hesaplanmış örnek · bilinen dizide yüzdelik · başabaş formülü · oyuncak veride flip tablosu · eşit ağırlık ve her önceliğe %100 ile tek ölçüt sırası.
-İmzalar değişmez; İsmail zaten bunlara bağlı.
-
-### T+4–7 · `export.py` + `build.py`
-- `write_all()`: `site_index` (locations + rotations.yaml + soil.yaml'daki derinlik sınıfları + `power_range` + `start_years`), `results/{loc}` (soilgrids properties + `awc_used` + sequences), `ledger/{loc}`, `defaults` (defaults.yaml), `validation` (checks), `smap/{loc}` (veri yoksa `available: false`). Yuvarlama ARAYUZLER §10. `generated_at`, `schema_version`, `mock`.
-- `build.py`: ARAYUZLER §7 sırası. `test_export.py`: mock runner ile yazılan her dosya şemadan geçer.
-
-### T+7–9 · Gerçek veri → M2
-Ömer'in `run_location`'ı gelince `build.py` onu çağırır. `make data` → `mock: false` → commit → Vercel'de görünüyor → **`git tag v0.1 && git push --tags`**.
-
-### T+9–14 · Değerleri ve metinleri geçir → M3
-Her 2 saatte bir `docs/SOURCES.md`'yi oku:
-- `price.*, cost.*, support.*, ym.*` → `defaults.yaml` (V biçimi, `verified: true`, `as_of`). Ym = TÜİK ilçe yıllık verimlerinin yüksek yüzdeliği (ör. P90; hangi yüzdeliği seçtiğini `source`'a yaz), tür `statistic`.
-- `ref.*` → `references.yaml` (deneme verimleri, PSE aralığı, MGM normalleri, sıcak gün eşiği).
-- `strategy.*, trait.*` → `rotations.yaml`.
-- Sözlük İsmail'e gider (`strings.ts`).
-- Bulunamayanlar `type: assumption`, `verified: false` + not.
-README teknik kısım (kurulum, `make data`, veri kaynakları, varsayımlar). M3'te **`v0.2` etiketi**.
-
-### SMAP geldiğinde
-`smap.py`: aylık klimatoloji (kök bölgesi ıslaklığı P10/P50/P90), aylık seri, son değer ve o takvim ayındaki yüzdeliği → `smap/{loc}.json`, `available: true`. Test: ıslaklık 0–1. T+12'ye kadar gelmezse `available: false` kalır, E1'e geçer.
-
-### T+14–19 · Genişletme (her biri ayrı branch, yeşil değilse merge yok)
-E1 veri tarafı (SMAP günlük seri Ömer'e) + **E2 sözleşmesi** (`results/{loc}__{scenario}.json`, `site_index.scenarios`; önce tipler ve mock, sonra Ömer/İsmail) → E3 GRACE havza su trendi (veri + trend hesabı) → E6 kısıtlar veya E9 fiyat belirsizliği.
-
-### T+19–22 · Yayın
-Son build, tüm linkler, repo temizliği, `docs/AI_USE.md` derlemesi (Muhammet beyana çevirir).
+`make` yoksa (Windows):
+```bash
+cd engine
+python -m pytest -q
+python -m nobetsu.build --out ../web/public/data                 # make data
+python -m nobetsu.build --out ../web/public/data --no-scenarios  # E2 senaryoları olmadan, hızlı
+python -m nobetsu.build --mock --out ../web/public/data          # make mock
+python -m nobetsu.smap <csv>                                     # AppEEARS SMAP CSV → data/smap/{loc}.json
+```
 
 ## Bağımlılıkların
 
-| Ne | Kimden | Ne zaman | Gecikirse |
-|---|---|---|---|
-| Web iskeleti (vitest dahil) | İsmail | T+1 | `economics.test.ts`'i yazmaya devam et, iskelet gelince çalıştır |
-| `run_location()` gerçek çıktı | Ömer | T+7:30 | M2'yi kısmi gerçek veriyle (ör. tek lokasyon) yap |
-| `validate.run_checks()` | Ömer | T+12 | `validation.json`'da kontroller `pending` |
-| Fiyat, destek / maliyet, Ym | Muhammet | T+3 / T+5 | `assumption` |
-| Referanslar | Muhammet | T+7 | `references.yaml` boş, kontroller `pending` |
-| Strateji metinleri | Muhammet | T+9 | "text pending" yer tutucusu |
+| Ne | Kimden | Gecikirse |
+|---|---|---|
+| Web iskeleti + Vercel | İsmail | gerçek JSON hazır bekler; `ISMAIL_BAKMALI.md` güncel tut |
+| Motor değişiklikleri (`run_location`, `validate`) | Ömer | son çıktı kalır; değişince veriyi yenile (prompt 2) |
+| SMAP sonucu | NASA AppEEARS | `available: false`, `smap_anomaly` `pending` |
+| Yeni kaynak / metin | Muhammet (`docs/SOURCES.md`) | `type: assumption`, `verified: false` |
 
-**Senden bekleyenler:** herkes (T+0:10 repo) · İsmail (T+1 types + mock + economics; T+9 gerçek JSON) · Ömer (T+2 POWER, T+2:45 AWC) · Muhammet (T+0:30 koordinatlar).
+**Senden bekleyenler:** İsmail (güncel sözleşme, gerçek JSON, `economics.ts` API'si) · Ömer (`GUMUS_BAKMALI.md`'deki maddelere yanıt) · herkes (merge düzeni, etiketler).
 
 ## AI ajan başlangıç promptları
 
 Her görev için yeni oturum. Önce şunu söyle: **"Ben Gümüş'üm (Rol B)."**
 
-**1 — Sözleşme iskeleti (T+0:10):**
+**1 — SMAP verisi geldi:**
 ```
-Ben Gümüş'üm (Rol B). AGENTS.md, docs/team/ROL_B_VERI.md, docs/ARAYUZLER.md ve docs/PLAN_MVP.md §2–§4'ü oku.
-Sadece benim dosyalarımı oluştur: engine/pyproject.toml, engine/nobetsu/{__init__,config,power,export,build,mock}.py
-(power/export şimdilik iskelet), Makefile (test/mock/data/web), web/src/lib/types.ts (PLAN §4'ün birebir karşılığı),
-docs/contract/*.schema.json, engine/tests/test_contract.py, web/src/lib/contract.test.ts, ve ARAYUZLER §9 imzalarıyla
-basit çalışan web/src/lib/economics.ts. mock.fake_run_location() ARAYUZLER §5 biçiminde, sahte ama makul sayılar,
-tam boyut (2 lokasyon × 216 satır); `make mock` 6 tür JSON'u mock:true ile web/public/data/ altına yazsın.
-Ömer'in modüllerini (et0, waterbalance, rotations, yieldmodel, indicators, runner, validate) ve web iskeletini
-OLUŞTURMA. Bilim kodu yazma. `make mock` ve `pytest` geçince dur, TASKS.md'de sadece Gümüş bölümünü işaretle.
+Ben Gümüş'üm (Rol B). docs/ARAYUZLER.md'yi oku. AppEEARS SMAP CSV'si geldi: data/smap/<dosya>.csv.
+cd engine && python -m nobetsu.smap ../data/smap/<dosya>.csv ile data/smap/{loc}.json üret, sonra
+python -m nobetsu.build --out ../web/public/data çalıştır. smap/{loc}.json available:true olmalı, wetness 0–1,
+validation.json'da smap_anomaly artık pending olmamalı. pytest geçsin. Sadece benim dosyalarıma dokun.
+Bitince TASKS.md'de sadece Gümüş bölümündeki SMAP satırını işaretle.
 ```
 
-**2 — power.py, SoilGrids, economics, export (sırayla, her biri yeni oturum):**
+**2 — Ömer'in değişikliklerinden sonra veriyi yenile:**
 ```
-Ben Gümüş'üm (Rol B). AGENTS.md, docs/team/ROL_B_VERI.md ve docs/ARAYUZLER.md'yi oku.
-Bu görev: <TASKS.md'deki satır>. İlgili PLAN_MVP bölümü: <§5.1 / §5.10 / §5.5+§5.9 / §4>.
-Önce test, sonra kod. Sözleşmedeki adları ve biçimleri birebir kullan. Bitince TASKS.md'de sadece Gümüş
-bölümündeki o satırı işaretle.
-```
-
-**3 — Değer aktarımı (T+9'dan itibaren, her 2 saatte):**
-```
-Ben Gümüş'üm (Rol B). docs/SOURCES.md'de dolu olup henüz YAML'a geçmemiş satırları bul. Her birini ID'sine göre
-defaults.yaml / references.yaml / rotations.yaml'a V biçiminde (value, unit, source, source_url, type, verified, as_of)
-geçir. Değeri değiştirme, yuvarlama, tahmin etme; boş olanlara dokunma. Sonra `make data && make test` çalıştır.
+Ben Gümüş'üm (Rol B). docs/GUMUS_BAKMALI.md ve docs/ARAYUZLER.md'yi oku. main'i (Ömer'in son değişiklikleri)
+kendi branch'ime çek. cd engine && python -m pytest -q, sonra python -m nobetsu.build --out ../web/public/data.
+Şema testi ve contract testleri geçsin; sözleşmede değişiklik gerekiyorsa DUR ve bana sor. Ömer'in dosyalarına
+dokunma. GUMUS_BAKMALI.md'de biten maddeleri - [x] ile işaretle, Ömer'e notu OMER_BAKMALI.md'ye yaz.
 ```
 
 ## Takılırsan
 
-- POWER API yavaş/hata → yeniden dene; önbellek bir kez yazılınca bir daha çağrılmaz. Son çare: POWER web arayüzünden JSON indir, aynı yola koy.
-- SoilGrids 45 dakikayı geçti → bırak, Muhammet'e devret.
-- AppEEARS sonucu gelmedi → T+12'de `available: false`, gerisi E1.
+- POWER API yavaş/hata → yeniden dene; önbellek bir kez yazılınca bir daha çağrılmaz.
+- AppEEARS sonucu gelmedi → `available: false` kalır, gerisi çalışır.
+- Build uzun sürüyor → `--no-scenarios` ile E2'siz çalıştır, son build'de tam haliyle.
 - İki kişinin PR'ı çakıştı → dosya sahipliği tablosuna bak; sahibinin sürümü kazanır.

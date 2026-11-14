@@ -8,3 +8,11 @@ web/dist/
 .env
 .env.*
 .claude/settings.local.json
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+coverage/
+*.tsbuildinfo
+.ruff_cache/

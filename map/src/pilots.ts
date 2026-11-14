@@ -1,9 +1,10 @@
 // Loads the NöbetSu data files (web/public/data, served under /data/nobetsu) and
-// turns them into what the pilot-district panel shows. All money and range
-// maths goes through the project's own economics.ts, never re-implemented here.
+// turns them into what the pilot-district panel shows. All range maths goes
+// through the project's own economics.ts, never re-implemented here.
+// 14 Nov: the site shows no money (ARAYUZLER §9); defaults.json holds decision parameters only.
 
 import type { DefaultsFile, DepthId, LocationId, ResultsFile, SiteIndex, SmapFile } from '../../web/src/lib/types';
-import { inputsFromDefaults, summarize } from '../../web/src/lib/economics';
+import { summarize } from '../../web/src/lib/economics';
 import { pilotFeature, type Feature } from './vector/features';
 import type { PilotData } from './ui/inspector';
 
@@ -49,13 +50,9 @@ export class Pilots {
     if (!location) return null;
     this.ensure(id);
     const results = this.results.get(id) ?? null;
-    const inp = inputsFromDefaults(this.defaults, id);
-    const summaries = results ? summarize(results, this.site, this.depth, inp) : null;
-    const vals = this.defaults.values[id];
-    // economics.ts reads null as 0, so a missing cost or Ym would silently show
-    // a wrong margin; the panel hides money and kg/da while any is missing.
-    const moneyPending = !vals || [vals.wheat, vals.chickpea, vals.lentil].some((c) => c.cost_tl_per_da.value === null || c.ym_kg_per_da.value === null)
-      || vals.fallow.cost_tl_per_da.value === null;
+    const summaries = results ? summarize(results, this.site, this.depth) : null;
+    // No money is shown anywhere (14 Nov decision): nothing is "pending", so the old money notice stays off.
+    const moneyPending = false;
     return { site: this.site, location, results, smap: this.smap.get(id) ?? null, summaries, depth: this.depth, moneyPending };
   }
 

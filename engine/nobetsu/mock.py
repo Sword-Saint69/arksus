@@ -10,6 +10,8 @@ from __future__ import annotations
 import math
 from datetime import date, timedelta
 
+from .soilgrids import MEANING
+
 START_YEARS = list(range(2001, 2025))  # 2001..2024 inclusive
 ROTATIONS = {
     "fallow_wheat": None,
@@ -175,7 +177,7 @@ def fake_soil_properties() -> list[dict]:
             "id": pid, "label": {"en": en, "tr": tr}, "depth": "0-30 cm",
             "q05": q05, "q50": q50, "q95": q95, "unit": unit,
             "source": MOCK_SOURCE, "type": "model", "how_obtained": "manual_viewer",
-            "meaning": {"en": "[text pending]", "tr": "[metin bekleniyor]"},
+            "meaning": dict(MEANING[pid]),
         }
         for pid, en, tr, unit, q05, q50, q95 in _SOIL_PROPS
     ]
@@ -203,7 +205,7 @@ def fake_smap(location_id: str) -> dict:
 
 
 def fake_checks() -> list[dict]:
-    ids = ["mass_balance", "et0_fao56_ex18", "pse_literature", "trial_ratio", "precip_vs_mgm"]
+    ids = ["mass_balance", "et0_fao56_ex18", "pse_literature", "trial_ratio", "precip_vs_mgm", "smap_anomaly"]
     return [
         {"id": i, "status": "pending", "value": "", "reference": "",
          "note": {"en": "Mock: check not run yet.", "tr": "Mock: kontrol henüz çalıştırılmadı."}}

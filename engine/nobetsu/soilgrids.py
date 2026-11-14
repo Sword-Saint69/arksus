@@ -41,6 +41,28 @@ CARD_PROPERTIES = {
     "bdod": (100, "g/cm³", "Bulk density", "Hacim ağırlığı"),
     "cfvo": (10, "vol %", "Coarse fragments", "Kaba parçalar"),
 }
+# One plain sentence per property for the soil card (what it means for the rotation choice). No numbers.
+MEANING = {
+    "clay": {"en": "Clay holds water and nutrients well, so clayey soils keep more of the rain saved during fallow; they crust and crack when dry.",
+             "tr": "Kil suyu ve besini iyi tutar; killi topraklar nadasta biriken yağmurun daha fazlasını saklar, kuruyunca kabuk bağlar ve çatlar."},
+    "sand": {"en": "Sand drains fast and holds little water, so water saved by fallow is lost sooner in sandy soils.",
+             "tr": "Kum suyu hızlı geçirir ve az tutar; kumlu topraklarda nadasla biriken su daha çabuk kaybolur."},
+    "silt": {"en": "Silt holds water well but crusts easily, and dry, bare silty soil is easily blown away by wind.",
+             "tr": "Silt suyu iyi tutar ama kolay kabuk bağlar; kuru ve çıplak siltli toprağı rüzgâr kolayca uçurur."},
+    "phh2o": {"en": "A pH above 7 means alkaline, often limy soil; wheat, chickpea and lentil grow in it, but phosphorus and zinc can be less available, which a soil test shows.",
+              "tr": "pH'nin 7'nin üzerinde olması bazik, çoğu zaman kireçli toprak demektir; buğday, nohut ve mercimek yetişir ama fosfor ve çinko daha az alınabilir, bunu toprak analizi gösterir."},
+    "soc": {"en": "Organic carbon keeps soil crumbly and helps it hold water; bare fallow and frequent tillage slowly lower it, while plant cover and residues build it up.",
+            "tr": "Organik karbon toprağı gevşek tutar ve su tutmasına yardım eder; çıplak nadas ve sık toprak işleme onu yavaşça azaltır, bitki örtüsü ve artıklar artırır."},
+    "nitrogen": {"en": "Total nitrogen is the soil's nitrogen store; chickpea and lentil add some by fixation, but how much reaches the next wheat needs a soil test.",
+                 "tr": "Toplam azot toprağın azot deposudur; nohut ve mercimek bağlama ile bir miktar ekler, ama sonraki buğdaya ne kadar kaldığını toprak analizi gösterir."},
+    "cec": {"en": "Cation exchange capacity is how many nutrients the soil can hold on to; it is higher in clayey and organic soils.",
+            "tr": "Katyon değişim kapasitesi toprağın ne kadar besin tutabildiğidir; killi ve organik maddece zengin topraklarda daha yüksektir."},
+    "bdod": {"en": "Bulk density shows how compact the soil is; higher values leave less room for roots, air and water.",
+             "tr": "Hacim ağırlığı toprağın ne kadar sıkı olduğunu gösterir; yüksek değer kök, hava ve su için daha az boşluk demektir."},
+    "cfvo": {"en": "Coarse fragments are stones and gravel; they hold no water, so more stones mean less stored water per metre of soil.",
+             "tr": "Kaba parçalar taş ve çakıldır; su tutmazlar, bu yüzden taş arttıkça toprağın metre başına sakladığı su azalır."},
+}
+
 # wv0033 / wv1500 mapped unit is 10^-3 cm³/cm³ = 1 mm water per m of soil -> used as mm/m directly.
 WATER_PROPERTIES = ["wv0033", "wv1500"]
 
@@ -164,7 +186,7 @@ def build_record(location_id: str, raw: dict) -> dict:
             mapped = depth_weighted({d: raw[prop][d][qk] for d in CARD_DEPTHS}, CARD_DEPTHS)
             item[qk] = round(convert(prop, mapped), 2)
         item.update({"unit": unit, "source": SOURCE, "type": "model", "how_obtained": "wcs",
-                     "meaning": {"en": "[text pending]", "tr": "[metin bekleniyor]"}})
+                     "meaning": dict(MEANING[prop])})
         properties.append(item)
 
     awc = {qk: awc_mm_per_m({d: raw["wv0033"][d][qk] for d in AWC_DEPTHS},

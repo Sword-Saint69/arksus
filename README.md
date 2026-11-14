@@ -23,17 +23,19 @@ It is **not** a yield forecast for one field, a price forecast or a fertiliser a
 
 ---
 
-## Status (14 Nov 2026)
+## Status (15 Nov 2026)
 
 | Part | State |
 |---|---|
 | Engine (FAO-56 ET₀, two-layer dual-Kc water balance, yield ratio, soil indicators) | done, 13 districts |
 | Real data in `web/public/data/` (`mock: false`) | done, tag `v0.1` (2 districts), extended to 13 |
-| Validation checks (5) | 2 pass, 3 info |
+| Validation checks (6) | 2 pass, 3 info, 1 pending (SMAP comparison, waiting for SMAP data) |
 | Decision module (`web/src/lib/economics.ts`: score, guardrails, recommendation) | done, unit-tested |
 | Reference yields, prices, supports (internal parameters), validation references | sourced (`docs/SOURCES.md`) |
 | Production costs | not used (team decision 14 Nov: no money shown; costs not sourced) |
 | NASA SMAP soil wetness | requested from AppEEARS, not yet in the data (`available: false`) |
+| Climate sensitivity scenarios (drier / warmer, E2) | done: 5 scenarios × 13 districts in `results/{loc}__{scenario}.json` |
+| NASA GPM IMERG precipitation (second satellite estimate) | done, shown in the precipitation check |
 | Web site (React) | not started yet |
 
 ---
@@ -86,7 +88,9 @@ python -m pytest -q                                  # tests
 python -m nobetsu.build --out ../web/public/data      # make data
 python -m nobetsu.build --mock --out ../web/public/data   # make mock
 python -m nobetsu.power                               # fetch NASA POWER for locations without a cache
+python -m nobetsu.imerg                               # fetch NASA GPM IMERG monthly precipitation (no login needed)
 python -m nobetsu.soilgrids                           # pull SoilGrids for all locations
+python -m nobetsu.smap ../data/smap/<appeears>.csv    # turn the AppEEARS SMAP CSV into data/smap/{loc}.json, then make data
 ```
 
 Raw downloads are cached in `data/` and committed, so `make data` needs no network.
@@ -105,12 +109,13 @@ Raw downloads are cached in `data/` and committed, so `make data` needs no netwo
 ```
 engine/
   config/        locations, crops, soil, rotations (texts), defaults (decision parameters), references (validation)
-  nobetsu/       power, soilgrids, et0, waterbalance, rotations, yieldmodel, indicators, runner, validate, export, build, mock
+  nobetsu/       power, soilgrids, imerg, smap, et0, waterbalance, rotations, yieldmodel, indicators, runner, validate, export, build, mock
   tests/         pytest
 web/
   public/data/   generated JSON (the contract)
   src/lib/       types.ts (contract types), economics.ts (+ tests)
-data/            cached NASA POWER, SoilGrids, SMAP request files
+data/            cached NASA POWER, SoilGrids, IMERG, SMAP request files
+map/             3D map of the districts (separate Vite app)
 docs/            PLAN_MVP.md, ARAYUZLER.md (interfaces), contract/*.schema.json, SOURCES.md, AI_USE.md
 ```
 
@@ -123,6 +128,7 @@ docs/            PLAN_MVP.md, ARAYUZLER.md (interfaces), contract/*.schema.json,
 | **NASA POWER** daily (PRECTOTCORR, T2M_MAX/MIN, T2MDEW, RH2M, WS2M, WS2M_MAX, ALLSKY_SFC_SW_DWN), community AG | weather for the engine, 2000-01-01 → 2026-11-09 | [power.larc.nasa.gov](https://power.larc.nasa.gov/) API |
 | **NASA SMAP L4** `SPL4SMGP.008` (root-zone and surface wetness, 9 km) | regional soil wetness panel | AppEEARS point request (`data/smap/appeears_request.json`) |
 | **SoilGrids 2.0** (ISRIC), 250 m | soil card, texture class, coarse fragments | WCS |
+| **NASA GPM IMERG** Final monthly V07 (0.1°) | second satellite precipitation estimate in the precipitation check | NSF NCAR GDEX mirror (d736000) |
 | **WMO Climate Normals 1991–2020** (Turkish State Meteorological Service stations) | check of POWER precipitation | [NOAA NCEI archive](https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/) |
 | **ESA WorldCover 2021** (10 m) | check that each point lies on cropland | AWS open data |
 | FAO-56 (Allen et al. 1998), FAO-33 | method and crop/soil parameters | [fao.org/4/x0490e](https://www.fao.org/4/x0490e/x0490e00.htm) |
@@ -141,7 +147,8 @@ Every value, its link and access date are listed in `docs/SOURCES.md`; the YAML 
 | ET₀ vs FAO-56 Example 18 | pass (±0.1 mm/day) |
 | Fallow storage efficiency vs Central Anatolian literature (11–29 %) | info: model 8–23 % |
 | Wheat yield after chickpea / lentil relative to after fallow vs the Konya trial (0.80 / 0.87) | info: model 0.89 / 0.90 at Karapınar |
-| NASA POWER annual precipitation vs WMO station normal | info: see below |
+| NASA POWER and NASA GPM IMERG annual precipitation vs WMO station normal | info: see below |
+| NASA SMAP root-zone wetness vs model soil-water fullness (monthly anomalies) | pending until SMAP data arrives |
 
 ---
 
@@ -175,4 +182,4 @@ AI tools were used; who used which tool for what is listed in [`docs/AI_USE.md`]
 
 ## Türkçe özet
 
-NöbetSu, İç Anadolu'daki kuru tarım çiftçisi için "nadas mı, nohut mu, mercimek mi?" sorusunun su, toprak ve para tarafını, NASA POWER'ın 24 yıllık iklim verisiyle birlikte gösterir. 13 ilin her birinden bir ilçe, 3 toprak derinliği ve 3 rotasyon için hesaplanır. Bir tarla için verim tahmini değildir, "şunu ek" demez; seçenekleri yan yana koyar, kararı çiftçi ve yerel uzman verir. Kurulum ve komutlar yukarıda; tüm kaynaklar `docs/SOURCES.md`'de.
+NöbetSu, İç Anadolu'daki kuru tarım çiftçisi için "nadas mı, nohut mu, mercimek mi?" sorusunu su, toprak, verim ve çiftçinin kazancı açısından birlikte tartar (para gösterilmez), NASA POWER'ın 24 yıllık iklim verisiyle birlikte gösterir. 13 ilin her birinden bir ilçe, 3 toprak derinliği ve 3 rotasyon için hesaplanır. Bir tarla için verim tahmini değildir, "şunu ek" demez; seçenekleri yan yana koyar, kararı çiftçi ve yerel uzman verir. Kurulum ve komutlar yukarıda; tüm kaynaklar `docs/SOURCES.md`'de.

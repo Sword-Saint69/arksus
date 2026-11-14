@@ -44,12 +44,15 @@ export interface Rotation {
   strategy: Strategy;
 }
 export interface DepthClass { id: DepthId; depth_m: number; label: Text }
+/** E2 "what if the same 24 years were drier or warmer?" — a sensitivity test, not a projection. */
+export interface Scenario { id: string; label: Text; precip_factor: number; temp_shift_c: number }
 export interface SiteIndex extends FileHeader {
   power_range: { start: string; end: string };
   locations: Location[];
   rotations: Rotation[];            // baseline always first
   depth_classes: DepthClass[];
   start_years: [number, number];    // [first, last], both inclusive
+  scenarios: Scenario[];            // E2; baseline first. Non-baseline results: results/{location_id}__{scenario_id}.json
 }
 
 // §4.2 results/{location_id}.json
@@ -77,8 +80,12 @@ export interface SequenceRow {
 }
 export interface ResultsFile extends FileHeader {
   location_id: LocationId;
+  scenario_id: string;                       // 'baseline' in results/{loc}.json
   soil: {
     awc_mm_per_m: { value: number | null; unit?: string; source: string; type: Badge; verified: boolean };
+    /** 15 Nov: AWC estimates the engine did NOT use (soil-card transparency), e.g. soilgrids_wv0033_wv1500, saxton_rawls_2006. */
+    awc_alternatives?: Record<string, { value: number; unit: string; source: string; type: Badge; verified: boolean; range_q05_q95?: [number, number] }>;
+    texture_class?: string;                  // USDA class, 0–100 cm (e.g. "silty clay")
     properties: SoilProperty[];
     not_available_remotely: string[];
   };
@@ -116,6 +123,6 @@ export interface DefaultsFile extends FileHeader {
 }
 
 // §4.5 validation.json
-export type CheckId = 'mass_balance' | 'et0_fao56_ex18' | 'pse_literature' | 'trial_ratio' | 'precip_vs_mgm';
+export type CheckId = 'mass_balance' | 'et0_fao56_ex18' | 'pse_literature' | 'trial_ratio' | 'precip_vs_mgm' | 'smap_anomaly';
 export interface Check { id: CheckId; status: 'pass' | 'fail' | 'info' | 'pending'; value: string; reference: string; note: Text }
 export interface ValidationFile extends FileHeader { checks: Check[] }

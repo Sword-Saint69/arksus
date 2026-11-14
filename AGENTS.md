@@ -21,11 +21,13 @@ Tek doğru kaynak: `docs/PLAN_MVP.md`. Kod bağlantıları: `docs/ARAYUZLER.md`.
 ## Dosya sahipliği (sadece kendi dosyanı düzenle)
 | Sahip | Dosyalar |
 |---|---|
-| Ömer (Rol A) | `engine/config/{crops,soil}.yaml`, `engine/nobetsu/{et0,waterbalance,rotations,yieldmodel,indicators,runner,validate}.py`, bunların testleri `engine/tests/test_{et0,waterbalance,rotations,yieldmodel,indicators,runner,validate}.py`, `engine/tests/fixtures.py` |
-| Gümüş (Rol B) | `AGENTS.md`, `CLAUDE.md`, `Makefile`, `README.md`, `docs/ARAYUZLER.md`, `docs/contract/**`, `engine/pyproject.toml`, `engine/config/{locations,rotations,defaults,references}.yaml`, `engine/nobetsu/{__init__,config,power,soilgrids,smap,mock,export,build}.py`, `engine/tests/test_{power,export,contract}.py`, `data/**`, `web/public/data/**`, `web/src/lib/{types,economics,economics.test,contract.test}.ts` |
+| Ömer (Rol A) | `engine/config/{crops,soil,scenarios}.yaml`, `engine/nobetsu/{et0,waterbalance,rotations,yieldmodel,indicators,runner,validate}.py`, bunların testleri `engine/tests/test_{et0,waterbalance,rotations,yieldmodel,indicators,runner,validate,scenarios,smapcheck}.py`, `engine/tests/fixtures.py` |
+| Gümüş (Rol B) | `AGENTS.md`, `CLAUDE.md`, `Makefile`, `README.md`, `.gitignore`, `.claude/settings.json`, `docs/ARAYUZLER.md`, `docs/team/ROL_B_VERI.md`, `docs/contract/**`, `engine/pyproject.toml`, `engine/config/{locations,rotations,defaults,references}.yaml`, `engine/nobetsu/{__init__,config,power,soilgrids,smap,imerg,mock,export,build}.py`, `engine/tests/test_{power,export,contract,soilgrids,imerg,smap}.py`, `data/**`, `web/public/data/**`, `web/src/lib/{types,economics,economics.test,contract.test}.ts` |
 | İsmail | `web/` altındaki diğer her şey (`package.json`, Vite/Tailwind ayarları, `src/**`, `vercel.json`) |
 | Muhammet | `docs/SOURCES.md`, `docs/pitch/**` |
+| Biar | `map/**` (3B ilçe haritası, ayrı Vite uygulaması) |
 | Herkes | `TASKS.md`, `docs/STATUS.md`, `docs/AI_USE.md` — **sadece kendi başlığının altı** |
+| Ekip (değişiklik ekipçe, uygulayan Gümüş) | `docs/PLAN_MVP.md`, `docs/PLAN_EXPANSION.md`, `docs/PROJE_OZETI.md` |
 
 Başkasının dosyasında değişiklik gerekiyorsa kendin yapma; kullanıcıya hangi değişikliğin kime sorulacağını yaz.
 Ömer ↔ Gümüş notları: Ömer'in Gümüş'e yazdıkları `docs/GUMUS_BAKMALI.md`, Gümüş'ün Ömer'e yazdıkları `docs/OMER_BAKMALI.md`. Karşı tarafın not dosyasına yazma, sadece kendinde ona ait maddeleri `- [x]` ile işaretle.

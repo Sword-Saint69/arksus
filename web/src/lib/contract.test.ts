@@ -21,11 +21,12 @@ describe('contract', () => {
     expect(site.rotations.map((r) => r.id)).toEqual(['fallow_wheat', 'chickpea_wheat', 'lentil_wheat']);
     expect(site.depth_classes.map((d) => d.id)).toEqual(['shallow', 'medium', 'deep']);
     expect(site.start_years).toEqual([2001, 2024]);
+    expect(site.scenarios[0].id).toBe('baseline');
   });
 
-  it('validation has the five checks in order', () => {
+  it('validation has the six checks in order', () => {
     expect(validation.checks.map((c) => c.id)).toEqual(
-      ['mass_balance', 'et0_fao56_ex18', 'pse_literature', 'trial_ratio', 'precip_vs_mgm']);
+      ['mass_balance', 'et0_fao56_ex18', 'pse_literature', 'trial_ratio', 'precip_vs_mgm', 'smap_anomaly']);
   });
 
   it('locations are a non-empty list with unique ids; defaults hold the four crops', () => {
@@ -38,6 +39,12 @@ describe('contract', () => {
   for (const loc of site.locations.map((l) => l.id)) {
     it(`${loc}: results, ledger, smap fit the types and economics runs`, () => {
       const results = read<ResultsFile>(`results/${loc}.json`);
+      expect(results.scenario_id).toBe('baseline');
+      for (const sc of site.scenarios.slice(1)) {
+        const sr = read<ResultsFile>(`results/${loc}__${sc.id}.json`);
+        expect(sr.scenario_id).toBe(sc.id);
+        expect(sr.sequences).toHaveLength(216);
+      }
       const ledger = read<LedgerFile>(`ledger/${loc}.json`);
       const smap = read<SmapFile>(`smap/${loc}.json`);
       expect(results.sequences).toHaveLength(216);

@@ -11,7 +11,7 @@ from jsonschema import Draft202012Validator
 from nobetsu import config
 
 CONTRACT_DIR = config.REPO_ROOT / "docs" / "contract"
-CHECK_ORDER = ["mass_balance", "et0_fao56_ex18", "pse_literature", "trial_ratio", "precip_vs_mgm"]
+CHECK_ORDER = ["mass_balance", "et0_fao56_ex18", "pse_literature", "trial_ratio", "precip_vs_mgm", "smap_anomaly"]
 
 
 def schema_for(rel: Path) -> str:
@@ -38,12 +38,18 @@ def check_invariants(data_dir: Path) -> None:
     assert site["rotations"][0]["is_baseline"] is True, "baseline rotation must be first"
     assert sum(r["is_baseline"] for r in site["rotations"]) == 1
     assert site["start_years"] == [2001, 2024]
+    assert site["scenarios"][0]["id"] == "baseline", "baseline scenario must be first"
+    scenario_ids = [sc["id"] for sc in site["scenarios"][1:]]
     assert [c["id"] for c in load(data_dir / "validation.json")["checks"]] == CHECK_ORDER
     mocks = set()
     for loc in (l["id"] for l in site["locations"]):
         for kind in ("results", "ledger", "smap"):
             assert (data_dir / kind / f"{loc}.json").exists(), f"missing {kind}/{loc}.json"
         res = load(data_dir / "results" / f"{loc}.json")
+        assert res["scenario_id"] == "baseline"
+        for sid in scenario_ids:
+            sres = load(data_dir / "results" / f"{loc}__{sid}.json")
+            assert sres["scenario_id"] == sid and len(sres["sequences"]) == 216
         mocks.add(res["mock"])
         keys = {(s["rotation_id"], s["depth_id"], s["start_year"]) for s in res["sequences"]}
         assert len(keys) == 216, "need 3 rotations x 3 depths x 24 years, no duplicates"
