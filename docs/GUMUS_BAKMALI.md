@@ -194,7 +194,7 @@ OMER_BAKMALI §6'daki (b) seçeneği. Motor girdisi değişti; senden yalnız **
 - **Kanıt paneli:** `precip_vs_mgm` ham POWER–MGM karşılaştırmasını aynen tutuyor, sonuna "engine uses POWER × f" ve bir not ekliyor.
 - **Etki (orta derinlik, 24 yıl ortancası, scratch koşu):** faktörler Karaman 0,55 · Eskişehir 0,72 · Karapınar 0,73 · Boğazlıyan 0,88 … Nevşehir/Kaman 1,16. Karapınar nadas sonrası ekimde su 104 → 45 mm, buğday Ya/Ym 0,54 → 0,42; Kaman 62 → 95 mm. **Konya denemesine yaklaştı:** nohut/nadas 0,89 → 0,85 (deneme 0,80), mercimek/nadas 0,90 → 0,86 (deneme 0,87). Kütle dengesi geçiyor.
 - **Dikkat:** Karaman nadas su biriktirme verimi %30 çıktı, literatür aralığı %11–29'un hemen üstünde (`pse_literature`, info). Develi'nin istasyonu ~29 km uzakta (Kayseri Bölge); nokta taşıma turunda istasyon da değişecekse normal güncellenmeli.
-- [ ] `make data` (senaryolar dahil) — nokta taşımayla aynı turda yapman yeterli.
+- [x] `make data` (senaryolar dahil) — Ömer çalıştırdı (§23); taşımadan sonra tekrar gerekecek.
 
 ## 21. NDVI sulu nokta listesi — 13/13 ilçe (15 Kas)
 
@@ -227,3 +227,10 @@ AppEEARS SMAP isteği gelmediği için E1 kontrolü artık **SMAP yoksa MERRA-2'
 - **Sonuç (scratch, 2013-10 → 2026-09, 147 ay):** mevsim döngüsü ρ 0,88–0,99; aylık anomali ρ 0,25–0,57; en ıslak/kuru ay model ile MERRA-2 arasında en çok 1 ay fark (en kuru hep Ağustos).
 - [ ] **Sözleşme önerisi:** kontrol id'si `smap_anomaly` olarak kaldı (sözleşme bozulmasın diye). İstersen `soil_wetness_anomaly`'ye çevir; ben fonksiyon adını ona göre değiştiririm.
 - [ ] **Harita nem kutusu (isteğe bağlı):** kutu şu an "SMAP gelmedi, MERRA-2 ile karşılaştırılıyor, kanıt bölümüne bak" diyor. Kutuda grafik istersen `smap/{id}.json`'u MERRA-2'den üretebilirsin (`product` alanına MERRA-2 adını yaz, `cell_km` yerine 0,5° × 0,625°); `map` metnini ben güncelledim.
+
+## 23. `make data` Ömer tarafından çalıştırıldı (15 Kas, Gümüş'ün onayıyla)
+
+- `omer`'de, mevcut 13 noktayla (taşıma öncesi), senaryolar dahil; ~11 dk. 107 dosya, hepsi `web/public/data/` altında; `mock: false`.
+- Kapsadığı değişiklikler: yağış istasyon düzeltmesi (§20), ilçe adları, IMERG sütunu (§17), 6. kontrol MERRA-2 ile `info` (§22). 6 kontrol: 2 pass, 4 info.
+- Testler: motor 229, web 37 geçti; harita derleniyor.
+- [ ] Noktaları taşıdıktan sonra `make data` yine gerekecek (bu koşu taşıma öncesi noktalarla).
