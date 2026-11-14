@@ -29,6 +29,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) — 13 İç Anadolu lokasyonuna genişletme: WMO istasyon normalleri, ESA WorldCover ile tarla noktası seçimi, sözleşme açık lokasyon listesi, POWER/SoilGrids çekimi, gerçek veri, AppEEARS 13 nokta isteği — `engine/config/{locations,references,defaults}.yaml`, `docs/contract/`, `web/src/lib/{types,contract.test}.ts`, `data/**`, `web/public/data/**`
 - Claude Code (Opus 5.5) — README (teknik kısım: kurulum, komutlar, veri kaynakları, doğrulama, varsayımlar); kurulum temiz venv'de denendi — `README.md`
 - Claude Code (Opus 5.5) — para gösterimini kaldırıp karar modülüne geçiş: puan, verimlilik engelleri, öneri; referans verim kaynakları; metin ve sözleşme güncellemesi — `web/src/lib/{economics,economics.test,types,contract.test}.ts`, `engine/config/{defaults,rotations}.yaml`, `docs/contract/defaults.schema.json`, `docs/ARAYUZLER.md` §9, `AGENTS.md`
+- Claude Code (Opus 5.5) — PLAN_MVP güncellemesi: 13 ilçe, sitede para yok, karar modülü (§1–§8, Ek A) — `docs/PLAN_MVP.md`
 
 ## Ortak (plan ve görev dağılımı)
 - Claude — görev dağılımı, kişi rehberleri, arayüz sözleşmesi taslağı, proje özeti — `TASKS.md`, `AGENTS.md`, `docs/ARAYUZLER.md`, `docs/PROJE_OZETI.md`, `docs/team/*`

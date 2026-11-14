@@ -3,6 +3,7 @@
 > Read this file first. It is the single source of truth for the MVP.
 > Later additions live in `PLAN_EXPANSION.md`. Nothing from that file is built before milestone M3 is green.
 > This file supersedes the old `NOBETSU_BUILD_PLAN.md`.
+> **Updated 14 Nov 2026:** (1) 13 districts, one per Central Anatolian province (was 2 pilots); (2) **no money on the site** — the site recommends the most suitable rotation for the land; prices are only an internal parameter, and rotations that hurt productivity are blocked (§5.5, §5.9). Contract details: `docs/ARAYUZLER.md`.
 
 ---
 
@@ -18,22 +19,22 @@ The stack and the architecture are final from minute one (no throwaway prototype
 
 **Name:** NöbetSu
 **Challenge:** NASA Space Apps 2026 — *Field Shift: Adapting Farms with NASA Data*
-**Tagline:** *Fallow saves water but leaves the soil bare. See the trade-off — water, soil and lira — across 24 years of NASA climate.*
+**Tagline:** *Fallow saves water but leaves the soil bare. NöbetSu weighs water, soil, yield and what the farmer can earn across 24 years of NASA climate, and names the rotation that suits the land best.*
 
-**Problem.** After the 2025 drought and low 2026 grain prices, Central Anatolian farmers are again asking whether to leave land fallow for a year. On a one-season view, fallow always looks like a loss because it earns nothing. Its real value comes later: more stored soil water and a safer wheat crop the next year. But fallow has a soil cost too: the field sits bare and tilled for over a year. In Karapınar, fallow–cereal farming with heavy disc tillage is one of the causes the Ministry's Konya Soil, Water and Desertification Research Institute lists for the 1960s wind-erosion disaster. Nobody shows the water, soil and money sides of this decision together, with real climate data.
+**Problem.** After the 2025 drought and low 2026 grain prices, Central Anatolian farmers are again asking whether to leave land fallow for a year. On a one-season view, fallow always looks like a loss because it earns nothing. Its real value comes later: more stored soil water and a safer wheat crop the next year. But fallow has a soil cost too: the field sits bare and tilled for over a year. In Karapınar, fallow–cereal farming with heavy disc tillage is one of the causes the Ministry's Konya Soil, Water and Desertification Research Institute lists for the 1960s wind-erosion disaster. Nobody weighs the water, soil, yield and earnings sides of this decision together, with real climate data, and says which option suits a given piece of land.
 
-**What NöbetSu does.** For two pilot districts (Konya–Karapınar, Kayseri–Develi), three soil depth classes and three two-year rainfed rotations, it runs a daily FAO-56 soil water balance with NASA POWER weather for 24 historical sequences (2001–2024 start years). It then shows, for each rotation compared with the **current practice (fallow → wheat)**:
+**What NöbetSu does.** For 13 districts — one rainfed-farming district in each Central Anatolian province (Karapınar, Develi, Polatlı, Eskişehir, Aksaray, Karaman, Niğde, Nevşehir, Kaman, Kırıkkale, Çankırı, Gemerek, Boğazlıyan) — three soil depth classes and three two-year rainfed rotations, it runs a daily FAO-56 soil water balance with NASA POWER weather for 24 historical sequences (2001–2024 start years). It then shows, for each rotation compared with the **current practice (fallow → wheat)**:
 - **Water:** how much water each rotation leaves in the soil at wheat sowing, and in which months the wheat is usually under water or heat stress;
 - **Soil:** how many days the field lies bare, in which months, and how many of those days are windy with a dry surface (wind-exposure index); whether the rotation includes a nitrogen-fixing crop;
 - **Soil profile and minerals:** a regional soil card for each district (texture, pH, organic carbon, total nitrogen, CEC, bulk density, available water) from SoilGrids, each with its 90 % range and an "estimate, not your field" badge; a clear note that phosphorus, potassium and micronutrients cannot be estimated from satellites and need a soil test;
 - **Soil wetness and saturation:** how full the soil water store is month by month for each rotation (model), and, when NASA SMAP data has arrived, the regional root-zone wetness (degree of saturation) with its typical seasonal range and the latest value;
-- **Yield:** the range of wheat and legume yields that water allows (P10–P50–P90);
-- **Money:** the two-year gross margin range and the chance of a loss, using the farmer's own price, cost and support values (sourced defaults, editable);
-- **Where it flips:** soil depth × dry/normal/wet year;
+- **Yield:** the share of the attainable yield that water allows for wheat and the legume (P10–P50–P90), and the number of harvests in two years;
+- **Recommendation:** the rotation most suitable for this land under the farmer's priorities. Earnings are estimated **internally** (yield ratio × national reference yield × price + support) and balanced against wheat yield, soil protection and water. **No money is shown.** A rotation that cuts the next wheat below 85 % of after-fallow wheat, or whose first crop fails in the median year, is **blocked** whatever it would earn;
+- **Where it flips:** the recommended rotation for each soil depth × dry/normal/wet year;
 - **Why and what we don't know:** for each strategy, why it is on the list, what evidence supports it, its benefits, the information gaps and the risks a local expert should review.
-The farmer picks what matters most (save water, earn income, protect the soil) and the strategies are ranked by that priority.
+The farmer sets what matters most (earnings, wheat yield, soil, water); the site names the most suitable rotation, its main reason, the blocked options and whether the result is a close call.
 
-**What it is not.** It is not a yield forecast for one field, not a price forecast, not a fertiliser advisor and not a recommendation engine. It supports the farmer's judgment and local expertise; it does not replace them.
+**What it is not.** It is not a yield forecast for one field, not a price forecast and not a fertiliser advisor. Its recommendation is for a typical field in the district under 24 past climates, with its reasons shown; it supports the farmer's judgment and local expertise, it does not replace them.
 
 **Rotations (MVP).** The challenge asks for at least three strategies including the existing one.
 
@@ -47,8 +48,8 @@ All three start on the same day after a simulated wheat harvest and end at the n
 
 **Definition of done (MVP = milestone M3).**
 1. Public Vercel URL works on phone and laptop, in a private window.
-2. Real (non-mock) results for 2 locations × 3 rotations × 3 depth classes × 24 sequences, including the soil indicators (§5.8), the regional soil card and the soil-fullness curve (§5.10). SMAP wetness is shown if its data arrived by T+12; otherwise it moves to E1 and the card says "coming".
-3. Editable price, cost, support and Ym inputs, and a priority selector. Every number carries a source badge.
+2. Real (non-mock) results for 13 locations × 3 rotations × 3 depth classes × 24 sequences, including the soil indicators (§5.8), the regional soil card and the soil-fullness curve (§5.10). SMAP wetness is shown if its data arrived by T+12; otherwise it moves to E1 and the card says "coming".
+3. A recommendation per location and depth with its main reason, blocked options and close-call flag; priority sliders that re-rank live. **No money displayed.** Every displayed number carries a source badge.
 4. A strategy explanation (why / evidence / benefits / gaps / local review) for each rotation.
 5. Evidence panel with the five MVP checks (§5.7) and a short "satellite and model data vs ground stations" note.
 6. Public GitHub repo with README, AI-use disclosure and a one-command rebuild (`make data`).
@@ -60,7 +61,7 @@ All three start on the same day after a simulated wheat harvest and end at the n
 1. **No invented numbers.** Every parameter lives in a YAML file with `value`, `unit`, `source`, `type` and `verified`. If a value is not verified it is shown as "assumption" in the UI. Seed values in this plan are marked VERIFY.
 2. **Contract first.** The JSON contract in §4 is frozen at M0. A change needs agreement from the contract owner (Dev B) and a same-hour update to `web/src/lib/types.ts` and the mock files.
 3. **Mock flag.** Every JSON file has `"mock": true|false`. The site shows a visible banner while any loaded file is mock.
-4. **Honest wording.** Results are "for a typical field in the district, under 24 years of past climate, not your field's measured yield". Support totals are "gross, indicative, not an official eligibility decision". Never write "recommended", "best choice", "banned" or "profit guaranteed".
+4. **Honest wording.** Results are "for a typical field in the district, under 24 years of past climate, not your field's measured yield". The recommendation reads "Most suitable for this land under your priorities" and always shows its main reason, blocked options and close calls. **No TL, price, income, cost or profit is shown anywhere.** Never write "profit guaranteed", "certain" or "banned".
 5. **Badges.** Every displayed number has one of five types: `measured`, `model`, `official`, `literature`, `assumption`, plus `user` once edited.
 6. **Small PRs, green main.** `main` always builds and deploys. Each person works on their own branch and merges at least every 2 hours. Tests must pass before merge.
 7. **File ownership** (§3.3) prevents merge conflicts. Edit another person's files only after asking.
@@ -75,17 +76,17 @@ All three start on the same day after a simulated wheat harvest and end at the n
 ```
 NASA POWER API ──► engine/ (Python, offline batch) ──► web/public/data/*.json ──► web/ (static React site on Vercel)
                      ▲                                                               ▲
-     config/*.yaml (crops, locations, soil, defaults) ── Person D's verified values ──┘ economics computed in the browser (TS)
+     config/*.yaml (crops, locations, soil, defaults) ── Person D's verified values ──┘ decision computed in the browser (TS)
 ```
 
 - The Python engine computes **physical results only**: water, ETa/ETc and yield **ratios** (Ya/Ym, 0–1).
-- The browser turns ratios into kg/da and TL/da with the editable Ym, price, cost and support values. This keeps the economics interactive with no backend.
+- The browser scores each rotation and names the most suitable one (`economics.ts`, §5.5). Prices, supports and reference yields are internal parameters from `defaults.json`; no TL is displayed. The priority sliders keep it interactive with no backend.
 - No database, no server, no live API calls from the site in the MVP.
 
 ### 3.2 Stack (final)
 
 - **Engine:** Python 3.11+, `requests`, `numpy`, `pandas`, `pyyaml`, `pytest`. No pyfao56 in the MVP (see §5.3 for the reason; a cross-check is in the expansion plan).
-- **Web:** Vite + React + TypeScript + Tailwind + shadcn/ui + Recharts. `vitest` for the economics module.
+- **Web:** Vite + React + TypeScript + Tailwind + shadcn/ui + Recharts. `vitest` for the decision module.
 - **Hosting:** GitHub (public) + Vercel (auto-deploy from `main`, preview per branch).
 
 ### 3.3 Repo layout and owners
@@ -107,7 +108,7 @@ nobetsu/
 │   │   ├── crops.yaml        # calendars, Kcb, p, Zr, Ky                          — A (values from D)
 │   │   ├── soil.yaml         # AWC per location, depth classes, TEW/REW            — A
 │   │   ├── rotations.yaml    # baseline flag, soil traits, strategy explanations  — B (text from D)
-│   │   └── defaults.yaml     # Ym, price, cost, support per location × crop       — B (values from D)
+│   │   └── defaults.yaml     # decision parameters: reference yields, prices, supports (internal), weights, guardrails — B
 │   ├── nobetsu/
 │   │   ├── power.py          # fetch + cache NASA POWER                           — B
 │   │   ├── et0.py            # FAO-56 Penman–Monteith                             — A
@@ -122,7 +123,7 @@ nobetsu/
     ├── public/data/          # generated JSON (mock first, then real)            — B
     └── src/
         ├── lib/types.ts      # contract types                                     — B
-        ├── lib/economics.ts  # + economics.test.ts                                — B
+        ├── lib/economics.ts  # decision module + economics.test.ts               — B
         └── (everything else) # pages, components, charts, styles                 — C
 ```
 
@@ -229,20 +230,23 @@ Size: 3 rotations × 3 depths × 24 years = 216 rows per location.
 }
 ```
 
-### 4.4 `defaults.json`
+### 4.4 `defaults.json` (decision parameters, 14 Nov)
 
 ```jsonc
 {
-  "schema_version": "1.0", "mock": true,
-  "values": {
-    "karapinar": {
-      "wheat":    { "ym_kg_per_da": V, "price_tl_per_kg": V, "cost_tl_per_da": V, "support_tl_per_da": V },
-      "chickpea": { ... }, "lentil": { ... },
-      "fallow":   { "cost_tl_per_da": V, "support_tl_per_da": V }
-    },
-    "develi": { ... }
+  "schema_version": "1.0", "mock": false,
+  "crops": {
+    "wheat":    { "ref_yield_kg_per_da": V, "price_tl_per_kg": V, "support_tl_per_da": V },
+    "chickpea": { ... }, "lentil": { ... },
+    "fallow":   { "support_tl_per_da": V }
+  },
+  "decision": {
+    "weights":    { "value": V, "yield": V, "soil": V, "water": V },
+    "guardrails": { "min_wheat_ratio_vs_baseline": V, "min_first_crop_ratio": V },
+    "close_call_margin": V
   }
 }
+// National values, the same for every location. Prices and supports are INTERNAL parameters: never displayed.
 // V = { "value": number, "unit": "...", "source": "...", "source_url": "...",
 //       "type": "official|statistic|literature|assumption", "verified": boolean, "as_of": "YYYY-MM-DD" }
 ```
@@ -319,38 +323,42 @@ Every field has `source`; unverified fields set `verified: false`. No crop-speci
 ### 5.4 Yield (ratio only)
 
 - `Ya/Ym = max(0, 1 − Ky·(1 − ΣETa/ΣETc))` over the crop season (FAO-33). The engine outputs this ratio.
-- The browser multiplies by `Ym` (kg/da) from `defaults.json`. Default `Ym` = the district's high-percentile rainfed yield from TÜİK statistics (Person D), labelled `statistic`. Until delivered: `assumption`.
+- The site shows yields as this ratio ("54 % of the yield possible without water stress"). Inside the decision module the ratio is multiplied by a **national reference yield** per crop (TEPGE/TÜİK: wheat 296, chickpea 125, lentil 169 kg/da) only to compare earnings between crops; it is not a kg forecast.
 - **Do not multiply by a "previous crop" factor.** The fallow advantage in field trials is mostly water, which the model already computes. Applying a trial multiplier on top would count the same water twice. The trial numbers are used for validation instead (§5.7).
-- Label on every yield: "Expected range for a typical field in this district under 24 past climates. Not your field's measured yield."
+- Label on every yield: "Share of the attainable yield that water allowed, for a typical field in this district under 24 past climates. Not your field's measured yield."
 
-### 5.5 Economics (browser, `economics.ts`, pure functions + vitest)
+### 5.5 Decision (browser, `economics.ts`, pure functions + vitest) — replaces the money view (14 Nov)
 
-For each sequence:
-- `yield_kg_per_da = yield_ratio × Ym` for each crop;
-- `income = Σ yield × price + Σ support` (fallow: support only);
-- `net_2yr = income − Σ cost`.
+The site does not show money. It recommends the rotation most suitable for the land, aiming to earn the farmer more **without** giving up productivity.
 
-Across the 24 sequences per rotation × depth:
-- P10 / P50 / P90 of `net_2yr` (empirical percentiles; no Monte Carlo in the MVP);
-- loss probability = share of sequences with `net_2yr < 0`;
-- wheat break-even yield = `(cost − support) / price`.
+For each rotation at the chosen location and depth, over the 24 sequences (medians):
+- **value** (internal, never displayed): `Σ yield_ratio × ref_yield × price + Σ support` over the two years (fallow year: support only). Production costs are not included;
+- **yield:** median wheat yield ratio (the main crop);
+- **soil:** median wind-exposed bare days (fewer is better);
+- **water:** median plant-available water at wheat sowing.
 
-**Where it flips:** for each depth class × tercile of `pre_sowing_precip_mm` (dry / normal / wet, terciles over the 24 years per location), the rotation with the highest median `net_2yr` under the current inputs. Recompute live when inputs change.
+Each criterion is scaled to the best rotation (`x / best`; soil `best / x`) and summed with the priority weights (default value 0.40, yield 0.30, soil 0.20, water 0.10; `assumption`, user-adjustable).
 
-Unit tests: hand-computed example for one sequence; percentiles on a known array; break-even formula; flip table on a toy dataset.
+**Guardrails** (`defaults.yaml` → `decision.guardrails`): a rotation is **blocked** — never recommended, whatever it earns — if its median wheat yield ratio is below 0.85 × that after fallow, or if its first crop's median yield ratio is below 0.30. Farmers may plant the more lucrative option back-to-back; the tool will not recommend an option that wears down the main crop or fails most years.
 
-### 5.6 Defaults (Person D → `docs/SOURCES.md` → Dev B → `defaults.yaml`)
+Output (`decide`): recommended rotation, runner-up, **close call** when the top two eligible scores differ by less than 0.05, ranking with 0–1 parts, the main driver and block reasons. **No TL leaves the module.**
 
-| Value | Default source to find | Type |
+**Where it flips:** for each depth class × tercile of `pre_sowing_precip_mm` (dry / normal / wet, terciles over the 24 years per location), the recommended rotation for those years under the current priorities. Recomputed live when priorities change.
+
+Unit tests: hand-computed value for one sequence; percentiles on a known array; guardrail blocks a lucrative rotation that cuts the wheat; priorities change the answer; close call; no money-named fields and only 0–1 numbers in the output; flip table on a toy dataset.
+
+### 5.6 Decision parameters (Person D → `docs/SOURCES.md` → Dev B → `defaults.yaml`)
+
+| Value | Source | Type |
 |---|---|---|
-| Wheat price | TMO 2026 purchase price, 2nd group durum/bread as applicable (reported 16,500 TL/ton; VERIFY on TMO site) | official |
-| Chickpea, lentil price | TMO daily market bulletin or Konya Commodity Exchange daily bulletin | official / measured |
-| Cost per crop (TL/da, rent excluded) | Konya or Kayseri chamber of agriculture 2026 cost tables | literature |
-| Fallow cost (tillage passes) | same source | literature |
-| Support per crop and for fallow | Ministry support calculator `destekhesaplama.tarimorman.gov.tr` for both districts, rainfed | official |
-| Ym per crop | TÜİK district rainfed yields, 2004–2025, high percentile | statistic |
+| Wheat price | TMO 2026 purchase price, 2nd group (16,500 TL/ton) | official |
+| Chickpea price | Gönen Commodity Exchange bulletin, 2 Feb 2026 (Konya exchange not found) — least certain parameter | measured |
+| Lentil price | TMO 2026 green lentil purchase price (news) | official |
+| Supports | 2026 basic + planned production support, Sept 2026 update; fallow 0.3 × coefficient | official / assumption |
+| Reference yields | national averages, TEPGE reports (TÜİK): wheat 296, chickpea 125, lentil 169 kg/da | statistic |
+| Weights, guardrails, close-call margin | team decision 14 Nov | assumption |
 
-Anything not found by M3 stays `assumption` with an honest note. The user can edit every value in the UI.
+Production costs are **not used** (not sourced, and no money is shown). All values are internal parameters; the site never displays them.
 
 ### 5.7 Evidence panel (MVP checks)
 
@@ -402,10 +410,10 @@ The challenge is about soil health as much as water. These indicators come from 
 
 ### 5.9 Farmer priorities (browser, `economics.ts`)
 
-- Three priorities: **Save water** (median water at wheat sowing, higher is better; tie-break by wheat stress days), **Earn income** (median two-year net, tie-break by loss probability), **Protect soil** (median wind-exposed bare days, lower is better).
-- The farmer sets three weights (sliders summing to 100 %, default 34 / 33 / 33). Each metric is min–max scaled across the three rotations; the score is the weighted sum. Cards are sorted by score.
-- Wording: "Ranking under your priorities", never "recommended". Show which metric drove the ranking.
-- Unit tests: equal weights on a toy dataset; 100 % on each priority reproduces the single-metric order.
+- Four sliders: **Earnings** (internal value, §5.5), **Wheat yield**, **Protect soil**, **Save water**. Defaults 40 / 30 / 20 / 10 from `defaults.json`; the weights are normalised to sum to 1.
+- The recommendation and the flip grid re-compute live. Blocked rotations stay blocked whatever the weights.
+- Wording: "Most suitable for this land under your priorities: …". Show the main driver, blocked options with their reason, and "close call" when it applies.
+- Unit tests: see §5.5.
 
 ---
 
@@ -414,27 +422,28 @@ The challenge is about soil health as much as water. These indicators come from 
 **Feel:** a clean "agronomy field report", calm and readable, not a flashy dashboard. Light theme first, works on a phone. One page with anchored sections.
 
 **Sections, top to bottom:**
-1. **Header:** the question ("Fallow, chickpea or lentil before wheat?"), location toggle (Karapınar / Develi), depth class selector, the mock banner when needed.
-2. **Your priorities:** three sliders (save water / earn income / protect soil). Cards below re-sort live.
-3. **Three rotation cards**, the baseline marked "current practice", alternatives showing differences from it. Each card has four rows: **Water** (water at wheat sowing, median and P10–P90, mm and m³/da; 1 mm = 1 m³/da), **Soil** (bare days, wind-exposed bare days, N-fixing badge), **Yield** (wheat range, kg/da), **Money** (2-year net range TL/da, loss probability). A "Why this strategy?" button opens the strategy explanation: why / evidence (with links) / benefits / information gaps / ask a local expert about. Badges on every number.
+1. **Header:** the question ("Fallow, chickpea or lentil before wheat?"), location selector (13 districts grouped by province, from `site_index.locations`), depth class selector, the mock banner when needed.
+1b. **Recommendation card:** "Most suitable for this land under your priorities: X", its main driver, close-call note, and blocked options with their reason (§5.5).
+2. **Your priorities:** four sliders (earnings / wheat yield / protect soil / save water). The recommendation and cards re-sort live.
+3. **Three rotation cards**, the baseline marked "current practice", alternatives showing differences from it. Each card has four rows: **Water** (water at wheat sowing, median and P10–P90, mm and m³/da; 1 mm = 1 m³/da), **Soil** (bare days, wind-exposed bare days, N-fixing badge), **Yield** (wheat yield ratio range as %, first-crop ratio, harvests in two years). No money row. A "Why this strategy?" button opens the strategy explanation: why / evidence (with links) / benefits / information gaps / ask a local expert about. Badges on every number.
 3b. **Soil health section:**
    - *Your district's soil (regional estimate):* a compact card per property (texture triangle or bar, pH, organic carbon, total nitrogen, CEC, available water) with Q50 and the 90 % range, and one plain sentence on what each means for the rotations (e.g. low organic carbon → bare fallow and tillage matter more).
    - *What satellites can't tell you:* a fixed box: phosphorus, potassium, micronutrients and compaction need a soil test or a field check; link to how to get a soil test.
    - *How full is the soil?* `fullness_by_month` for the three rotations (median across years, P10–P90 band), 100 % line = field capacity.
    - *Regional wetness from NASA SMAP:* when `smap.available`, the typical seasonal wetness band and the latest value with its percentile ("wetter / drier than usual for November"); otherwise a "coming" placeholder.
-4. **Chart A — "24 climates, one decision":** per rotation, the 24 two-year nets as a strip plot with P10–P50–P90 marked, plus a zero line.
+4. **Chart A — "24 climates, one decision":** per rotation, the 24 wheat yield ratios as a strip plot with P10–P50–P90 marked.
 5. **Chart B — water ledger:** weekly available water over the 24 months for a selected start year (default: median year), the three rotations overlaid, crop periods shaded. Year selector.
 6. **Chart C — field calendar:** for each rotation, 24 month cells. Cell shade = share of years the field is bare that month; a marker shows months where wheat is under water stress in most years. Answers "when is the field bare, when is the crop vulnerable".
-7. **Where it flips:** a 3 × 3 grid (depth × dry/normal/wet) showing the rotation with the highest median two-year net in each cell under the current inputs.
-8. **Your numbers:** editable price, cost, support and Ym per crop, with source badge, `as_of` date and a "reset to defaults" button.
+7. **Where it flips:** a 3 × 3 grid (depth × dry/normal/wet) showing the recommended rotation in each cell under the current priorities, close calls marked.
+8. *(removed 14 Nov: no price/cost input panel; no money is shown.)*
 9. **Evidence:** the five checks with status chips and short notes, plus the satellite vs ground note.
 10. **Footer:** data sources (NASA POWER first), assumptions list (§5.3, §5.8), "this tool supports, it does not replace, farmer judgment and local expertise", AI-use link, GitHub link.
 
 **Glossary tooltips** (text from Person D, short and plain): evapotranspiration (ET, ET₀), water balance, available water, field capacity vs saturation, soil moisture anomaly, pH, organic carbon, CEC, P10/P50/P90, fallow storage efficiency, nitrogen fixation, wind exposure.
 
-**Rules:** all strings in `src/strings.ts` with `en` and `tr` keys (EN filled in the MVP; TR is expansion E4). Never render "recommended", "best" or "banned". Keep it accessible: colour is never the only signal.
+**Rules:** all strings in `src/strings.ts` with `en` and `tr` keys (EN filled in the MVP; TR is expansion E4). Never render TL, prices, income, costs or profit; never "profit guaranteed", "certain" or "banned". Keep it accessible: colour is never the only signal.
 
-**Build order for Dev C:** layout + header + cards on mock → Chart A → Chart B → inputs wired to `economics.ts` → priority sliders → strategy explanation drawer → Chart C → flip grid → evidence → glossary tooltips → footer → mobile pass. The soil health section goes in right after the priority sliders. If time is short at M3, drop in this order: flip grid → Chart C → SMAP panel (stays as placeholder). The strategy explanation, priority sliders, soil card and soil-fullness curve are not dropped.
+**Build order for Dev C:** layout + header + cards on mock → Chart A → Chart B → recommendation card wired to `economics.ts` → priority sliders → strategy explanation drawer → Chart C → flip grid → evidence → glossary tooltips → footer → mobile pass. The soil health section goes in right after the priority sliders. If time is short at M3, drop in this order: flip grid → Chart C → SMAP panel (stays as placeholder). The recommendation card, strategy explanation, priority sliders, soil card and soil-fullness curve are not dropped.
 
 ---
 
@@ -445,7 +454,7 @@ T0 = the moment everyone opens the repo. Example clock assumes T0 = Sat 15:00 an
 | Milestone | Time | Must be true |
 |---|---|---|
 | **M0 — Skeleton** | T+1 (16:00) | Repo, AGENTS.md, contract types, mock JSON for all contract files, Vercel shows the empty layout |
-| **M1 — Each part runs alone** | T+4 (19:00) | A: ET₀ test green, engine runs one sequence. B: POWER cached for both locations, `economics.ts` tests green. C: all sections render from mock on Vercel. D: first verified defaults in SOURCES.md |
+| **M1 — Each part runs alone** | T+4 (19:00) | A: ET₀ test green, engine runs one sequence. B: POWER cached for all locations, `economics.ts` tests green. C: all sections render from mock on Vercel. D: first verified defaults in SOURCES.md |
 | **M2 — End to end, real data** | T+9 (00:00) | `make data` produces real JSON for everything; site shows it; `mock: false`. **Tag `v0.1`. This is the safety net.** |
 | **M3 — MVP complete** | T+14 (05:00) | Evidence panel real, Person D's defaults in, flip grid, mobile pass, README. **Tag `v0.2` = demo version** |
 | Expansion window | T+14 → T+19 | Items from PLAN_EXPANSION.md in priority order, each on its own branch, merged only if green |
@@ -456,7 +465,7 @@ T0 = the moment everyone opens the repo. Example clock assumes T0 = Sat 15:00 an
 
 **Dev A — Engine & science (critical path).** et0.py, waterbalance.py, rotations.py, yieldmodel.py, validate.py, the soil and vulnerability indicators (§5.8), crops.yaml, soil.yaml, engine tests. Best fit: the strongest Python person. Use the most capable model with high effort for waterbalance.py only; normal effort for the rest.
 
-**Dev B — Data, contract, economics, delivery.** power.py, export.py, locations.yaml, rotations.yaml, defaults.yaml, mock JSON, types.ts, economics.ts (+ priority score, §5.9) with tests, Makefile, Vercel, README, merging. Owner of the contract. Transcribes Person D's values and texts.
+**Dev B — Data, contract, decision, delivery.** power.py, export.py, locations.yaml, rotations.yaml, defaults.yaml, mock JSON, types.ts, economics.ts (decision module, §5.5, §5.9) with tests, Makefile, Vercel, README, merging. Owner of the contract. Transcribes Person D's values and texts.
 
 **Dev C — Frontend.** Everything in `web/src/` except `lib/types.ts` and `lib/economics.ts`. Works only from the contract and mock files until M2.
 
@@ -471,9 +480,9 @@ T0 = the moment everyone opens the repo. Example clock assumes T0 = Sat 15:00 an
 - **Story spine:** Karapınar is where Turkey learned the soil cost of fallow (1960s dust storms; fallow–cereal farming with disc tillage is one of the official causes). Today drought and prices push farmers back to fallow for its water. NöbetSu shows both sides with NASA data.
 - **Hero sentence (fill from real results at M3):** "In Karapınar, on medium-depth soil, fallow left a median X mm more water at wheat sowing than chickpea — but kept the field bare for Y more days, Z of them windy and dry." Use only real numbers. If the result is not striking, open with the question instead of a number.
 - **30-second video:** 0–5 s the question and a Central Anatolian field; 5–12 s pick location, depth and priorities, the three cards; 12–22 s field calendar, Chart A and the flip grid; 22–26 s "Why this strategy?" drawer; 26–30 s "NASA POWER + FAO-56, 24 climates, open source" + URL. English subtitles.
-- **Slides (≤ 7):** problem (water vs soil vs income) → why one season lies → how (NASA POWER → FAO-56 → yield ratio → your prices and priorities) → the result → where it flips → evidence, gaps and limits → what's next (MUSTECH, more districts, SMAP, GRACE).
+- **Slides (≤ 7):** problem (water vs soil vs earnings) → why one season lies → how (NASA POWER → FAO-56 → yield ratio → priorities and guardrails → recommendation) → the result → where it flips → evidence, gaps and limits → what's next (MUSTECH, more districts, SMAP, GRACE).
 - **Challenge checklist (say it out loud in the pitch):** NASA Earth observations ✔ · local soil information (depth classes, regional soil card, soil fullness, SMAP wetness) ✔ · honest about what needs a lab (P, K) ✔ · crop characteristics ✔ · farmer priorities ✔ · ≥ 3 strategies including the existing one ✔ · why / evidence / benefits / gaps / risks per strategy ✔ · when fields are bare and when crops are vulnerable ✔ · uncertainty shown ✔ · supports, does not replace, local expertise ✔.
-- **Q&A prep:** "Why not a yield forecast?" "Why POWER and not stations?" "How do you know the water balance is right?" "Is the wind index an erosion measurement?" (no — exposure count) "Why no AI model?" (24 years × 2 districts is too little data for a learned model; a transparent physical model plus statistics is easier to check, and the uncertainty is visible) "What about snow and stubble?" "Why only two districts?" Answers come from §5 and the evidence panel.
+- **Q&A prep:** "Why not a yield forecast?" "Why POWER and not stations?" "How do you know the water balance is right?" "Is the wind index an erosion measurement?" (no — exposure count) "Why don't you show money?" (prices change every year and costs differ per farm; earnings are one weighted criterion, and options that hurt the wheat are blocked) "Why no AI model?" (24 years × 2 districts is too little data for a learned model; a transparent physical model plus statistics is easier to check, and the uncertainty is visible) "What about snow and stubble?" "Why these 13 districts?" (one rainfed district per Central Anatolian province, each near a WMO station) Answers come from §5 and the evidence panel.
 - **Submission checklist:** project page in English, demo link, GitHub link, video ≤ 30 s with subtitles or ≤ 7 slides, AI-use disclosure, NASA data named, all links tested in a private window.
 
 ---
@@ -512,12 +521,12 @@ Run one sequence (karapinar, fallow_wheat, medium, 2010) and print a mass-balanc
 Read docs/PLAN_MVP.md §4 and §6. Build the single-page site from the mock JSON only, in the build order in §6.
 Use shadcn/ui and Recharts. All strings in src/strings.ts (en filled, tr keys present). Show the mock banner.
 The baseline rotation is labelled "current practice"; alternatives show differences from it.
-Import economics from src/lib/economics.ts; do not reimplement it. Check the layout at 375 px width.
+Import the decision module from src/lib/economics.ts (decide, summarize, flipTable); do not reimplement it and never show TL. Check the layout at 375 px width.
 ```
 
 **Dev B (after M0, second task):**
 ```
-Read docs/PLAN_MVP.md §5.1, §5.5, §5.6 and §5.9. Implement power.py with caching, then economics.ts with the unit tests
+Read docs/PLAN_MVP.md §5.1, §5.5, §5.6 and §5.9. Implement power.py with caching, then economics.ts (decision module) with the unit tests
 listed in §5.5 and §5.9, then export.py that writes all five contract files from engine outputs. Validate every written file
 against web/src/lib/types.ts (a small zod or JSON-schema check in tests).
 Also: submit the AppEEARS SMAP request (§5.10) at T+1, and do the SoilGrids pull (§5.10) with a 45-minute timebox.
