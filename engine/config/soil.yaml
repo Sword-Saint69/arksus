@@ -83,6 +83,12 @@ awc_method:
   source: 'Team decision 14 Nov: SoilGrids AWC judged implausible for its own texture class; see comment above'
   type: assumption
   verified: false
+awc_cfvo_correction:
+  value: true
+  unit: '-'
+  source: 'Gümüş, docs/OMER_BAKMALI.md §2–3 (14 Nov): stones hold no water and Table 19 is for fine earth, so AWC × (1 − SoilGrids cfvo 0–100 cm). Set false to switch off'
+  type: assumption
+  verified: false
 texture_table:
   sand:
     awc_mm_per_m:

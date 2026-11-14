@@ -94,11 +94,23 @@ def usda_texture_class(clay_pct: float, sand_pct: float, silt_pct: float) -> str
     return "sandy_loam"
 
 
-def _soilgrids_texture(soilgrids: dict | None) -> dict | None:
-    """Q50 clay / sand / silt (%) from the SoilGrids card, or None if any is missing."""
+def _soilgrids_texture(soilgrids: dict | None) -> tuple[dict, str | None, str] | None:
+    """(clay/sand/silt %, USDA class from the file or None, depth label).
+
+    Prefers `texture_0_100cm` (whole profile, the roots reach 1 m); falls back to the Q50
+    0–30 cm soil-card properties. None if neither is complete.
+    """
+    t = (soilgrids or {}).get("texture_0_100cm")
+    if isinstance(t, dict):
+        try:
+            frac = {k: float(t[k]) for k in ("clay", "sand", "silt")}
+            cls = t.get("usda_class")
+            return frac, (str(cls).strip().lower().replace(" ", "_") if cls else None), "0–100 cm"
+        except (KeyError, TypeError, ValueError):
+            pass
     props = {p.get("id"): p for p in (soilgrids or {}).get("properties", [])}
     try:
-        return {k: float(props[k]["q50"]) for k in ("clay", "sand", "silt")}
+        return {k: float(props[k]["q50"]) for k in ("clay", "sand", "silt")}, None, "Q50 0–30 cm"
     except (KeyError, TypeError, ValueError):
         return None
 
@@ -122,28 +134,41 @@ def soil_setup(location_id: str, soilgrids: dict | None, soil_cfg: dict) -> tupl
     texture = _soilgrids_texture(soilgrids)
 
     if method == "texture_table" and texture is not None:
-        cls = usda_texture_class(texture["clay"], texture["sand"], texture["silt"])
+        frac_pct, file_cls, depth_label = texture
+        cls = file_cls or usda_texture_class(frac_pct["clay"], frac_pct["sand"], frac_pct["silt"])
         table_cls = cls
-        alias = (soil_cfg.get("texture_table_aliases") or {}).get(cls)
         if cls not in soil_cfg["texture_table"]:
+            alias = (soil_cfg.get("texture_table_aliases") or {}).get(cls)
             if alias is None:
                 raise KeyError(f"soil.yaml texture_table has no row or alias for {cls}")
             table_cls = alias["value"]
         row = soil_cfg["texture_table"][table_cls]
         ze = float(soil_cfg["evaporation"]["ze_m"]["value"])
         fc, wp = float(row["theta_fc"]["value"]), float(row["theta_wp"]["value"])
-        total = sum(texture.values())
-        frac = ", ".join(f"{k} {100 * v / total:.0f} %" for k, v in texture.items())
+        value = float(row["awc_mm_per_m"]["value"])
+
+        stones = ""
+        cfvo = (soilgrids or {}).get("cfvo_0_100cm_fraction")
+        if bool((soil_cfg.get("awc_cfvo_correction") or {}).get("value", False)) and isinstance(cfvo, dict) \
+                and cfvo.get("value") is not None:
+            value *= 1.0 - float(cfvo["value"])
+            stones = f" × (1 − coarse fragments {float(cfvo['value']):g}, SoilGrids cfvo 0–100 cm)"
+
+        total = sum(frac_pct.values())
+        frac = ", ".join(f"{k} {100 * v / total:.0f} %" for k, v in frac_pct.items())
         note = "" if table_cls == cls else f" ({cls.replace('_', ' ')} is not in Table 19; used {table_cls.replace('_', ' ')})"
-        dropped = ""
+        alts = []
         if isinstance(sg_awc, dict) and sg_awc.get("value") is not None:
-            dropped = (f". SoilGrids wv0033−wv1500 gave {sg_awc['value']:g} mm/m, not used: "
-                       "implausibly low for this texture class")
+            alts.append(f"SoilGrids wv0033−wv1500 {sg_awc['value']:g}")
+        sr = ((soilgrids or {}).get("awc_alternatives") or {}).get("saxton_rawls_2006")
+        if isinstance(sr, dict) and sr.get("value") is not None:
+            alts.append(f"Saxton–Rawls 2006 {sr['value']:g}")
+        alt_text = f". Not used (mm/m): {', '.join(alts)}" if alts else ""
         awc = {
-            "value": float(row["awc_mm_per_m"]["value"]),
+            "value": value,
             "unit": "mm/m",
-            "source": (f"FAO-56 Table 19, {cls.replace('_', ' ')}{note}: θFC − θWP range midpoint; "
-                       f"texture class from SoilGrids 2.0 Q50 0–30 cm ({frac}){dropped}"),
+            "source": (f"FAO-56 Table 19, {cls.replace('_', ' ')}{note}: θFC − θWP range midpoint {row['awc_mm_per_m']['value']:g} mm/m"
+                       f"{stones}; texture class from SoilGrids 2.0 {depth_label} ({frac}){alt_text}"),
             "type": "assumption",
             "verified": False,
         }

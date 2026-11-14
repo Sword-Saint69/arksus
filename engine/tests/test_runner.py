@@ -235,3 +235,32 @@ def test_run_location_with_texture_uses_table_awc(weather):
     out = runner.run_location("karapinar", weather, _sg(43.75, 11.03, 41.27), start_years=[2010])
     assert out["awc_used"]["value"] == load_config("soil")["texture_table"]["silty_clay"]["awc_mm_per_m"]["value"]
     assert out["diagnostics"]["max_mass_balance_error_mm"] < 0.01
+
+
+def _sg100(cls="silty clay", clay=48.6, sand=10.5, silt=41.0, cfvo=0.217):
+    sg = _sg(5.0, 90.0, 5.0)   # 0–30 cm says sand: must be ignored when 0–100 cm texture exists
+    sg["texture_0_100cm"] = {"clay": clay, "sand": sand, "silt": silt, "usda_class": cls, "source": "test"}
+    sg["cfvo_0_100cm_fraction"] = {"value": cfvo, "unit": "fraction (volume)", "source": "test", "type": "model",
+                                   "verified": False}
+    return sg
+
+
+def test_texture_0_100cm_is_preferred_and_cfvo_reduces_awc():
+    soil_cfg = load_config("soil")
+    awc, _ = runner.soil_setup("karapinar", _sg100(cfvo=0.217), soil_cfg)
+    table = soil_cfg["texture_table"]["silty_clay"]["awc_mm_per_m"]["value"]
+    assert awc["value"] == pytest.approx(table * (1 - 0.217))
+    assert "silty clay" in awc["source"] and "0.217" in awc["source"] and "0–100 cm" in awc["source"]
+
+
+def test_cfvo_correction_can_be_switched_off():
+    soil_cfg = load_config("soil")
+    soil_cfg["awc_cfvo_correction"]["value"] = False
+    awc, _ = runner.soil_setup("karapinar", _sg100(cfvo=0.217), soil_cfg)
+    assert awc["value"] == soil_cfg["texture_table"]["silty_clay"]["awc_mm_per_m"]["value"]
+
+
+def test_usda_class_name_from_file_maps_through_aliases():
+    soil_cfg = load_config("soil")
+    awc, _ = runner.soil_setup("develi", _sg100("clay loam", 39.7, 27.6, 32.6, cfvo=0.0), soil_cfg)
+    assert awc["value"] == soil_cfg["texture_table"]["silty_clay_loam"]["awc_mm_per_m"]["value"]

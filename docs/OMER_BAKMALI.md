@@ -17,12 +17,12 @@ Ters yön (Ömer → Gümüş): `docs/GUMUS_BAKMALI.md`. Yeni madde eklendikçe 
 Önerin **iki düzeltmeyle kabul**: doku SoilGrids'ten, AWC FAO-56 Tablo 19'dan. Sözleşme notu ARAYUZLER §3'te.
 
 **Senin dosyalarında (`soil.yaml`, `runner.py`) yapılacaklar:**
-- [ ] AWC'yi `data/soilgrids/{loc}.json` → `texture_0_100cm.usda_class` ile Tablo 19 orta değerinden al, **× (1 − `cfvo_0_100cm_fraction.value`)**. Taşlar su tutmaz; tablo değeri ince toprak içindir. Develi'de taş %21,7 → fark büyük.
-- [ ] `awc_mm_per_m` (SoilGrids doğrudan) artık **bilgi amaçlı**; motor onu kullanmasın. (Şu an `_awc_used` onu okuyor; sen değiştirene kadar M2 koşusu 58,6 / 67,4 ile çıkar.)
-- [ ] `awc_used`: `type: "literature"`, `verified: false`, kaynak: "SoilGrids dokusu (siltli kil) → FAO-56 Tablo 19, taş düzeltmeli".
-- [ ] **TEW / REW** da aynı doku sınıfından gelsin (şu an "loam" yazıyor). Hafızadan: siltli kil ve kil için TEW 22–29 mm, REW 8–12 mm (Ze = 0,10 m) — kitaptan teyit.
-- [ ] Develi **killi tın** Tablo 19'da yok. En yakın: siltli killi tın (0,13–0,18) ya da kil (0,12–0,20). Hangisini seçtiğini kaynağa yaz.
-- [ ] Sınıf → değer eşlemesi `soil.yaml`'da dursun (kodda `if` yok).
+- [x] AWC'yi `data/soilgrids/{loc}.json` → `texture_0_100cm.usda_class` ile Tablo 19 orta değerinden al, **× (1 − `cfvo_0_100cm_fraction.value`)**. Taşlar su tutmaz; tablo değeri ince toprak içindir. Develi'de taş %21,7 → fark büyük.
+- [x] `awc_mm_per_m` (SoilGrids doğrudan) artık **bilgi amaçlı**; motor onu kullanmasın. (Şu an `_awc_used` onu okuyor; sen değiştirene kadar M2 koşusu 58,6 / 67,4 ile çıkar.)
+- [x] `awc_used`: `type: "literature"`, `verified: false`, kaynak: "SoilGrids dokusu (siltli kil) → FAO-56 Tablo 19, taş düzeltmeli".
+- [x] **TEW / REW** da aynı doku sınıfından gelsin (şu an "loam" yazıyor). Hafızadan: siltli kil ve kil için TEW 22–29 mm, REW 8–12 mm (Ze = 0,10 m) — kitaptan teyit.
+- [x] Develi **killi tın** Tablo 19'da yok. En yakın: siltli killi tın (0,13–0,18) ya da kil (0,12–0,20). Hangisini seçtiğini kaynağa yaz.
+- [x] Sınıf → değer eşlemesi `soil.yaml`'da dursun (kodda `if` yok).
 
 **Veri (yeni çekim, 0–100 cm, ortalama haritalar):**
 
@@ -39,7 +39,7 @@ Ters yön (Ömer → Gümüş): `docs/GUMUS_BAKMALI.md`. Yeni madde eklendikçe 
 
 `omer` → `main` birleştirildi (151 test yeşil; gerçek havayla `build.py` uçtan uca çalıştı, 9 dosya şemadan geçti). AWC'yi dokudan alman tamam. Sen `main`'i 16:47'de çekmişsin; §2'deki karar ondan sonra geldiği için bir madde eksik kaldı:
 
-- [ ] **Taş (kaba parça) düzeltmesi:** `AWC = Tablo 19 orta değeri × (1 − cfvo)`. Taşlar su tutmaz, tablo değeri ince toprak içindir. `data/soilgrids/{loc}.json` → `cfvo_0_100cm_fraction.value`: Karapınar **0,033**, Develi **0,217**. Develi şu an 155 mm/m; düzeltmeyle ≈ **121**, Karapınar 160 → ≈ **155**. Düzeltme `soil.yaml`'da açılıp kapanabilir olsun (ör. `awc_cfvo_correction: true`), kaynak metnine "taş düzeltmeli (cfvo X)" eklensin.
-- [ ] (İsteğe bağlı) Doku sınıfı için 0–100 cm hazır: `texture_0_100cm.usda_class` (ortalama haritalar, 100'e ölçekli). Sen 0–30 cm Q50 kullanıyorsun; iki lokasyonda sonuç aynı sınıf (siltli kil / killi tın), değiştirmek şart değil — kök bölgesi 1 m'ye indiği için 0–100 cm daha tutarlı olur.
+- [x] **Taş (kaba parça) düzeltmesi:** `AWC = Tablo 19 orta değeri × (1 − cfvo)`. Taşlar su tutmaz, tablo değeri ince toprak içindir. `data/soilgrids/{loc}.json` → `cfvo_0_100cm_fraction.value`: Karapınar **0,033**, Develi **0,217**. Develi şu an 155 mm/m; düzeltmeyle ≈ **121**, Karapınar 160 → ≈ **155**. Düzeltme `soil.yaml`'da açılıp kapanabilir olsun (ör. `awc_cfvo_correction: true`), kaynak metnine "taş düzeltmeli (cfvo X)" eklensin.
+- [x] (İsteğe bağlı, yapıldı: motor artık `texture_0_100cm` kullanıyor, yoksa 0–30 cm Q50) Doku sınıfı için 0–100 cm hazır: `texture_0_100cm.usda_class` (ortalama haritalar, 100'e ölçekli). Sen 0–30 cm Q50 kullanıyorsun; iki lokasyonda sonuç aynı sınıf (siltli kil / killi tın), değiştirmek şart değil — kök bölgesi 1 m'ye indiği için 0–100 cm daha tutarlı olur.
 - Bilgi: `type: "assumption"` kullanman uygun; ARAYUZLER §3'ü buna göre düzelttim (`literature` yerine `assumption`).
 - Senin "SoilGrids'in kendi AWC'si de kartta gösterilsin" önerin: kabul. `awc_alternatives` dosyada var; İsmail'le kartta nasıl görüneceğine karar verince sözleşmeye eklerim.

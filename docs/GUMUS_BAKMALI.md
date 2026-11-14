@@ -88,3 +88,11 @@ Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı.
 - [ ] **Senin adımın:** `omer` main'e girince `make data` → `web/public/data`'yı commit et → `v0.1` etiketi (M2).
 - [ ] **Bilgi:** her `ledger/{loc}.json` 2,1 MB (mock ile aynı boyut); gzip'li ~0,12 MB. Vercel gzip/brotli ile sunduğu için sorun olmamalı; yine de İsmail lazy-load etsin (planda zaten öyle).
 - [ ] **Bilgi:** `validation.json` → `precip_vs_mgm` MGM normalleri gelene kadar `pending`; `smap/*.json` `available: false`.
+
+## 12. OMER_BAKMALI §2–3 uygulandı (14 Kas, `omer`)
+
+- Taş düzeltmesi eklendi: `AWC = Tablo 19 orta × (1 − cfvo_0_100cm_fraction)`, `soil.yaml` → `awc_cfvo_correction: true` ile açılıp kapanıyor. Doku sınıfı artık `texture_0_100cm.usda_class`'tan (yoksa 0–30 cm Q50 + USDA üçgeni).
+- Sonuç: **Karapınar 154,7 mm/m**, **Develi 121,4 mm/m**. `awc_used.source` metni kullanılmayan alternatifleri de yazıyor (SoilGrids doğrudan, Saxton–Rawls).
+- `trial_ratio` değer satırına "soil available water used: X mm/m" ve notuna "sonuç AWC'ye çok bağlı, alternatifler toprak kartında" eklendi (yeni check id'si yok).
+- `make data` yeniden koşuldu (geçici klasöre): 9 dosya şemadan geçti.
+- [ ] **Senin tarafın (export):** `results.soil.awc_mm_per_m.value` yuvarlanmadan yazılıyor (Develi `121.36500000000001`). ARAYUZLER §10'a göre yuvarlama export'ta; `awc_mm_per_m.value`'yu da 1 ondalığa yuvarlar mısın?

@@ -101,3 +101,8 @@ def test_power_annual_mean_uses_complete_years_only(weathers):
     w = weathers["karapinar"]
     full = w.loc["2000-01-01":"2025-12-31", "precip_mm"]
     assert validate.power_annual_mean_mm(w) == pytest.approx(full.sum() / 26)
+
+
+def test_trial_ratio_mentions_awc_used(outputs, weathers, refs):
+    c = _by_id(validate.run_checks(outputs, weathers, refs))["trial_ratio"]
+    assert "mm/m" in c["value"]
