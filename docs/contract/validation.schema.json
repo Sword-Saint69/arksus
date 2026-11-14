@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/validation.schema.json",
+  "title": "validation",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": [
+              "mass_balance",
+              "et0_fao56_ex18",
+              "pse_literature",
+              "trial_ratio",
+              "precip_vs_mgm"
+            ]
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "info",
+              "pending"
+            ]
+          },
+          "value": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "object",
+            "properties": {
+              "en": {
+                "type": "string"
+              },
+              "tr": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "en",
+              "tr"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "value",
+          "reference",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 5,
+      "maxItems": 5
+    }
+  },
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "checks"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,409 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/site_index.schema.json",
+  "title": "site_index",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "power_range": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "additionalProperties": false
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": [
+              "karapinar",
+              "develi"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "district": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "lat": {
+            "type": "number"
+          },
+          "lon": {
+            "type": "number"
+          },
+          "elevation_m": {
+            "type": "number"
+          },
+          "note": {
+            "type": "object",
+            "properties": {
+              "en": {
+                "type": "string"
+              },
+              "tr": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "en",
+              "tr"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "district",
+          "province",
+          "lat",
+          "lon",
+          "elevation_m",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "rotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": [
+              "fallow_wheat",
+              "chickpea_wheat",
+              "lentil_wheat"
+            ]
+          },
+          "is_baseline": {
+            "type": "boolean"
+          },
+          "crops": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "fallow",
+                "wheat",
+                "chickpea",
+                "lentil"
+              ]
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "label": {
+            "type": "object",
+            "properties": {
+              "en": {
+                "type": "string"
+              },
+              "tr": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "en",
+              "tr"
+            ],
+            "additionalProperties": false
+          },
+          "soil_traits": {
+            "type": "object",
+            "properties": {
+              "n_fixing": {
+                "type": "boolean"
+              },
+              "tillage_passes": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "unit": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "source_url": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "measured",
+                      "model",
+                      "official",
+                      "statistic",
+                      "literature",
+                      "assumption",
+                      "user"
+                    ]
+                  },
+                  "verified": {
+                    "type": "boolean"
+                  },
+                  "as_of": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value",
+                  "unit",
+                  "source",
+                  "type",
+                  "verified"
+                ],
+                "additionalProperties": false
+              },
+              "note": {
+                "type": "object",
+                "properties": {
+                  "en": {
+                    "type": "string"
+                  },
+                  "tr": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "en",
+                  "tr"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "n_fixing",
+              "tillage_passes",
+              "note"
+            ],
+            "additionalProperties": false
+          },
+          "strategy": {
+            "type": "object",
+            "properties": {
+              "why": {
+                "type": "object",
+                "properties": {
+                  "en": {
+                    "type": "string"
+                  },
+                  "tr": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "en",
+                  "tr"
+                ],
+                "additionalProperties": false
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "object",
+                      "properties": {
+                        "en": {
+                          "type": "string"
+                        },
+                        "tr": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "en",
+                        "tr"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "source"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "benefits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "en": {
+                      "type": "string"
+                    },
+                    "tr": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "en",
+                    "tr"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "gaps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "en": {
+                      "type": "string"
+                    },
+                    "tr": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "en",
+                    "tr"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "local_review": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "en": {
+                      "type": "string"
+                    },
+                    "tr": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "en",
+                    "tr"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "why",
+              "evidence",
+              "benefits",
+              "gaps",
+              "local_review"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "is_baseline",
+          "crops",
+          "label",
+          "soil_traits",
+          "strategy"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "depth_classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": [
+              "shallow",
+              "medium",
+              "deep"
+            ]
+          },
+          "depth_m": {
+            "type": "number"
+          },
+          "label": {
+            "type": "object",
+            "properties": {
+              "en": {
+                "type": "string"
+              },
+              "tr": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "en",
+              "tr"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "depth_m",
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "start_years": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    }
+  },
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "power_range",
+    "locations",
+    "rotations",
+    "depth_classes",
+    "start_years"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/smap.schema.json",
+  "title": "smap",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "location_id": {
+      "enum": [
+        "karapinar",
+        "develi"
+      ]
+    },
+    "available": {
+      "type": "boolean"
+    },
+    "product": {
+      "type": "string"
+    },
+    "cell_km": {
+      "type": "number"
+    },
+    "latest": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "rootzone_wetness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rootzone_m3m3": {
+              "type": "number"
+            },
+            "percentile_for_month": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "date",
+            "rootzone_wetness",
+            "rootzone_m3m3",
+            "percentile_for_month"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "monthly_climatology": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "p10": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "p50": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "p90": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "month",
+          "p10",
+          "p50",
+          "p90"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "monthly_series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "month_start": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "rootzone_wetness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "surface_wetness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "month_start",
+          "rootzone_wetness",
+          "surface_wetness"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "location_id",
+    "available",
+    "product",
+    "cell_km",
+    "latest",
+    "monthly_climatology",
+    "monthly_series"
+  ],
+  "additionalProperties": false
+}

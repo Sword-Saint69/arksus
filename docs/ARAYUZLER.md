@@ -105,6 +105,11 @@ cost_tl_per_da:
   as_of: "2026-11-14"
 ```
 
+**M0 netleştirmeleri (Gümüş):**
+- `value: null` = değer henüz kaynaklı değil (**pending**). Sitede sayı yerine "bekleniyor" gösterilir; `economics.ts` bunu 0 sayar. Mock build'de pending değerler sahte sayıyla ve `source: "MOCK ..."` ile doldurulur.
+- `soil.yaml` (Ömer) derinlik sınıflarını `depth_classes: [{id, depth_m, label: {en, tr}}]` olarak tutar (`depth_m` sayı veya V). Dosya yoksa export PLAN_MVP §4.1'deki 0.6 / 0.9 / 1.2 m değerlerini kullanır.
+- `references.yaml` anahtarları (Ömer `validate.py`'de bunları okur): `trial_yields_kg_per_da.{after_fallow, after_lentil, after_chickpea}`, `pse_range.{low, high}` (oran, 0–1), `mgm_annual_precip_mm.{karapinar, develi}` (+ `station`), `heat_threshold_c`. Hepsi V.
+
 Derinlik sınıfı id'leri sabit: `shallow`, `medium`, `deep`. Rotasyon id'leri sabit: `fallow_wheat`, `chickpea_wheat`, `lentil_wheat`. Lokasyon id'leri sabit: `karapinar`, `develi`. Ürün id'leri sabit: `wheat`, `chickpea`, `lentil`, `fallow`.
 
 ---
@@ -154,7 +159,9 @@ def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs:
 
 ```python
 # engine/nobetsu/export.py
-def write_all(outputs: dict[str, dict], checks: list[dict], mock: bool, out_dir: str = "web/public/data") -> None: ...
+def write_all(outputs: dict[str, dict], checks: list[dict], mock: bool, out_dir: str = "web/public/data",
+              weather_meta: dict[str, dict] | None = None) -> None: ...
+# weather_meta = {loc: load_weather(loc).attrs} → site_index.locations[].elevation_m ve power_range
 
 # engine/nobetsu/build.py   →  make data  /  make mock
 #   for loc in locations: w = load_weather(loc); s = soilgrids json; out[loc] = run_location(loc, w, s)
@@ -176,7 +183,7 @@ Biçim: PLAN_MVP §4. Dosyalar `web/public/data/` altında:
 | `results/{location_id}.json` | lokasyon seçilince |
 | `defaults.json` | sayfa açılınca |
 | `validation.json` | sayfa açılınca |
-| `smap/{location_id}.json` | lokasyon seçilince (**her zaman vardır**; veri yoksa `available: false`) |
+| `smap/{location_id}.json` | lokasyon seçilince (**her zaman vardır**; veri yoksa `available: false`, `latest: null`, listeler boş). Mock'ta Karapınar `available: true`, Develi `false` (iki UI durumu da denenebilsin) |
 | `ledger/{location_id}.json` | Grafik B görünür olunca (lazy) |
 
 Netleştirmeler:

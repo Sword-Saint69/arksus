@@ -1,0 +1,77 @@
+# Owner: Gümüş (Rol B); values from Muhammet via docs/SOURCES.md (ref.*). Read by validate.run_checks (Ömer).
+# Values quoted in PLAN_MVP are "reported" and NOT yet verified against the papers (verified: false).
+# value: null = not available -> the related check returns status "pending".
+
+trial_yields_kg_per_da:          # Konya dryland previous-crop trial (PLAN_MVP §5.7, check: trial_ratio)
+  years: "2011–2014"
+  after_fallow:
+    value: 286
+    unit: "kg/da"
+    source: "Konya kuru koşul ön bitki denemesi, PLAN_MVP §5.7'de raporlanan değer — Muhammet makaleden doğrulayacak (ref.trial)"
+    source_url: ""
+    type: literature
+    verified: false
+    as_of: ""
+  after_lentil:
+    value: 249
+    unit: "kg/da"
+    source: "Konya kuru koşul ön bitki denemesi, PLAN_MVP §5.7'de raporlanan değer — Muhammet makaleden doğrulayacak (ref.trial)"
+    source_url: ""
+    type: literature
+    verified: false
+    as_of: ""
+  after_chickpea:
+    value: 228
+    unit: "kg/da"
+    source: "Konya kuru koşul ön bitki denemesi, PLAN_MVP §5.7'de raporlanan değer — Muhammet makaleden doğrulayacak (ref.trial)"
+    source_url: ""
+    type: literature
+    verified: false
+    as_of: ""
+
+pse_range:                       # fallow (precipitation) storage efficiency, Central Anatolia (check: pse_literature)
+  low:
+    value: 0.08
+    unit: "fraction"
+    source: "Orta Anadolu nadas su depolama verimi, PLAN_MVP §5.7'de raporlanan ~%8–30 — Muhammet doğrulayacak (ref.pse)"
+    source_url: ""
+    type: literature
+    verified: false
+    as_of: ""
+  high:
+    value: 0.30
+    unit: "fraction"
+    source: "Orta Anadolu nadas su depolama verimi, PLAN_MVP §5.7'de raporlanan ~%8–30 — Muhammet doğrulayacak (ref.pse)"
+    source_url: ""
+    type: literature
+    verified: false
+    as_of: ""
+
+mgm_annual_precip_mm:            # MGM 1991–2020 normal at the nearest station (check: precip_vs_mgm)
+  karapinar:
+    station: ""
+    value: null
+    unit: "mm/year"
+    source: "pending: SOURCES.md ref.mgm.karapinar"
+    source_url: ""
+    type: official
+    verified: false
+    as_of: ""
+  develi:
+    station: ""
+    value: null
+    unit: "mm/year"
+    source: "pending: SOURCES.md ref.mgm.develi"
+    source_url: ""
+    type: official
+    verified: false
+    as_of: ""
+
+heat_threshold_c:                # T2M_MAX threshold for heat days at wheat flowering (PLAN_MVP §5.8)
+  value: 30
+  unit: "°C"
+  source: "PLAN_MVP §5.8 literatür eşiği (VERIFY) — Muhammet doğrulayacak (ref.heat)"
+  source_url: ""
+  type: literature
+  verified: false
+  as_of: ""
