@@ -6,6 +6,8 @@ import { Header } from '@/sections/Header';
 import { Recommendation } from '@/sections/Recommendation';
 import { Priorities } from '@/sections/Priorities';
 import { RotationCards } from '@/sections/RotationCards';
+import { SoilHealth } from '@/sections/SoilHealth';
+import { ChartA } from '@/sections/ChartA';
 import { MockBanner } from '@/components/MockBanner';
 import { initialLang, saveLang, t, tx, type Lang } from '@/strings';
 import { PRECIP_WARN_PCT, precipGapPct } from '@/utils/precip';
@@ -84,6 +86,12 @@ export default function App() {
             <Recommendation site={index} decision={computed.decision} robustness={computed.robustness} lang={lang} />
             <Priorities weights={w} defaults={inputs.weights} lang={lang} onChange={setWeights} />
             <RotationCards site={index} summaries={computed.summaries} decision={computed.decision} lang={lang} />
+          </>
+        )}
+        {loc.status === 'ready' && (
+          <>
+            <SoilHealth site={index} results={loc.data.results} smap={loc.data.smap} depthId={depthId} lang={lang} />
+            <ChartA site={index} results={loc.data.results} depthId={depthId} lang={lang} />
           </>
         )}
         <p className="text-sm text-faint">{t(lang, 'comingNext')}</p>

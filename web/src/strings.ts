@@ -30,7 +30,7 @@ export const S = {
     en: 'Regional result for a typical rainfed field of the district, not your field.',
     tr: 'İlçenin tipik bir kuru tarım tarlası için bölgesel sonuç; sizin tarlanız değil.',
   },
-  comingNext: { en: 'Charts, soil health and evidence arrive in the next milestones.', tr: 'Grafikler, toprak sağlığı ve kanıt paneli sonraki aşamalarda gelecek.' },
+  comingNext: { en: 'Water ledger, field calendar, flip grid and evidence arrive in the next milestones.', tr: 'Su defteri, tarla takvimi, flip ızgarası ve kanıt paneli sonraki aşamalarda gelecek.' },
   supports: {
     en: 'This tool supports, it does not replace, farmer judgment and local expertise.',
     tr: 'Bu araç çiftçinin ve yerel uzmanın kararını destekler, yerine geçmez.',
@@ -108,9 +108,58 @@ export const S = {
   benefits: { en: 'Benefits', tr: 'Faydaları' },
   gaps: { en: 'What we do not know', tr: 'Bilmediklerimiz' },
   localReview: { en: 'Ask a local expert about', tr: 'Yerel uzmana danışın' },
+
+  // Soil health (PLAN_MVP §6 3b)
+  soilTitle: { en: 'Soil health', tr: 'Toprak sağlığı' },
+  soilCard: { en: "Your district's soil (regional estimate)", tr: 'İlçenizin toprağı (bölgesel tahmin)' },
+  soilCardSub: { en: 'SoilGrids 2.0, {d}. Median with the 90 % range. An estimate for the district, not your field.', tr: 'SoilGrids 2.0, {d}. Ortanca ve %90 aralığı. İlçe için tahmin, sizin tarlanız değil.' },
+  texture: { en: 'Texture class (0–100 cm)', tr: 'Doku sınıfı (0–100 cm)' },
+  awc: { en: 'Available water the model uses', tr: 'Modelin kullandığı yarayışlı su' },
+  awcAlt: { en: 'Other estimates (not used): {list}', tr: 'Diğer tahminler (kullanılmadı): {list}' },
+  awc_soilgrids_wv0033_wv1500: { en: 'SoilGrids', tr: 'SoilGrids' },
+  awc_saxton_rawls_2006: { en: 'Saxton–Rawls', tr: 'Saxton–Rawls' },
+  notRemote: { en: "What satellites can't tell you", tr: 'Uydunun söyleyemedikleri' },
+  notRemoteBody: { en: 'These need a soil test or a check in the field. Ask your provincial agriculture directorate or a soil laboratory.', tr: 'Bunlar için toprak analizi ya da tarlada kontrol gerekir. İl tarım müdürlüğüne ya da bir toprak laboratuvarına danışın.' },
+  nr_phosphorus: { en: 'phosphorus', tr: 'fosfor' },
+  nr_potassium: { en: 'potassium', tr: 'potasyum' },
+  nr_micronutrients: { en: 'micronutrients', tr: 'mikro besinler' },
+  nr_compaction: { en: 'compaction', tr: 'sıkışma' },
+  fullTitle: { en: 'How full is the soil?', tr: 'Toprak ne kadar dolu?' },
+  fullSub: { en: 'Share of the soil water store filled at each month end, median of {n} years with the P10–P90 band. 100 % = field capacity.', tr: 'Her ay sonunda toprak su deposunun dolu payı; {n} yılın ortancası ve P10–P90 bandı. %100 = tarla kapasitesi.' },
+  year1: { en: 'Year 1', tr: '1. yıl' },
+  year2: { en: 'Year 2', tr: '2. yıl' },
+  fieldCapacity: { en: 'field capacity', tr: 'tarla kapasitesi' },
+  smapTitle: { en: 'Regional wetness from NASA SMAP', tr: 'NASA SMAP ile bölgesel nem' },
+  smapComing: { en: 'Coming: SMAP root-zone data for this district has not arrived yet.', tr: 'Yakında: Bu ilçe için SMAP kök bölgesi verisi henüz gelmedi.' },
+  smapLatest: { en: 'Latest ({date}): {w} % wet, {pct}th percentile for this month.', tr: 'Son değer ({date}): %{w} nemli; bu ay için {pct}. yüzdelik.' },
+  showTable: { en: 'Show as a table', tr: 'Tablo olarak göster' },
+  month: { en: 'Month', tr: 'Ay' },
+  median: { en: 'median', tr: 'ortanca' },
+
+  // Chart A
+  chartATitle: { en: '24 climates, one decision', tr: '24 iklim, tek karar' },
+  chartASub: {
+    en: 'Each dot is one start year: wheat yield as a share of what enough water would allow. The bar marks the median, the dashes P10 and P90.',
+    tr: 'Her nokta bir başlangıç yılı: buğday verimi, su yeterli olsaydı alınabilecek verimin yüzdesi olarak. Çizgi ortancayı, kesikli çizgiler P10 ve P90’ı gösterir.',
+  },
+  startYear: { en: 'Start year', tr: 'Başlangıç yılı' },
+  wheatYieldPct: { en: 'Wheat yield (% of water-limited)', tr: 'Buğday verimi (su sınırlı verimin %)' },
 } as const satisfies Record<string, T>;
 
 export type Key = keyof typeof S;
+
+/** USDA texture classes (results.soil.texture_class is the English USDA name). */
+const TEXTURE_TR: Record<string, string> = {
+  clay: 'kil', 'silty clay': 'siltli kil', 'sandy clay': 'kumlu kil', 'clay loam': 'killi tın',
+  'silty clay loam': 'siltli killi tın', 'sandy clay loam': 'kumlu killi tın', loam: 'tın', 'silt loam': 'siltli tın',
+  'sandy loam': 'kumlu tın', silt: 'silt', 'loamy sand': 'tınlı kum', sand: 'kum',
+};
+export function textureName(lang: Lang, cls: string): string {
+  return lang === 'tr' ? TEXTURE_TR[cls.toLowerCase()] ?? cls : cls;
+}
+
+/** For keys built from data (e.g. `nr_${id}`): fall back to the raw id when no string exists. */
+export const hasKey = (k: string): k is Key => k in S;
 
 export function t(lang: Lang, key: Key, vars?: Record<string, string | number>): string {
   let s: string = S[key][lang];
