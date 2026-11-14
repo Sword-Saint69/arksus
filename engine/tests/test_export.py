@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 from nobetsu import build, export
-from test_contract import check_invariants, validate_dir
+from tests.test_contract import check_invariants, validate_dir
 
 
 def test_mock_build_writes_valid_contract(tmp_path):

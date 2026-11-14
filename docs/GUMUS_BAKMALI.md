@@ -18,7 +18,7 @@ Yeni madde eklendikçe en alta tarihle yazılır.
   ```
 
   Şu an sadece `cd engine && python -m pytest` ile çalışıyor.
-- [ ] pandas 3.x ile test edildi (3.1.1). Daha eski sürüme sabitlersen haber ver; `DatetimeIndex.day_of_year` kullanılıyor.
+- [x] pandas 3.x ile test edildi (3.1.1). Daha eski sürüme sabitlersen haber ver; `DatetimeIndex.day_of_year` kullanılıyor.
 
 ## 2. `engine/nobetsu/__init__.py`
 
@@ -34,9 +34,9 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 
 ## 5. `power.load_weather()` — motorun beklediği
 
-- [ ] `df.attrs["lat"]` **derece** ve `df.attrs["elevation_m"]` zorunlu; eksikse `et0_from_weather` `KeyError` verir.
-- [ ] ET₀ şu sütunları kullanıyor: `tmax_c, tmin_c, tdew_c, u2_ms, rs_mj_m2`. Nem için `tdew_c` kullanılıyor (`rh_pct` değil). NaN görürse `ValueError` verir.
-- [ ] `rs_mj_m2` gerçekten MJ/m²/gün olmalı. POWER başlığı kWh/m²/gün derse × 3,6 ile çevir.
+- [x] `df.attrs["lat"]` **derece** ve `df.attrs["elevation_m"]` zorunlu; eksikse `et0_from_weather` `KeyError` verir.
+- [x] ET₀ şu sütunları kullanıyor: `tmax_c, tmin_c, tdew_c, u2_ms, rs_mj_m2`. Nem için `tdew_c` kullanılıyor (`rh_pct` değil). NaN görürse `ValueError` verir.
+- [x] `rs_mj_m2` gerçekten MJ/m²/gün olmalı. POWER başlığı kWh/m²/gün derse × 3,6 ile çevir.
 
 ## 6. Ömer'in hazır verdiği
 
@@ -48,9 +48,9 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [x] **`nobetsu/config.py`** → `load("crops")` ve `load("soil")` YAML'ı **olduğu gibi düz `dict`** döndürmeli (V nesnelerini açma, `value`'ya indirgeme). Motor `cfg["wheat"]["kcb_mid"]["value"]` diye okuyor. Şimdilik testler `tests/fixtures.load_config()` ile aynı işi yapıyor; `config.py` gelince `runner.py` onu kullanacak.
 - [x] **`rotations.yaml`** → `crops` listesi tam 2 eleman, `[ilk yıl, ana ürün]` sırasıyla ve id'ler `crops.yaml`'daki anahtarlarla aynı olmalı: `["fallow","wheat"]`, `["chickpea","wheat"]`, `["lentil","wheat"]`. Motor son elemanı ana ürün (spin-up + 2. yıl) sayıyor.
 - [x] **`site_index.depth_classes`** → `engine/config/soil.yaml` içindeki `depth_classes` listesinden oku (id, depth_m, label sözleşmedekiyle aynı yazıldı).
-- [ ] **`load_weather()` aralığı** → her sekans 1 Ekim `y−1`'de başlıyor ve son buğday hasadına kadar sürüyor. 2001 sekansı için **2000-10-01**, 2024 sekansı için **2026-07-12**'ye kadar veri şart (şu anki takvimle). Eksikse `daily_inputs` `ValueError` verir.
-- [ ] **`data/soilgrids/{loc}.json`** → `awc_mm_per_m.value` gelmezse motor `soil.yaml`'daki yedek değeri (150 mm/m, `assumption`) kullanacak.
-- [ ] **Bilgi (sözleşme netleştirmesi, değişiklik değil):** `ledger.weeks` her seride **104 hafta** (1 Temmuz `y`'den başlayan, 24 aylık pencerenin içine tam sığan 7 günlük bloklar; Haziran `y+2`'nin son 2–3 günü dışarıda kalır). Şemada `weeks` uzunluğunu 104 olarak sabitleyebilirsin. Farklı istiyorsan Ömer'e yaz.
+- [x] **`load_weather()` aralığı** → her sekans 1 Ekim `y−1`'de başlıyor ve son buğday hasadına kadar sürüyor. 2001 sekansı için **2000-10-01**, 2024 sekansı için **2026-07-12**'ye kadar veri şart (şu anki takvimle). Eksikse `daily_inputs` `ValueError` verir.
+- [x] **`data/soilgrids/{loc}.json`** → `awc_mm_per_m.value` gelmezse motor `soil.yaml`'daki yedek değeri (150 mm/m, `assumption`) kullanacak.
+- [x] **Bilgi (sözleşme netleştirmesi, değişiklik değil):** `ledger.weeks` her seride **104 hafta** (1 Temmuz `y`'den başlayan, 24 aylık pencerenin içine tam sığan 7 günlük bloklar; Haziran `y+2`'nin son 2–3 günü dışarıda kalır). Şemada `weeks` uzunluğunu 104 olarak sabitleyebilirsin. Farklı istiyorsan Ömer'e yaz.
 - [ ] **Bilgi:** aylık listeler (24 eleman) 1 Temmuz `y` → 30 Haziran `y+2` penceresini kapsıyor; buğday hasadı ~12 Temmuz `y+2` olduğu için buğdayın `eta_mm / etc_mm / stress_days` toplamları pencerenin 12 gün dışına taşıyor (sezonun tamamı sayılıyor). Sözleşmede buna aykırı bir şey yok, haberin olsun.
 
 ## 8. `runner.run_location()` hazır (14 Kas, `omer/runner`)
@@ -59,7 +59,7 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [x] **`references.yaml`** → sıcak gün eşiği: motor senin sözleşmendeki `heat_threshold_c` anahtarını okuyor (Ömer kendi tarafını düzeltti). Anahtar yoksa 30 °C ile devam eder ve uyarı basar.
 - [x] **`rotations.yaml`** → motor şu üç biçimden birini okur: en üstte liste `[{id, crops, ...}]`, ya da `rotations: [...]`, ya da `{fallow_wheat: {crops: [...]}, ...}`. Dosya yoksa üç sözleşme id'siyle devam eder ve uyarı basar.
 - [x] **`config.py`** → `nobetsu.config.load(name)` gelince runner otomatik onu kullanır; yoksa YAML'ı kendisi okur. `load` dosya yoksa `FileNotFoundError` versin.
-- [ ] **`mock.fake_run_location()`** için biçim örneği: `engine/tests/test_runner.py` içindeki `SEQUENCE_KEYS`, `FIRST_CROP_KEYS`, `WHEAT_KEYS`, `WEEK_KEYS` listeleri gerçek çıktının anahtar sırası. Tipler: gün sayıları `int`, diğerleri `float`; `fallow_wheat` → `first_crop: None`, diğerleri → `fallow_storage_efficiency: None`.
+- [x] **`mock.fake_run_location()`** için biçim örneği: `engine/tests/test_runner.py` içindeki `SEQUENCE_KEYS`, `FIRST_CROP_KEYS`, `WHEAT_KEYS`, `WEEK_KEYS` listeleri gerçek çıktının anahtar sırası. Tipler: gün sayıları `int`, diğerleri `float`; `fallow_wheat` → `first_crop: None`, diğerleri → `fallow_storage_efficiency: None`.
 - [ ] **Bilgi:** `stress_by_month` pencere içindeki **tüm ürün günlerini** sayıyor (spin-up buğdayının Temmuz `y` başındaki son günleri ve ilk yıl baklagili dahil), sadece 2. yıl buğdayını değil. `wheat.stress_days` ise sadece 2. yıl buğdayı.
 - [ ] **Bilgi:** `crops.yaml`'daki tüm değerler şu an `verified: false`. `site_index` ya da UI'da ürün parametresi gösterilecekse rozet "assumption" olmalı.
 
@@ -68,3 +68,12 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [ ] **`make data` artık senin `power.load_weather()`'ına bağlı.** `build.build(mock=False)` sentetik havayla baştan sona çalıştı; 9 dosyanın hepsi şemadan geçti. POWER gelince başka bir şey gerekmiyor.
 - [ ] **`references.yaml`** → `precip_vs_mgm` iki lokasyonda da `value: null` olduğu için `pending`. Muhammet'in MGM normalleri gelince `value` ve `station` doldur; biri gelirse o lokasyon için `info` olur.
 - [ ] **Bilgi:** `pse_range` oran (0–1) olarak okunuyor, `trial_yields_kg_per_da` kg/da, `years` metni referans satırında görünüyor. Muhammet farklı yıl bulursa `years`'ı güncelle.
+
+## Gümüş'ten yanıt (14 Kas, omer → main birleştirmesi)
+
+- POWER hazır: `load_weather()` 2000-01-01 → 2026-11-09, `attrs` tam (lat/lon derece, `elevation_m` POWER hücresinden). Radyasyon birimi başlıktan okunuyor, kWh gelirse × 3,6. `gaps_filled` = en az bir değişkeni doldurulan **gün** sayısı.
+- SoilGrids hazır: `data/soilgrids/{loc}.json`. **AWC düşük çıktı:** Karapınar 58,6 mm/m (Q05–Q95: 40,9–88,4), Develi 67,4 mm/m (51,1–77,1). SoilGrids `wv1500`'ü yüksek tahmin ediyor. Senin 150 mm/m yedeğinden çok farklı; hangisini kullanacağımızı konuşalım.
+- Ledger 104 hafta: şema ve mock 104'e sabitlendi, ARAYUZLER §5'e yazıldı.
+- pandas: bende 2.2.3, senin testlerin dahil 109 test geçiyor; sabitleme yok (`pandas>=2.1`).
+- `engine/tests/__init__.py` **ekledim**: bazı makinelerde (ultralytics/roboflow kuruluysa) site-packages'ta bir `tests` paketi var ve namespace paketini gölgeliyor; `from tests.fixtures import ...` bu yüzden kırılıyordu. Senin import'ların aynen çalışıyor.
+- Sıradaki: `build.py` gerçek koşu için `validate.py`'yi bekliyor; gelene kadar kontrolleri `pending` yazacak şekilde ayarlayacağım (M2).

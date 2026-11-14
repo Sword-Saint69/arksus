@@ -136,7 +136,7 @@ Dönüş (`EngineOutput`):
 Kurallar:
 - `start_year` 2001…2024 (dahil). Ay listeleri (`bare_by_month`, `stress_by_month`, `fullness_by_month`) **tam 24 eleman**, eleman 0 = y yılının Temmuzu.
 - `fallow_wheat` için `first_crop: None`; diğerlerinde `fallow_storage_efficiency: None`.
-- `ledger.weeks[].week_start`: 1 Temmuz y'den başlayan 7 günlük bloklar (ISO tarih). `crop` alanı haftadaki günlerin çoğunluğu: `"fallow" | "bare" | "wheat" | "chickpea" | "lentil"` (nadas rotasyonundaki boş dönem `fallow`, baklagil rotasyonlarındaki boş dönem `bare`).
+- `ledger.weeks[].week_start`: 1 Temmuz y'den başlayan 7 günlük bloklar (ISO tarih); **her seride tam 104 hafta** (24 aylık pencereye tam sığan bloklar, Haziran y+2'nin son 2–3 günü dışarıda). `crop` alanı haftadaki günlerin çoğunluğu: `"fallow" | "bare" | "wheat" | "chickpea" | "lentil"` (nadas rotasyonundaki boş dönem `fallow`, baklagil rotasyonlarındaki boş dönem `bare`).
 - Sayılar ham `float`/`int` döner; **yuvarlamayı export yapar** (§10).
 - Para, fiyat, TL **yok**. Motor sadece fizik ve oran üretir.
 

@@ -81,7 +81,9 @@
                 "crop"
               ],
               "additionalProperties": false
-            }
+            },
+            "minItems": 104,
+            "maxItems": 104
           }
         },
         "required": [
