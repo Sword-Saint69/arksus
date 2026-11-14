@@ -185,3 +185,13 @@ Senin notuna göre: çekme kodu (`modis.py`) bende kalıyor; JSON alanı ve şem
   ```
   Değerleri `validate.ndvi_comparison(...)` sözlüğünden ve iki aylık klimatolojiden (ben yardımcı fonksiyon yazarım, istersen) üretebilirsin. Etiket: `measured` (NDVI) ve `model` (model_cover).
 - **Durum:** Karapınar, Develi, Polatlı tamam; diğerleri iniyor (ORNL API yavaş, 502 verince kaldığı yerden devam ediyor).
+
+## 20. POWER yağışına istasyon düzeltmesi açıldı (15 Kas, `omer` 2ad2478) — `make data` gerekiyor
+
+OMER_BAKMALI §6'daki (b) seçeneği. Motor girdisi değişti; senden yalnız **yeniden üretim** lazım, sözleşme ve `build.py` değişmiyor.
+- **Yöntem:** günlük POWER yağışı × (MGM/WMO 1991–2020 yıllık normali ÷ POWER yıllık ortalaması). Doğrusal ölçekleme (Teutschbein & Seibert 2012, J. Hydrol., doi:10.1016/j.jhydrol.2012.05.052); yağışlı günler aynı. Anahtar: `scenarios.yaml → precip_correction.enabled` (assumption, açık). Normalleri senin `references.yaml`'dan okuyor.
+- **Nerede:** `run_location`, `run_landscape`, `run_scenarios` (düzeltme senaryo çarpanından **önce**; `dry20` yine baseline × 0,8). `EngineOutput`'a `precip_correction` anahtarı eklendi (factor, normal, istasyon); export onu yazmıyor, sözleşmeye girmesi gerekmiyor.
+- **Kanıt paneli:** `precip_vs_mgm` ham POWER–MGM karşılaştırmasını aynen tutuyor, sonuna "engine uses POWER × f" ve bir not ekliyor.
+- **Etki (orta derinlik, 24 yıl ortancası, scratch koşu):** faktörler Karaman 0,55 · Eskişehir 0,72 · Karapınar 0,73 · Boğazlıyan 0,88 … Nevşehir/Kaman 1,16. Karapınar nadas sonrası ekimde su 104 → 45 mm, buğday Ya/Ym 0,54 → 0,42; Kaman 62 → 95 mm. **Konya denemesine yaklaştı:** nohut/nadas 0,89 → 0,85 (deneme 0,80), mercimek/nadas 0,90 → 0,86 (deneme 0,87). Kütle dengesi geçiyor.
+- **Dikkat:** Karaman nadas su biriktirme verimi %30 çıktı, literatür aralığı %11–29'un hemen üstünde (`pse_literature`, info). Develi'nin istasyonu ~29 km uzakta (Kayseri Bölge); nokta taşıma turunda istasyon da değişecekse normal güncellenmeli.
+- [ ] `make data` (senaryolar dahil) — nokta taşımayla aynı turda yapman yeterli.
