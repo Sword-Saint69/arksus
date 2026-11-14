@@ -20,7 +20,7 @@ REFERENCE_DEPTH_ID = "medium"          # info checks are reported for the medium
 TRIAL_LOCATION_ID = "karapinar"        # the previous-crop trial is in Konya
 
 # FAO-56 (Allen et al. 1998) Chapter 4, Example 18: Brussels, 6 July. Same values as
-# engine/tests/test_et0.py; VERIFY against the book.
+# engine/tests/test_et0.py; checked against https://www.fao.org/4/x0490e/x0490e08.htm.
 EX18 = dict(lat_deg=50.0 + 48.0 / 60.0, elevation_m=100.0, doy=187, tmax_c=21.5, tmin_c=12.3,
             rh_max=84.0, rh_min=63.0, u10_ms=10.0 / 3.6, sun_hours=9.25, expected_mm=3.9)
 
@@ -132,6 +132,9 @@ def check_trial(outputs, refs):
         m = med(rot)
         parts.append(f"{label} {m / base:.2f}" if base and m is not None else f"{label} n/a")
     value = f"model ({_name(loc)}, medium soil, median wheat yield ÷ after fallow): " + ", ".join(parts)
+    awc = outputs[loc].get("awc_used") or {}
+    if awc.get("value") is not None:
+        value += f"; soil available water used: {awc['value']:.0f} mm/m"
 
     if not fallow or chickpea is None or lentil is None:
         return _check("trial_ratio", "pending", value, "",
@@ -143,9 +146,11 @@ def check_trial(outputs, refs):
         f"Konya dryland trial{' ' + years if years else ''}: after chickpea {chickpea / fallow:.2f}, "
         f"after lentil {lentil / fallow:.2f} ({chickpea:g} / {lentil:g} / {fallow:g} kg/da)",
         "The model knows only water. The trial also includes nitrogen, disease and weed effects, "
-        "so the two are shown side by side, not as a pass/fail test.",
+        "so the two are shown side by side, not as a pass/fail test. The result depends strongly on the "
+        "soil's available water; the soil card lists the alternative estimates.",
         "Model sadece suyu bilir. Denemede azot, hastalık ve yabancı ot etkileri de var; "
-        "bu yüzden ikisi yan yana gösterilir, geçti/kaldı testi değildir.",
+        "bu yüzden ikisi yan yana gösterilir, geçti/kaldı testi değildir. Sonuç toprağın kullanılabilir "
+        "su kapasitesine çok bağlıdır; diğer tahminler toprak kartında.",
     )
 
 
