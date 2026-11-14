@@ -1,326 +1,366 @@
 # Soil parameters for the water balance engine (owner: Ömer, Rol A).
-# Every numeric parameter is a value object (V): value, unit, source, type, verified.
-# Seed values are from FAO-56 tables as remembered and are NOT yet checked against the
-# book: verified: false until someone opens the table and confirms.
+# Every numeric parameter is a value object (V): value, unit, source, (source_url), type, verified.
+#
+# STATUS (14 Nov): FAO-56 values checked against the FAO HTML edition (fao.org/4/x0490e),
+# verified: true with URL. Project choices from PLAN_MVP (initial fill, wind percentile,
+# awc_method, texture aliases) stay type: assumption.
+#
+# Available water (awc_method: texture_table): SoilGrids 2.0 wv0033 − wv1500 gives 58.6
+# (Karapınar) and 67.4 (Develi) mm/m, far below the FAO-56 Table 19 range for the clay-rich
+# textures SoilGrids itself reports at these points (decision 14 Nov). The texture class comes
+# from SoilGrids Q50 clay/sand/silt 0–30 cm (USDA triangle); AWC, θFC, θWP and REW come from
+# FAO-56 Table 19 for that class (range midpoints); TEW = 1000·(θFC − 0.5·θWP)·Ze (Eq. 73).
+# Set awc_method to `soilgrids` to use the SoilGrids value instead.
 
-depth_classes:   # ids and depths are frozen by the contract (PLAN_MVP §4.1)
-  - id: shallow
-    depth_m: 0.6
-    label: { en: "Shallow (<60 cm)", tr: "Sığ (<60 cm)" }
-  - id: medium
-    depth_m: 0.9
-    label: { en: "Medium (60–90 cm)", tr: "Orta (60–90 cm)" }
-  - id: deep
-    depth_m: 1.2
-    label: { en: "Deep (>90 cm)", tr: "Derin (>90 cm)" }
-
+depth_classes:
+- id: shallow
+  depth_m: 0.6
+  label:
+    en: Shallow (<60 cm)
+    tr: Sığ (<60 cm)
+- id: medium
+  depth_m: 0.9
+  label:
+    en: Medium (60–90 cm)
+    tr: Orta (60–90 cm)
+- id: deep
+  depth_m: 1.2
+  label:
+    en: Deep (>90 cm)
+    tr: Derin (>90 cm)
 evaporation:
   ze_m:
-    value: 0.10
-    unit: "m"
-    source: "FAO-56 Chapter 7: depth of the surface evaporation layer, 0.10–0.15 m"
+    value: 0.1
+    unit: m
+    source: 'FAO-56 Chapter 7, Eq. 73: ''Where unknown, a value for Ze ... of 0.10-0.15 m is recommended'' (lower end; Table 19 TEW column also assumes Ze = 0.10 m)'
     type: literature
-    verified: false
+    verified: true
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   tew_mm:
     value: 20.0
-    unit: "mm"
-    source: "FAO-56 Table 19, loam, TEW for Ze = 0.10 m (range 16–22 mm); dominant texture of the pilot points not yet confirmed"
+    unit: mm
+    source: 'FAO-56 Table 19, loam: TEW 16–22 mm for Ze = 0.10 m; Example 31 uses TEW ≈ 20 mm for loam. Used only when no SoilGrids texture is available'
     type: assumption
-    verified: false
+    verified: true
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   rew_mm:
     value: 9.0
-    unit: "mm"
-    source: "FAO-56 Table 19, loam, REW (range 8–10 mm); dominant texture of the pilot points not yet confirmed"
+    unit: mm
+    source: 'FAO-56 Table 19, loam: REW 8–10 mm; Example 31 uses REW ≈ 9 mm for loam. Used only when no SoilGrids texture is available'
     type: assumption
-    verified: false
-
-# Used only when data/soilgrids/{location_id}.json is missing (ARAYUZLER §3).
+    verified: true
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
 fallback_awc_mm_per_m:
   karapinar:
-    value: 150.0
-    unit: "mm/m"
-    source: "FAO-56 Table 19, loam, θFC − θWP range 0.13–0.18 m3/m3; texture not confirmed"
+    value: 155.0
+    unit: mm/m
+    source: 'FAO-56 Table 19, loam: θFC − θWP 0.13–0.18 m3/m3 (midpoint). Used only when data/soilgrids/{loc}.json is missing; texture not known then'
     type: assumption
-    verified: false
+    verified: true
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   develi:
-    value: 150.0
-    unit: "mm/m"
-    source: "FAO-56 Table 19, loam, θFC − θWP range 0.13–0.18 m3/m3; texture not confirmed"
+    value: 155.0
+    unit: mm/m
+    source: 'FAO-56 Table 19, loam: θFC − θWP 0.13–0.18 m3/m3 (midpoint). Used only when data/soilgrids/{loc}.json is missing; texture not known then'
     type: assumption
-    verified: false
-
+    verified: true
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
 initial_fill_fraction:
   value: 0.5
-  unit: "fraction of available water"
-  source: "PLAN_MVP §5.3 sequence design: spin-up wheat starts at 50 % of available water"
+  unit: fraction of available water
+  source: 'PLAN_MVP §5.3 sequence design (project choice, not a measured value): spin-up wheat starts at 50 % of available water'
   type: assumption
   verified: false
-
 wind_exposure_percentile:
   value: 75
-  unit: "percentile of daily WS2M_MAX over the full record"
-  source: "PLAN_MVP §5.8: stated threshold choice for the wind-exposure count"
+  unit: percentile of daily WS2M_MAX over the full record
+  source: 'PLAN_MVP §5.8: stated threshold choice for the wind-exposure count'
   type: assumption
   verified: false
-
-# --- Available water from soil texture (awc_method: texture_table) ------------------
-# Why: SoilGrids 2.0 wv0033 − wv1500 gives 58.6 (Karapınar) and 67.4 (Develi) mm/m, far below
-# the FAO-56 Table 19 range for the clay-rich textures SoilGrids itself reports at these points
-# (decision 14 Nov, Ömer). The texture class comes from SoilGrids Q50 clay/sand/silt 0–30 cm
-# (USDA triangle); AWC, θFC, θWP and REW come from FAO-56 Table 19 for that class (range
-# midpoints). TEW = 1000·(θFC − 0.5·θWP)·Ze (FAO-56 Eq. 73). Values written from memory:
-# verified: false until checked against the book.
 awc_method:
-  value: texture_table   # texture_table | soilgrids
-  unit: "-"
-  source: "Team decision 14 Nov: SoilGrids AWC judged implausible for its own texture class; see comment above"
+  value: texture_table
+  unit: '-'
+  source: 'Team decision 14 Nov: SoilGrids AWC judged implausible for its own texture class; see comment above'
   type: assumption
   verified: false
-
 texture_table:
   sand:
     awc_mm_per_m:
       value: 80.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, sand: θFC − θWP, midpoint of 0.05–0.11 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, sand: θFC − θWP, midpoint of 0.05–0.11 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.12
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, sand: θFC, midpoint of 0.07–0.17"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, sand: θFC, midpoint of 0.07–0.17'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.045
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, sand: θWP, midpoint of 0.02–0.07"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, sand: θWP, midpoint of 0.02–0.07'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 4.5
-      unit: "mm"
-      source: "FAO-56 Table 19, sand: REW, midpoint of 2–7 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, sand: REW, midpoint of 2–7 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   loamy_sand:
     awc_mm_per_m:
       value: 90.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, loamy sand: θFC − θWP, midpoint of 0.06–0.12 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, loamy sand: θFC − θWP, midpoint of 0.06–0.12 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.15
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, loamy sand: θFC, midpoint of 0.11–0.19"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, loamy sand: θFC, midpoint of 0.11–0.19'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.065
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, loamy sand: θWP, midpoint of 0.03–0.10"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, loamy sand: θWP, midpoint of 0.03–0.10'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 6.0
-      unit: "mm"
-      source: "FAO-56 Table 19, loamy sand: REW, midpoint of 4–8 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, loamy sand: REW, midpoint of 4–8 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   sandy_loam:
     awc_mm_per_m:
       value: 130.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, sandy loam: θFC − θWP, midpoint of 0.11–0.15 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, sandy loam: θFC − θWP, midpoint of 0.11–0.15 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.23
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, sandy loam: θFC, midpoint of 0.18–0.28"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, sandy loam: θFC, midpoint of 0.18–0.28'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.11
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, sandy loam: θWP, midpoint of 0.06–0.16"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, sandy loam: θWP, midpoint of 0.06–0.16'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 8.0
-      unit: "mm"
-      source: "FAO-56 Table 19, sandy loam: REW, midpoint of 6–10 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, sandy loam: REW, midpoint of 6–10 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   loam:
     awc_mm_per_m:
       value: 155.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, loam: θFC − θWP, midpoint of 0.13–0.18 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, loam: θFC − θWP, midpoint of 0.13–0.18 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.25
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, loam: θFC, midpoint of 0.20–0.30"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, loam: θFC, midpoint of 0.20–0.30'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.12
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, loam: θWP, midpoint of 0.07–0.17"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, loam: θWP, midpoint of 0.07–0.17'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 9.0
-      unit: "mm"
-      source: "FAO-56 Table 19, loam: REW, midpoint of 8–10 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, loam: REW, midpoint of 8–10 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   silt_loam:
     awc_mm_per_m:
       value: 160.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, silt loam: θFC − θWP, midpoint of 0.13–0.19 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, silt loam: θFC − θWP, midpoint of 0.13–0.19 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.29
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silt loam: θFC, midpoint of 0.22–0.36"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silt loam: θFC, midpoint of 0.22–0.36'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.15
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silt loam: θWP, midpoint of 0.09–0.21"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silt loam: θWP, midpoint of 0.09–0.21'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 9.5
-      unit: "mm"
-      source: "FAO-56 Table 19, silt loam: REW, midpoint of 8–11 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, silt loam: REW, midpoint of 8–11 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   silt:
     awc_mm_per_m:
       value: 180.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, silt: θFC − θWP, midpoint of 0.16–0.20 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, silt: θFC − θWP, midpoint of 0.16–0.20 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.32
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silt: θFC, midpoint of 0.28–0.36"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silt: θFC, midpoint of 0.28–0.36'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.17
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silt: θWP, midpoint of 0.12–0.22"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silt: θWP, midpoint of 0.12–0.22'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 9.5
-      unit: "mm"
-      source: "FAO-56 Table 19, silt: REW, midpoint of 8–11 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, silt: REW, midpoint of 8–11 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   silty_clay_loam:
     awc_mm_per_m:
       value: 155.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, silty clay loam: θFC − θWP, midpoint of 0.13–0.18 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, silty clay loam: θFC − θWP, midpoint of 0.13–0.18 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.335
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silty clay loam: θFC, midpoint of 0.30–0.37"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silty clay loam: θFC, midpoint of 0.30–0.37'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.205
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silty clay loam: θWP, midpoint of 0.17–0.24"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silty clay loam: θWP, midpoint of 0.17–0.24'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 9.5
-      unit: "mm"
-      source: "FAO-56 Table 19, silty clay loam: REW, midpoint of 8–11 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, silty clay loam: REW, midpoint of 8–11 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   silty_clay:
     awc_mm_per_m:
       value: 160.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, silty clay: θFC − θWP, midpoint of 0.13–0.19 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, silty clay: θFC − θWP, midpoint of 0.13–0.19 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.36
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silty clay: θFC, midpoint of 0.30–0.42"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silty clay: θFC, midpoint of 0.30–0.42 (printed ''0-30 - 0.42'' in the HTML edition; read as 0.30–0.42)'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.23
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, silty clay: θWP, midpoint of 0.17–0.29"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, silty clay: θWP, midpoint of 0.17–0.29'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 10.0
-      unit: "mm"
-      source: "FAO-56 Table 19, silty clay: REW, midpoint of 8–12 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, silty clay: REW, midpoint of 8–12 mm'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
   clay:
     awc_mm_per_m:
       value: 160.0
-      unit: "mm/m"
-      source: "FAO-56 Table 19, clay: θFC − θWP, midpoint of 0.12–0.20 m3/m3"
+      unit: mm/m
+      source: 'FAO-56 Table 19, clay: θFC − θWP, midpoint of 0.12–0.20 m3/m3'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_fc:
       value: 0.36
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, clay: θFC, midpoint of 0.32–0.40"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, clay: θFC, midpoint of 0.32–0.40'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     theta_wp:
       value: 0.22
-      unit: "m3/m3"
-      source: "FAO-56 Table 19, clay: θWP, midpoint of 0.20–0.24"
+      unit: m3/m3
+      source: 'FAO-56 Table 19, clay: θWP, midpoint of 0.20–0.24'
       type: literature
-      verified: false
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     rew_mm:
       value: 10.0
-      unit: "mm"
-      source: "FAO-56 Table 19, clay: REW, midpoint of 8–12 mm"
+      unit: mm
+      source: 'FAO-56 Table 19, clay: REW, midpoint of 8–12 mm'
       type: literature
-      verified: false
-
-# USDA classes that FAO-56 Table 19 does not list are mapped to the nearest listed class.
+      verified: true
+      source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
 texture_table_aliases:
   clay_loam:
     value: silty_clay_loam
-    unit: "-"
-    source: "Assumption: clay loam is not in FAO-56 Table 19; nearest listed class by clay content (27–40 %) is silty clay loam"
+    unit: '-'
+    source: 'Assumption: clay loam is not in FAO-56 Table 19; nearest listed class by clay content (27–40 %) is silty clay loam. FAO-56 Table 19 checked: the class is not listed'
     type: assumption
     verified: false
   sandy_clay_loam:
     value: sandy_loam
-    unit: "-"
-    source: "Assumption: sandy clay loam is not in FAO-56 Table 19; nearest listed class by sand content is sandy loam"
+    unit: '-'
+    source: 'Assumption: sandy clay loam is not in FAO-56 Table 19; nearest listed class by sand content is sandy loam. FAO-56 Table 19 checked: the class is not listed'
     type: assumption
     verified: false
   sandy_clay:
     value: clay
-    unit: "-"
-    source: "Assumption: sandy clay is not in FAO-56 Table 19; nearest listed class by clay content (≥ 35 %) is clay"
+    unit: '-'
+    source: 'Assumption: sandy clay is not in FAO-56 Table 19; nearest listed class by clay content (≥ 35 %) is clay. FAO-56 Table 19 checked: the class is not listed'
     type: assumption
     verified: false

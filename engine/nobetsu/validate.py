@@ -20,7 +20,7 @@ REFERENCE_DEPTH_ID = "medium"          # info checks are reported for the medium
 TRIAL_LOCATION_ID = "karapinar"        # the previous-crop trial is in Konya
 
 # FAO-56 (Allen et al. 1998) Chapter 4, Example 18: Brussels, 6 July. Same values as
-# engine/tests/test_et0.py; VERIFY against the book.
+# engine/tests/test_et0.py; checked against https://www.fao.org/4/x0490e/x0490e08.htm.
 EX18 = dict(lat_deg=50.0 + 48.0 / 60.0, elevation_m=100.0, doy=187, tmax_c=21.5, tmin_c=12.3,
             rh_max=84.0, rh_min=63.0, u10_ms=10.0 / 3.6, sun_hours=9.25, expected_mm=3.9)
 

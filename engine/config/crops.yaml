@@ -1,269 +1,282 @@
 # Crop parameters for the water balance engine (owner: Ömer, Rol A; calendars from Muhammet).
-# Every parameter is a value object (V): value, unit, source, type, verified.
+# Every parameter is a value object (V): value, unit, source, (source_url), type, verified.
 #
-# STATUS: all values are seeds. FAO-56 table values were written from memory and are
-# NOT yet checked against the book (verified: false). Calendars and stage lengths are
-# assumptions that reproduce the seed calendar in PLAN_MVP §5.3; they are replaced by
-# TAGEM / GKTAEM / Bahri Dağdaş values (docs/SOURCES.md calendar.*) when they arrive.
+# STATUS (14 Nov): every FAO-56 table value below was checked against the FAO HTML edition
+# (fao.org/4/x0490e) and carries its URL: verified: true. Still assumptions (verified: false):
+# sowing dates, stage lengths and the wheat flowering window, until Muhammet's calendars arrive.
+# Ky for chick pea and lentil is FAO-56's own default for crops without a Table 24 value.
 #
 # The engine has no crop-specific branches. An entry WITHOUT a `sowing` key means the
 # land stays bare for that part of the rotation (kcb = 0) and the bare period is
 # labelled with the entry's id in the ledger.
 
 fallow: {}
-
 wheat:
   sowing:
-    value: "10-15"
-    unit: "MM-DD"
-    source: "PLAN_MVP §5.3 seed calendar (sown ~15 Oct); replace with SOURCES.md calendar.*.wheat"
+    value: 10-15
+    unit: MM-DD
+    source: 'PLAN_MVP §5.3 seed calendar (sown ~15 Oct); replace with SOURCES.md calendar.*.wheat. FAO-56 Table 11 checked: no Central Anatolian wheat row, no chick pea row, lentil only for Europe (April,
+      150 d) and arid regions (Oct/Nov). Waiting for Muhammet''s TAGEM / GKTAEM / Bahri Dağdaş calendars (SOURCES.md calendar.*).'
     type: assumption
     verified: false
-  stage_days:   # initial, development, mid-season, late-season
+  stage_days:
     ini:
       value: 150
-      unit: "days"
-      source: "Assumption: winter dormancy to mid-March; total 270 days gives harvest ~12 Jul (PLAN_MVP §5.3). FAO-56 Table 11 winter wheat entries do not match Central Anatolia directly"
+      unit: days
+      source: 'Assumption: winter dormancy to mid-March; total 270 days gives harvest ~12 Jul (PLAN_MVP §5.3). FAO-56 Table 11 winter wheat entries do not match Central Anatolia directly'
       type: assumption
       verified: false
     dev:
       value: 45
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
     mid:
       value: 45
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
     late:
       value: 30
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
   kcb_ini:
     value: 0.15
-    unit: "-"
-    source: "FAO-56 Table 17, winter wheat with frozen soils"
+    unit: '-'
+    source: 'FAO-56 Table 17, wheat winter: Kcb ini 0.15–0.5; footnote 11: the higher value only for full ground cover on non-frozen soil, so the lower value is used for a crop sown into bare soil with
+      a frozen winter'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   kcb_mid:
-    value: 1.10
-    unit: "-"
-    source: "FAO-56 Table 17, winter wheat"
+    value: 1.1
+    unit: '-'
+    source: 'FAO-56 Table 17, wheat winter: Kcb mid 1.10 (climate-adjusted in the engine with Eq. 70)'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   kcb_end:
     value: 0.15
-    unit: "-"
-    source: "FAO-56 Table 17, winter wheat (range 0.15–0.3; lower end for grain dried in the field)"
+    unit: '-'
+    source: 'FAO-56 Table 17, wheat winter: Kcb end 0.15–0.3; footnote 10: the higher value is for hand-harvested crops, so the lower value is used for machine harvest'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   h_max_m:
     value: 1.0
-    unit: "m"
-    source: "FAO-56 Table 12, winter wheat maximum crop height"
+    unit: m
+    source: 'FAO-56 Table 12, winter wheat with frozen soils: maximum crop height 1 m'
+    source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
     type: literature
-    verified: false
-  zr_min_m:
+    verified: true
+  zr_min_m: &id001
     value: 0.15
-    unit: "m"
-    source: "FAO-56 Chapter 8: effective rooting depth at planting, 0.15–0.20 m"
+    unit: m
+    source: 'FAO-56 Annex 8: ''For many annual crops, Zr min can be estimated as 0.15 to 0.20 m'' (lower end)'
+    source_url: https://www.fao.org/4/x0490e/x0490e0p.htm
     type: literature
-    verified: false
+    verified: true
   zr_max_m:
-    value: 1.5
-    unit: "m"
-    source: "FAO-56 Table 22, winter wheat (range 1.5–1.8 m); capped by the depth class in the engine"
+    value: 1.8
+    unit: m
+    source: 'FAO-56 Table 22, winter wheat: Zr 1.5–1.8 m; footnote 1: the larger value is for modelling and rainfed conditions. Capped by the depth class (max 1.2 m) in the engine'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
+    verified: true
   p:
     value: 0.55
-    unit: "-"
-    source: "FAO-56 Table 22, winter wheat depletion fraction for ETc ≈ 5 mm/day"
+    unit: '-'
+    source: 'FAO-56 Table 22, winter wheat: p 0.55 for ETc ≈ 5 mm/day; adjusted daily with p + 0.04(5 − ETc), limited to 0.1–0.8 (Table 22 footnote 2)'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
+    verified: true
   ky:
     value: 1.05
-    unit: "-"
-    source: "FAO Irrigation and Drainage Paper 33 / FAO-56 Table 24, winter wheat seasonal yield response factor"
+    unit: '-'
+    source: 'FAO-56 Table 24 (from FAO Irrigation and Drainage Paper 33): winter wheat Ky 1.05'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
-  flowering:   # window used for heat_days_flowering (PLAN_MVP §5.8)
+    verified: true
+  flowering:
     offset_from_mid_start_days:
       value: 25
-      unit: "days after the start of mid-season"
-      source: "Assumption: with the seed calendar mid-season starts ~28 Apr, so the window opens ~23 May; replace with a TAGEM / Bahri Dağdaş heading–flowering date"
+      unit: days after the start of mid-season
+      source: 'Assumption: with the seed calendar mid-season starts ~28 Apr, so the window opens ~23 May; replace with a TAGEM / Bahri Dağdaş heading–flowering date'
       type: assumption
       verified: false
     length_days:
       value: 15
-      unit: "days"
-      source: "Assumption: flowering and early grain set, ~23 May – 6 Jun with the seed calendar"
+      unit: days
+      source: 'Assumption: flowering and early grain set, ~23 May – 6 Jun with the seed calendar'
       type: assumption
       verified: false
-
 chickpea:
   sowing:
-    value: "04-01"
-    unit: "MM-DD"
-    source: "PLAN_MVP §5.3 seed calendar (sown ~1 Apr); replace with SOURCES.md calendar.*.chickpea"
+    value: 04-01
+    unit: MM-DD
+    source: 'PLAN_MVP §5.3 seed calendar (sown ~1 Apr); replace with SOURCES.md calendar.*.chickpea. FAO-56 Table 11 checked: no Central Anatolian wheat row, no chick pea row, lentil only for Europe (April,
+      150 d) and arid regions (Oct/Nov). Waiting for Muhammet''s TAGEM / GKTAEM / Bahri Dağdaş calendars (SOURCES.md calendar.*).'
     type: assumption
     verified: false
   stage_days:
     ini:
       value: 20
-      unit: "days"
-      source: "Assumption: total 105 days gives harvest ~mid July (PLAN_MVP §5.3)"
+      unit: days
+      source: 'Assumption: total 105 days gives harvest ~mid July (PLAN_MVP §5.3)'
       type: assumption
       verified: false
     dev:
       value: 30
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
     mid:
       value: 35
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
     late:
       value: 20
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
   kcb_ini:
     value: 0.15
-    unit: "-"
-    source: "FAO-56 Table 17, chick pea"
+    unit: '-'
+    source: 'FAO-56 Table 17, legumes group value: Kcb ini 0.15 (chick pea row leaves ini blank)'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   kcb_mid:
     value: 0.95
-    unit: "-"
-    source: "FAO-56 Table 17, chick pea"
+    unit: '-'
+    source: 'FAO-56 Table 17, chick pea: Kcb mid 0.95'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   kcb_end:
     value: 0.25
-    unit: "-"
-    source: "FAO-56 Table 17, chick pea"
+    unit: '-'
+    source: 'FAO-56 Table 17, chick pea: Kcb end 0.25'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   h_max_m:
     value: 0.4
-    unit: "m"
-    source: "FAO-56 Table 12, chick pea maximum crop height"
+    unit: m
+    source: 'FAO-56 Table 12, chick pea: maximum crop height 0.4 m'
+    source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
     type: literature
-    verified: false
-  zr_min_m:
-    value: 0.15
-    unit: "m"
-    source: "FAO-56 Chapter 8: effective rooting depth at planting, 0.15–0.20 m"
-    type: literature
-    verified: false
+    verified: true
+  zr_min_m: *id001
   zr_max_m:
-    value: 0.8
-    unit: "m"
-    source: "FAO-56 Table 22, chick pea (range 0.6–1.0 m; midpoint)"
+    value: 1.0
+    unit: m
+    source: 'FAO-56 Table 22, chick pea: Zr 0.6–1.0 m; footnote 1: the larger value is for modelling and rainfed conditions'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
+    verified: true
   p:
-    value: 0.50
-    unit: "-"
-    source: "FAO-56 Table 22, chick pea"
+    value: 0.5
+    unit: '-'
+    source: 'FAO-56 Table 22, chick pea: p 0.50 for ETc ≈ 5 mm/day'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
+    verified: true
   ky:
-    value: 1.15
-    unit: "-"
-    source: "No chickpea value found in FAO-33; proxy = pea / bean (1.15) from FAO-56 Table 24"
+    value: 1.0
+    unit: '-'
+    source: 'Chick pea is not in FAO-56 Table 24 (FAO-33 lists about 23 crops). FAO-56 Chapter 8: ''For crops where Ky is unknown, the user may use Ky = 1'''
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: assumption
-    verified: false
-
+    verified: true
 lentil:
   sowing:
-    value: "03-15"
-    unit: "MM-DD"
-    source: "PLAN_MVP §5.3 seed calendar (sown ~mid March); replace with SOURCES.md calendar.*.lentil"
+    value: 03-15
+    unit: MM-DD
+    source: 'PLAN_MVP §5.3 seed calendar (sown ~mid March); replace with SOURCES.md calendar.*.lentil. FAO-56 Table 11 checked: no Central Anatolian wheat row, no chick pea row, lentil only for Europe (April,
+      150 d) and arid regions (Oct/Nov). Waiting for Muhammet''s TAGEM / GKTAEM / Bahri Dağdaş calendars (SOURCES.md calendar.*).'
     type: assumption
     verified: false
   stage_days:
     ini:
       value: 15
-      unit: "days"
-      source: "Assumption: FAO-56 Table 11 lentil proportions scaled to 110 days, harvest ~early July (PLAN_MVP §5.3)"
+      unit: days
+      source: 'Assumption: FAO-56 Table 11 lentil proportions scaled to 110 days, harvest ~early July (PLAN_MVP §5.3)'
       type: assumption
       verified: false
     dev:
       value: 25
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
     mid:
       value: 45
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
     late:
       value: 25
-      unit: "days"
-      source: "Assumption, see ini"
+      unit: days
+      source: Assumption, see ini
       type: assumption
       verified: false
   kcb_ini:
     value: 0.15
-    unit: "-"
-    source: "FAO-56 Table 17, lentil"
+    unit: '-'
+    source: 'FAO-56 Table 17, legumes group value: Kcb ini 0.15 (lentil row leaves ini blank)'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   kcb_mid:
     value: 1.05
-    unit: "-"
-    source: "FAO-56 Table 17, lentil"
+    unit: '-'
+    source: 'FAO-56 Table 17, lentil: Kcb mid 1.05'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   kcb_end:
-    value: 0.20
-    unit: "-"
-    source: "FAO-56 Table 17, lentil"
+    value: 0.2
+    unit: '-'
+    source: 'FAO-56 Table 17, lentil: Kcb end 0.20'
+    source_url: https://www.fao.org/4/x0490e/x0490e0c.htm
     type: literature
-    verified: false
+    verified: true
   h_max_m:
     value: 0.5
-    unit: "m"
-    source: "FAO-56 Table 12, lentil maximum crop height"
+    unit: m
+    source: 'FAO-56 Table 12, lentil: maximum crop height 0.5 m'
+    source_url: https://www.fao.org/4/x0490e/x0490e0b.htm
     type: literature
-    verified: false
-  zr_min_m:
-    value: 0.15
-    unit: "m"
-    source: "FAO-56 Chapter 8: effective rooting depth at planting, 0.15–0.20 m"
-    type: literature
-    verified: false
+    verified: true
+  zr_min_m: *id001
   zr_max_m:
-    value: 0.7
-    unit: "m"
-    source: "FAO-56 Table 22, lentil (range 0.6–0.8 m; midpoint)"
+    value: 0.8
+    unit: m
+    source: 'FAO-56 Table 22, lentil: Zr 0.6–0.8 m; footnote 1: the larger value is for modelling and rainfed conditions'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
+    verified: true
   p:
-    value: 0.50
-    unit: "-"
-    source: "FAO-56 Table 22, lentil"
+    value: 0.5
+    unit: '-'
+    source: 'FAO-56 Table 22, lentil: p 0.50 for ETc ≈ 5 mm/day'
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: literature
-    verified: false
+    verified: true
   ky:
-    value: 1.15
-    unit: "-"
-    source: "No lentil value found in FAO-33; proxy = pea / bean (1.15) from FAO-56 Table 24"
+    value: 1.0
+    unit: '-'
+    source: 'Lentil is not in FAO-56 Table 24 (FAO-33 lists about 23 crops). FAO-56 Chapter 8: ''For crops where Ky is unknown, the user may use Ky = 1'''
+    source_url: https://www.fao.org/4/x0490e/x0490e0e.htm
     type: assumption
-    verified: false
+    verified: true

@@ -2,8 +2,9 @@
 
 Reference: Allen, Pereira, Raes & Smith (1998), FAO Irrigation and Drainage Paper 56,
 Chapter 4, Example 18 ("Determination of ETo with daily data", Brussels, 6 July).
-Inputs and expected values below are copied from that example. VERIFY against the book
-(Ömer) — if any printed value differs, fix it here, not in et0.py.
+Inputs and expected values below are copied from that example.
+Checked 14 Nov against https://www.fao.org/4/x0490e/x0490e08.htm (all inputs and printed
+intermediates match; the page prints Rns = 17.00 and N both as 16.1 and 16.3).
 
 Tolerances: the book rounds intermediates to 2–4 significant digits, so intermediate
 checks use a tolerance of about one unit in the last printed digit. The final ET0 must
@@ -42,7 +43,7 @@ EX18 = {
     "ra": 41.09,
     "rs": 22.07,
     "rso": 30.90,
-    "rns": 16.99,
+    "rns": 17.00,
     "rnl": 3.71,
     "rn": 13.28,
     "et0": 3.9,
