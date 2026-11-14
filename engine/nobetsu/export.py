@@ -99,12 +99,20 @@ def _soil_properties(location_id: str, mock: bool) -> list[dict]:
     return mockmod.fake_soil_properties() if mock else []
 
 
+def _awc(node: dict) -> dict:
+    """AWC is mm per m of soil: 1 decimal, like other mm values (ARAYUZLER §10)."""
+    node = dict(node)
+    if isinstance(node.get("value"), (int, float)) and not isinstance(node["value"], bool):
+        node["value"] = round(float(node["value"]), 1)
+    return node
+
+
 def _results(out: dict, mock: bool, ts: str) -> dict:
     return {
         **_header(mock, ts),
         "location_id": out["location_id"],
         "soil": {
-            "awc_mm_per_m": out["awc_used"],
+            "awc_mm_per_m": _awc(out["awc_used"]),
             "properties": _soil_properties(out["location_id"], mock),
             "not_available_remotely": list(NOT_AVAILABLE_REMOTELY),
         },

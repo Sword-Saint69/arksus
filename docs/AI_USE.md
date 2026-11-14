@@ -25,6 +25,7 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) — AWC ayrışması analizi (Saxton–Rawls çapraz kontrolü, motor duyarlılığı), doku sınıfı ve taş oranı çıktısı — `engine/nobetsu/soilgrids.py`, `docs/ARAYUZLER.md` §3, `docs/OMER_BAKMALI.md`
 - Claude Code (Opus 5.5) + WebSearch/web-fetch — Muhammet'in Gümüş'e giden araştırma görevleri: fiyat, destek, deneme verimleri, nadas etkinliği, WMO yağış normalleri, erozyon kaynağı, strateji metinleri, sözlük; kaynak PDF'leri pdftotext ile okundu — `docs/SOURCES.md`, `engine/config/{defaults,references,rotations}.yaml`
 - Claude Code (Opus 5.5) — İsmail için devir notu (hazır veri, tipler, economics API, gösterim kuralları) — `docs/ISMAIL_BAKMALI.md`
+- Claude Code (Opus 5.5) — M2: AWC yuvarlama düzeltmesi + testi, gerçek veri üretimi ve kontrolü, ilk sonuç özeti — `engine/nobetsu/export.py`, `engine/tests/test_export.py`, `web/public/data/**`
 
 ## Ortak (plan ve görev dağılımı)
 - Claude — görev dağılımı, kişi rehberleri, arayüz sözleşmesi taslağı, proje özeti — `TASKS.md`, `AGENTS.md`, `docs/ARAYUZLER.md`, `docs/PROJE_OZETI.md`, `docs/team/*`

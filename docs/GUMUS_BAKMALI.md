@@ -51,7 +51,7 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [x] **`load_weather()` aralığı** → her sekans 1 Ekim `y−1`'de başlıyor ve son buğday hasadına kadar sürüyor. 2001 sekansı için **2000-10-01**, 2024 sekansı için **2026-07-12**'ye kadar veri şart (şu anki takvimle). Eksikse `daily_inputs` `ValueError` verir.
 - [x] **`data/soilgrids/{loc}.json`** → `awc_mm_per_m.value` gelmezse motor `soil.yaml`'daki yedek değeri (150 mm/m, `assumption`) kullanacak.
 - [x] **Bilgi (sözleşme netleştirmesi, değişiklik değil):** `ledger.weeks` her seride **104 hafta** (1 Temmuz `y`'den başlayan, 24 aylık pencerenin içine tam sığan 7 günlük bloklar; Haziran `y+2`'nin son 2–3 günü dışarıda kalır). Şemada `weeks` uzunluğunu 104 olarak sabitleyebilirsin. Farklı istiyorsan Ömer'e yaz.
-- [ ] **Bilgi:** aylık listeler (24 eleman) 1 Temmuz `y` → 30 Haziran `y+2` penceresini kapsıyor; buğday hasadı ~12 Temmuz `y+2` olduğu için buğdayın `eta_mm / etc_mm / stress_days` toplamları pencerenin 12 gün dışına taşıyor (sezonun tamamı sayılıyor). Sözleşmede buna aykırı bir şey yok, haberin olsun.
+- [x] **Bilgi:** aylık listeler (24 eleman) 1 Temmuz `y` → 30 Haziran `y+2` penceresini kapsıyor; buğday hasadı ~12 Temmuz `y+2` olduğu için buğdayın `eta_mm / etc_mm / stress_days` toplamları pencerenin 12 gün dışına taşıyor (sezonun tamamı sayılıyor). Sözleşmede buna aykırı bir şey yok, haberin olsun.
 
 ## 8. `runner.run_location()` hazır (14 Kas, `omer/runner`)
 
@@ -60,14 +60,14 @@ Yeni madde eklendikçe en alta tarihle yazılır.
 - [x] **`rotations.yaml`** → motor şu üç biçimden birini okur: en üstte liste `[{id, crops, ...}]`, ya da `rotations: [...]`, ya da `{fallow_wheat: {crops: [...]}, ...}`. Dosya yoksa üç sözleşme id'siyle devam eder ve uyarı basar.
 - [x] **`config.py`** → `nobetsu.config.load(name)` gelince runner otomatik onu kullanır; yoksa YAML'ı kendisi okur. `load` dosya yoksa `FileNotFoundError` versin.
 - [x] **`mock.fake_run_location()`** için biçim örneği: `engine/tests/test_runner.py` içindeki `SEQUENCE_KEYS`, `FIRST_CROP_KEYS`, `WHEAT_KEYS`, `WEEK_KEYS` listeleri gerçek çıktının anahtar sırası. Tipler: gün sayıları `int`, diğerleri `float`; `fallow_wheat` → `first_crop: None`, diğerleri → `fallow_storage_efficiency: None`.
-- [ ] **Bilgi:** `stress_by_month` pencere içindeki **tüm ürün günlerini** sayıyor (spin-up buğdayının Temmuz `y` başındaki son günleri ve ilk yıl baklagili dahil), sadece 2. yıl buğdayını değil. `wheat.stress_days` ise sadece 2. yıl buğdayı.
-- [ ] **Bilgi:** `crops.yaml`'daki tüm değerler şu an `verified: false`. `site_index` ya da UI'da ürün parametresi gösterilecekse rozet "assumption" olmalı.
+- [x] **Bilgi:** `stress_by_month` pencere içindeki **tüm ürün günlerini** sayıyor (spin-up buğdayının Temmuz `y` başındaki son günleri ve ilk yıl baklagili dahil), sadece 2. yıl buğdayını değil. `wheat.stress_days` ise sadece 2. yıl buğdayı.
+- [x] **Bilgi:** `crops.yaml`'daki tüm değerler şu an `verified: false`. `site_index` ya da UI'da ürün parametresi gösterilecekse rozet "assumption" olmalı.
 
 ## 9. `validate.run_checks()` hazır (14 Kas, `omer`)
 
-- [ ] **`make data` artık senin `power.load_weather()`'ına bağlı.** `build.build(mock=False)` sentetik havayla baştan sona çalıştı; 9 dosyanın hepsi şemadan geçti. POWER gelince başka bir şey gerekmiyor.
-- [ ] **`references.yaml`** → `precip_vs_mgm` iki lokasyonda da `value: null` olduğu için `pending`. Muhammet'in MGM normalleri gelince `value` ve `station` doldur; biri gelirse o lokasyon için `info` olur.
-- [ ] **Bilgi:** `pse_range` oran (0–1) olarak okunuyor, `trial_yields_kg_per_da` kg/da, `years` metni referans satırında görünüyor. Muhammet farklı yıl bulursa `years`'ı güncelle.
+- [x] **`make data` artık senin `power.load_weather()`'ına bağlı.** `build.build(mock=False)` sentetik havayla baştan sona çalıştı; 9 dosyanın hepsi şemadan geçti. POWER gelince başka bir şey gerekmiyor.
+- [x] **`references.yaml`** → `precip_vs_mgm` iki lokasyonda da `value: null` olduğu için `pending`. Muhammet'in MGM normalleri gelince `value` ve `station` doldur; biri gelirse o lokasyon için `info` olur.
+- [x] **Bilgi:** `pse_range` oran (0–1) olarak okunuyor, `trial_yields_kg_per_da` kg/da, `years` metni referans satırında görünüyor. Muhammet farklı yıl bulursa `years`'ı güncelle.
 
 ## 10. AWC kararı: SoilGrids dokusu + FAO-56 tablosu (14 Kas, `omer`)
 
@@ -85,9 +85,9 @@ Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı.
 ## 11. `make data` kontrolü (14 Kas, `omer`)
 
 - [x] `python -m nobetsu.build` `omer` üzerinde gerçek POWER + SoilGrids ile ~19 sn'de çalıştı (geçici klasöre yazıldı, `web/public/data`'ya dokunulmadı). 9 dosyanın hepsi şemadan ve `check_invariants`'tan geçti, hepsi `mock: false`, yasak kelime yok.
-- [ ] **Senin adımın:** `omer` main'e girince `make data` → `web/public/data`'yı commit et → `v0.1` etiketi (M2).
-- [ ] **Bilgi:** her `ledger/{loc}.json` 2,1 MB (mock ile aynı boyut); gzip'li ~0,12 MB. Vercel gzip/brotli ile sunduğu için sorun olmamalı; yine de İsmail lazy-load etsin (planda zaten öyle).
-- [ ] **Bilgi:** `validation.json` → `precip_vs_mgm` MGM normalleri gelene kadar `pending`; `smap/*.json` `available: false`.
+- [x] **Senin adımın:** `omer` main'e girince `make data` → `web/public/data`'yı commit et → `v0.1` etiketi (M2).
+- [x] **Bilgi:** her `ledger/{loc}.json` 2,1 MB (mock ile aynı boyut); gzip'li ~0,12 MB. Vercel gzip/brotli ile sunduğu için sorun olmamalı; yine de İsmail lazy-load etsin (planda zaten öyle).
+- [x] **Bilgi:** `validation.json` → `precip_vs_mgm` MGM normalleri gelene kadar `pending`; `smap/*.json` `available: false`.
 
 ## 12. OMER_BAKMALI §2–3 uygulandı (14 Kas, `omer`)
 
@@ -95,7 +95,7 @@ Senin "AWC düşük çıktı, hangisini kullanacağız" soruna Ömer'in kararı.
 - Sonuç: **Karapınar 154,7 mm/m**, **Develi 121,4 mm/m**. `awc_used.source` metni kullanılmayan alternatifleri de yazıyor (SoilGrids doğrudan, Saxton–Rawls).
 - `trial_ratio` değer satırına "soil available water used: X mm/m" ve notuna "sonuç AWC'ye çok bağlı, alternatifler toprak kartında" eklendi (yeni check id'si yok).
 - `make data` yeniden koşuldu (geçici klasöre): 9 dosya şemadan geçti.
-- [ ] **Senin tarafın (export):** `results.soil.awc_mm_per_m.value` yuvarlanmadan yazılıyor (Develi `121.36500000000001`). ARAYUZLER §10'a göre yuvarlama export'ta; `awc_mm_per_m.value`'yu da 1 ondalığa yuvarlar mısın?
+- [x] **Senin tarafın (export):** `results.soil.awc_mm_per_m.value` yuvarlanmadan yazılıyor (Develi `121.36500000000001`). ARAYUZLER §10'a göre yuvarlama export'ta; `awc_mm_per_m.value`'yu da 1 ondalığa yuvarlar mısın?
 
 ## 13. Muhammet'in doğrulama referanslarını Ömer buldu → `references.yaml` (14 Kas)
 

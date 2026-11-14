@@ -29,3 +29,11 @@ def test_real_defaults_keep_pending_as_null():
     assert d["values"]["karapinar"]["wheat"]["ym_kg_per_da"]["value"] is None
     m = export._defaults(mock=True, ts="t")
     assert m["values"]["karapinar"]["wheat"]["ym_kg_per_da"]["value"] is not None
+
+
+def test_awc_value_rounded_to_one_decimal():
+    out = {"location_id": "develi", "sequences": [], "ledger": [],
+           "awc_used": {"value": 121.36500000000001, "unit": "mm/m", "source": "s", "type": "assumption", "verified": False}}
+    r = export._results(out, mock=False, ts="t")
+    assert r["soil"]["awc_mm_per_m"]["value"] == 121.4
+    assert out["awc_used"]["value"] == 121.36500000000001  # input not mutated

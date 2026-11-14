@@ -106,7 +106,7 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 - [x] **T+2–2.75: SoilGrids tek seferlik çekim (45 dk sınır)** → `data/soilgrids/{lokasyon}.json`; olmazsa Muhammet'e "elle oku" de — ✅ 16:45 (gumus/soilgrids)
 - [x] **T+2.75–4: economics.ts + vitest testleri** — P10/P50/P90, zarar olasılığı, başabaş verimi, flip tablosu, öncelik puanı (§5.9) → M1 — ✅ 16:47 (gumus/economics)
 - [x] **T+4–7: export.py + build.py** — mock runner ile uçtan uca, şema doğrulama testi — ✅ 16:29 (gumus/m0; düzeltmeler gumus/economics öncesi main'de)
-- [ ] **T+7–9: `make data` → gerçek JSON → Vercel'de görünüyor, `mock:false`** → M2, `v0.1` etiketini at — ⏳ kalan: Ömer'in AWC değişikliği (OMER_BAKMALI §2) ve `validate.py` bekleniyor; İsmail'in web iskeleti/Vercel bekleniyor
+- [ ] **T+7–9: `make data` → gerçek JSON → Vercel'de görünüyor, `mock:false`** → M2, `v0.1` etiketini at — ⏳ kalan: sadece Vercel'de görünmesi (İsmail'in web iskeleti yok). Gerçek JSON `mock:false` main'de, `v0.1` etiketi atıldı — 18:28 (gumus/m2)
 - [ ] **T+9–14: Muhammet'in değerlerini defaults.yaml / references.yaml'a, strateji metinlerini rotations.yaml'a geçir (her 2 saatte bir); README teknik kısım** → M3, `v0.2` etiketi
 - [ ] **SMAP verisi geldiğinde: `smap/{lokasyon}.json` üret** — T+12'ye kadar gelmezse `available:false`, E1'e kalır
 - [ ] **T+14–16: Genişletme E1 veri tarafı + E2 için sözleşme (tipler, `scenarios` listesi)**

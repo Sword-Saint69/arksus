@@ -6,7 +6,7 @@ Web tarafına başlarken `main`'i çek; aşağıdakiler hazır. Gümüş'ün dos
 
 | Ne | Nerede | Sahibi |
 |---|---|---|
-| 6 tür veri dosyası (9 JSON), şu an **mock** | `web/public/data/` | Gümüş |
+| 6 tür veri dosyası (9 JSON), **gerçek veri (`mock: false`, M2, `v0.1`)** | `web/public/data/` | Gümüş |
 | Sözleşme tipleri | `web/src/lib/types.ts` | Gümüş |
 | Para, aralık, flip ve öncelik hesabı | `web/src/lib/economics.ts` | Gümüş |
 | Testler (22 vitest) | `web/src/lib/{economics,contract}.test.ts` | Gümüş |
@@ -52,7 +52,7 @@ const ranked = rankByPriority(cards, { water: 34, income: 33, soil: 33 }); // ka
 
 ## 5. Gösterim kuralları (önemli)
 
-- [ ] **Mock bandı:** yüklenen herhangi bir dosyada `mock: true` varsa görünür bant. Şu an hepsi mock. Gerçek veriye geçişi (M2) Gümüş yapacak; dosya adları ve biçim aynı kalacak, senin kodun değişmeyecek.
+- [ ] **Mock bandı:** yüklenen herhangi bir dosyada `mock: true` varsa görünür bant. **14 Kas'tan beri `main`'deki dosyalar gerçek veri** (`mock: false`). Bandı denemek ya da maliyet/Ym dolu sahte sayılarla çalışmak istersen yerelde `cd engine && python -m nobetsu.build --mock --out ../web/public/data` çalıştır, **ama bunu commit etme** (`git checkout web/public/data` ile geri al).
 - [ ] **`value: null` = "bekleniyor".** V nesnelerinde değer `null` olabilir; ekranda **0 değil**, "bekleniyor / pending" yaz. `economics.ts` null'ı 0 sayıyor, yani:
   - [ ] **Gerçek veride şu an maliyetler ve Ym boş** (kaynak bulunamadı). Bunlar boşken para kartlarında "maliyet / verim verisi eksik, sonuç eksik" uyarısı göster; net kâr sayısını tek başına gösterme. (Mock'ta bu boşluklar `source: "MOCK…"` sahte sayılarla dolu, o yüzden mock'ta uyarı görünmez.)
 - [ ] **Rozet:** her sayının `type`'ı var: `measured, model, official, statistic, literature, assumption, user`. `verified: false` olanlar en az "assumption" gibi görünmeli ya da yanında "doğrulanmadı" notu olmalı.
@@ -80,3 +80,9 @@ const ranked = rankByPriority(cards, { water: 34, income: 33, soil: 33 }); // ka
 
 - [ ] Web iskeleti + Vercel linki gelince gruba yaz; `make test` web testlerini de çalıştırmaya başlar.
 - [ ] Sözleşmede eksik ya da garip bir alan görürsen **kendi tipini yazma**, bana yaz (aynı saat içinde düzeltirim).
+
+## 9. M2 yapıldı (14 Kas)
+
+- `web/public/data/` artık gerçek NASA POWER + motor çıktısı, `mock: false`, etiket `v0.1`.
+- [ ] Gerçek veride **maliyet ve Ym `null`** (kaynak bulunamadı) → para kartlarında "veri eksik" durumu şimdiden görünecek; §5'teki uyarıyı ilk sürümde kur.
+- [ ] SMAP iki lokasyonda da `available: false` (mock'taki Karapınar örneği artık yok; "yakında" durumu ile başla).

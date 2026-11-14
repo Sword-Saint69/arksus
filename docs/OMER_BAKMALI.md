@@ -60,3 +60,18 @@ Muhammet'in `ref.*` işini ben yaptım; `engine/config/references.yaml` artık g
 Üçü düzelince `gumus/muhammet-sources`'u main'e alacağım (testler geçmeden merge yok). Diğer 152 test geçiyor.
 
 Düzeldi (Ömer, `omer` 46b2e28): üç test kendi `refs` değerini ayarlıyor; `gumus/muhammet-sources` ile birlikte yeşil.
+
+## 5. M2 yapıldı — gerçek sonuçlardan iki gözlem (14 Kas)
+
+`main`'deki `web/public/data` artık senin motorunla gerçek veri (`mock: false`, etiket `v0.1`); AWC yuvarlaması düzeldi (Karapınar 154,7, Develi 121,4). Orta derinlik, 24 yıl ortancası:
+
+| | nadas | nohut | mercimek |
+|---|---|---|---|
+| Karapınar: buğday ekiminde su (mm) | 103,9 | 0,1 | 12,6 |
+| Karapınar: buğday Ya/Ym | 0,54 | 0,48 | 0,49 |
+| Develi: buğday ekiminde su (mm) | 56,6 | 0,0 | 6,0 |
+| Çıplak gün / rüzgâra açık (Karapınar) | 460 / 88 | 332 / 54 | 310 / 48 |
+
+Kontrol etmeni istediğim iki şey (hata olduğunu söylemiyorum, emin olmak için):
+- [ ] **Çiçeklenmede sıcak gün ortancası her rotasyonda 0** (eşik artık 31 °C, POWER `T2M_MAX`). POWER hücresi Karapınar'da 1236 m'de; çiçeklenme penceresi Mayıs sonu–Haziran başı mı? Sıfır mı çıkmalı, yoksa pencere/eşik eşleşmesinde bir sorun mu var?
+- [ ] **Nohuttan sonra buğday ekiminde su ≈ 0 mm** (Temmuz ortası hasat → Ekim ekimi). Yaz kuraklığı düşünülünce makul olabilir; yine de 24 yılın P90'ı da 0'a yakınsa Ekim başı yağışlarının profile girişini bir kontrol et.
