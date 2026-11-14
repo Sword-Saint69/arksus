@@ -44,6 +44,7 @@ export type InspectorActions = {
   setScenario: (id: string) => void;
   setWeight: (k: keyof Weights, v: number) => void;
   resetWeights: () => void;
+  simulate: (f: Feature) => void;
 };
 
 const icon = (id: string) => `<svg class="icon" aria-hidden="true"><use href="#${id}"/></svg>`;
@@ -218,6 +219,7 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     <p class="sec-sub">${d.smap && d.smap.available ? 'SMAP' : t('smapComing')}</p>
     ${evidenceHtml(d)}
     <div class="actions" style="margin-top:14px">
+      <button class="btn primary wide" data-act="simulate">▶ ${t('simOpen')}</button>
       <button class="btn" data-act="focus">${icon('i-target')}${t('focus')}</button>
       <button class="btn" data-act="copy" data-ll="${loc.lat}, ${loc.lon}">${icon('i-copy')}${t('coords')}</button>
     </div>
@@ -368,6 +370,7 @@ function wire(root: HTMLElement, ctx: InspectorContext, act: InspectorActions) {
       case 'export-all': act.exportGeoJSON(ctx.selection.filter((s) => s.kind !== 'pilot')); break;
       case 'clear': act.clear(); break;
       case 'reset-weights': act.resetWeights(); break;
+      case 'simulate': act.simulate(f!); break;
     }
   }));
   root.querySelectorAll<HTMLSelectElement>('[data-scenario]').forEach((s) => s.addEventListener('change', () => act.setScenario(s.value)));

@@ -26,6 +26,10 @@ export class MapCamera {
   heading = 0;
   pitch = 0;
   onChange: () => void = () => {};
+  /** Farthest the camera may pull back. */
+  maxDistance = MAX_DIST;
+  /** Scene-space box the view centre must stay in (the map is limited to one country). */
+  bounds: { minX: number; maxX: number; minZ: number; maxZ: number } | null = null;
 
   private goalDist = this.distance;
   private zoomAnchor: THREE.Vector3 | null = null;
@@ -173,7 +177,7 @@ export class MapCamera {
 
   /** Zoom by factor f toward a ground anchor; smooth unless immediate. */
   zoomBy(f: number, anchor: THREE.Vector3 | null, immediate: boolean) {
-    this.goalDist = THREE.MathUtils.clamp(this.goalDist * f, MIN_DIST, MAX_DIST);
+    this.goalDist = THREE.MathUtils.clamp(this.goalDist * f, MIN_DIST, this.maxDistance);
     this.zoomAnchor = anchor;
     if (immediate) this.stepZoom(1);
   }
@@ -197,7 +201,7 @@ export class MapCamera {
     const s = mercToScene(m.x, m.y);
     const to = {
       x: s.x, z: s.z,
-      d: THREE.MathUtils.clamp(opts.distance ?? this.distance, MIN_DIST, MAX_DIST),
+      d: THREE.MathUtils.clamp(opts.distance ?? this.distance, MIN_DIST, this.maxDistance),
       h: opts.heading ?? this.heading,
       p: opts.pitch ?? this.pitch,
     };
@@ -270,6 +274,10 @@ export class MapCamera {
   }
 
   apply() {
+    if (this.bounds) {
+      this.target.x = THREE.MathUtils.clamp(this.target.x, this.bounds.minX, this.bounds.maxX);
+      this.target.z = THREE.MathUtils.clamp(this.target.z, this.bounds.minZ, this.bounds.maxZ);
+    }
     // Follow the ground smoothly so the view does not jump as better elevation loads.
     const ground = this.terrain.sceneHeight(this.target.x, this.target.z);
     this.targetY += (ground - this.targetY) * 0.2;
