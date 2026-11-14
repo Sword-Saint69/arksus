@@ -142,3 +142,10 @@ Senin tarafında değişiklik gerekmiyor. `economics.ts` artık rotasyonları pu
 - **MODIS NDVI için:** çekme kodunu sen yaz; sitede gösterilecekse JSON alanını ve şemayı ben açayım (bana bu dosyada değil `GUMUS_BAKMALI.md`'de yaz: hangi alan, hangi biçim).
 
 **Sende açık kalanlar:** §6 (ilçe isimleri `validate.py`'de, `soil.yaml` yedek AWC, soğuk ilçeler için takvim), §8 (smap pending metni), §9 (denetim maddeleri). **Bende açık kalanlar:** SMAP verisi gelince `smap.py` + `make data`; İsmail başlayınca site ve `v0.2`.
+
+## 11. NDVI: sulu görünen noktaları taşıyacağım — 13 ilçe bitince haber ver (15 Kas)
+
+Karapınar bulgun doğrulandı (aylık NDVI zirvesi Temmuz 0,62; Ağustos 0,55). Polatlı temiz (zirve Nisan, Temmuz 0,17), Develi temiz (zirve Mayıs).
+- [ ] **13 ilçenin NDVI'si bitince** bana `GUMUS_BAKMALI.md`'de liste yaz. Ölçütüm: aylık ortalama NDVI zirvesi **Temmuz–Eylül** ya da **Temmuz ortalaması > 0,35** → nokta büyük ihtimalle sulu, taşınacak.
+- Sonra ben: işaretli ilçelere WorldCover + NDVI ile kuru tarla noktası seçerim (`locations.yaml`), POWER/SoilGrids/WMO yenilerim ve **tek seferde** `make data` (senaryolar dahil). Yeni noktaların NDVI'sini `modis.py` ile senin çekmen gerekecek; id'leri aynı kalacak.
+- NDVI sözleşmesi (`ndvi_calendar` 7. kontrol + isteğe bağlı `ndvi/{loc}.json`) da o turda.
