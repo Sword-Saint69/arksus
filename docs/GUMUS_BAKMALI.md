@@ -122,3 +122,24 @@ Bulunamayan: Kayseri'ye özel ekim/hasat takvimi (Develi'de Konya takvimi kullan
 - §4 senin branch'inde olduğu için orada işaretleyemedim; birleştirince `[x]` sayabilirsin.
 - [x] **Dikkat, TASKS.md çakışacak:** ikimiz de Muhammet bölümündeki "takvim" ve "doğrulama kaynakları" satırlarını işaretledik (`omer`: "Ömer yaptı", senin branch: "gümüş yaptı"). Takvimleri ben `crops.yaml`'a kaynaklı geçirdim; doğrulama referanslarını ikimiz de bulduk (senin MGM değerin daha iyi: WMO Karapınar istasyonu). Birleştirirken iki notu da tutabilirsin.
 - Bu notun §13'ündeki referans değerleri artık senin branch'inde var; §13'ü kapatabilirsin (MGM için senin WMO değerlerin geçerli).
+
+## 15. E1 SMAP karşılaştırması — motor tarafı hazır (14 Kas, branch `exp/E1-smap`)
+
+Motor tarafı yazıldı ve test edildi (164 test geçiyor). Gerçek SMAP verisi olmadan sitede görünmez; **senden 3 şey lazım**:
+
+- [ ] **SMAP verisi.** `smap/{loc}.json` (sözleşmedeki biçim) `available: true` ve `monthly_series[].rootzone_wetness` dolu olmalı; motor yalnızca bunu okuyor. AppEEARS / Earth Engine Earthdata girişi istiyor, ben yapamam. En az **24 ay** örtüşme yoksa kontrol `pending` kalır.
+- [ ] **Sözleşme: 6. kontrol `smap_anomaly`.** `validation.schema.json`'da `checks` şu an tam 5 eleman ve `id` enum'unda `smap_anomaly` yok. PLAN_EXPANSION E1 bunu istiyor. Kabul edersen: enum'a `smap_anomaly` ekle, `maxItems` 6, `types.ts` + mock. Format diğer kontrollerle aynı (`id, status, value, reference, note{en,tr}`), durum `info` ya da `pending`.
+- [ ] **`build.py` bağlantısı** (sözleşme değişince):
+
+  ```python
+  from .runner import run_landscape
+  from .validate import check_smap_anomaly
+  lands = {loc: run_landscape(loc, weathers[loc], _soilgrids(loc)) for loc in locations}
+  smaps = {loc: <smap/{loc}.json dict'i> for loc in locations}
+  checks.append(check_smap_anomaly(lands, smaps))
+  ```
+
+  `run_landscape` iki lokasyon için ~2 sn sürüyor.
+- **Yöntem (bilgi):** Model tarafı bir "arazi": iki parsel, biri nadas yılındayken öteki buğdayda (her yıl arazinin yarısı nadas), orta derinlik, 2013-10 → son POWER tarihi, aylık ortalama doluluk. İki seri de takvim ayına göre standart anomaliye çevrilip **Spearman ρ** hesaplanıyor; ayrıca en ıslak / en kuru ay karşılaştırılıyor. Mutlak uyum iddiası yok (not metninde yazıyor).
+- **Gerçek havayla model tarafı:** Karapınar aylık doluluk en yüksek Şubat (%64), en düşük Ağustos–Eylül (%28); Develi Şubat–Mart (%57) / Temmuz–Eylül (%26).
+- (İsteğe bağlı) Kanıt panelinde küçük grafik istenirse aylık anomali serisini (`validate.smap_comparison` içindeki iki seri) dışa vermek kolay; sözleşmede yer açarsan yazarım.

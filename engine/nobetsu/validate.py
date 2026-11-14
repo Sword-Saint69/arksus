@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import statistics
 
+import numpy as np
+
 import pandas as pd
 
 from nobetsu import et0 as et0_mod
@@ -210,3 +212,98 @@ def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs:
     ]
     assert [c["id"] for c in checks] == list(CHECK_IDS)
     return checks
+
+
+# --- E1: SMAP L4 root-zone anomaly comparison (PLAN_EXPANSION E1) ---------------------------
+# Not yet part of run_checks(): the contract has exactly five checks. A sixth id
+# (`smap_anomaly`) needs Gümüş to extend validation.schema.json first.
+
+SMAP_MIN_MONTHS = 24
+
+
+def monthly_anomalies(series: pd.Series) -> pd.Series:
+    """Standardised anomaly per calendar month: (x − mean_month) / std_month."""
+    g = series.groupby(series.index.month)
+    std = g.transform("std", ddof=0).replace(0.0, float("nan"))
+    return ((series - g.transform("mean")) / std).fillna(0.0)
+
+
+def spearman(x, y) -> float:
+    """Spearman rank correlation (average ranks for ties)."""
+    rx = pd.Series(list(x), dtype=float).rank(method="average").to_numpy()
+    ry = pd.Series(list(y), dtype=float).rank(method="average").to_numpy()
+    if len(rx) < 3 or rx.std() == 0 or ry.std() == 0:
+        return float("nan")
+    return float(np.corrcoef(rx, ry)[0, 1])
+
+
+def _smap_monthly(smap: dict) -> pd.Series:
+    rows = [r for r in smap.get("monthly_series", []) if r.get("rootzone_wetness") is not None]
+    if not rows:
+        return pd.Series(dtype=float)
+    return pd.Series([float(r["rootzone_wetness"]) for r in rows],
+                     index=pd.DatetimeIndex([pd.Timestamp(r["month_start"]) for r in rows])).sort_index()
+
+
+def smap_comparison(landscape: pd.DataFrame, smap: dict) -> dict:
+    """Compare monthly model fullness (landscape run) with SMAP root-zone wetness.
+
+    Both are reduced to standardised monthly anomalies over the overlapping months, so the
+    different definitions (fullness = share of available water capacity; SMAP wetness =
+    degree of saturation of a 9 km model cell) do not matter for the correlation.
+    """
+    days = landscape["fullness_pct"].groupby(landscape.index.to_period("M")).size()
+    model = landscape["fullness_pct"].resample("MS").mean() / 100.0
+    full_months = days[days == days.index.days_in_month].index.to_timestamp()
+    model = model.loc[model.index.isin(full_months)]
+    sm = _smap_monthly(smap)
+    both = pd.concat({"model": model, "smap": sm}, axis=1, join="inner").dropna()
+    out = {"n_months": int(len(both))}
+    if len(both) < 3:
+        return out
+    za, zb = monthly_anomalies(both["model"]), monthly_anomalies(both["smap"])
+    clim_m = both["model"].groupby(both.index.month).mean()
+    clim_s = both["smap"].groupby(both.index.month).mean()
+    out.update(
+        first_month=both.index[0].date().isoformat(),
+        last_month=both.index[-1].date().isoformat(),
+        spearman_anomaly=spearman(za, zb),
+        spearman_seasonal=spearman(clim_m, clim_s),
+        model_wettest_month=int(clim_m.idxmax()), model_driest_month=int(clim_m.idxmin()),
+        smap_wettest_month=int(clim_s.idxmax()), smap_driest_month=int(clim_s.idxmin()),
+    )
+    return out
+
+
+def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dict]) -> dict:
+    """Sixth check (E1) in the validation.json item format; `info` or `pending`."""
+    parts = []
+    for loc, land in landscapes.items():
+        smap = smaps.get(loc) or {}
+        if not smap.get("available"):
+            continue
+        s = smap_comparison(land, smap)
+        if s["n_months"] < SMAP_MIN_MONTHS:
+            continue
+        parts.append(
+            f"{_name(loc)}: ρ = {s['spearman_anomaly']:.2f} for monthly anomalies "
+            f"({s['n_months']} months, {s['first_month'][:7]} → {s['last_month'][:7]}); "
+            f"wettest month model {s['model_wettest_month']} / SMAP {s['smap_wettest_month']}, "
+            f"driest model {s['model_driest_month']} / SMAP {s['smap_driest_month']}"
+        )
+    if not parts:
+        return _check("smap_anomaly", "pending", "", "",
+                      "Waiting for NASA SMAP L4 root-zone data for the two points.",
+                      "İki nokta için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
+    return _check(
+        "smap_anomaly", "info", "; ".join(parts),
+        "NASA SMAP L4 SPL4SMGP v8 root-zone wetness, 9 km cell, monthly means",
+        "Spearman correlation of month-by-month anomalies between the model's soil-water fullness "
+        "(a landscape where half the land is fallow and half is wheat each year, medium soil) and SMAP. "
+        "It checks timing of wet and dry spells, not absolute agreement: SMAP is a satellite-assisted "
+        "model of a 9 km mixed cell and knows nothing about our rotations.",
+        "Modelin toprak suyu doluluğu (her yıl arazinin yarısı nadas, yarısı buğday; orta derinlik) ile "
+        "SMAP'in aylık anomalileri arasındaki Spearman korelasyonu. Islak ve kuru dönemlerin zamanlamasını "
+        "kontrol eder, mutlak uyumu değil: SMAP 9 km'lik karışık bir hücrenin uydu destekli modelidir ve "
+        "bizim rotasyonlarımızı bilmez.",
+    )

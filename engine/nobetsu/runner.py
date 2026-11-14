@@ -315,3 +315,64 @@ def run_location(location_id: str, weather: pd.DataFrame, soilgrids: dict | None
         "ledger": ledger,
         "diagnostics": {"max_mass_balance_error_mm": float(max_err), "n_sequences": len(sequences)},
     }
+
+
+# --- E1: continuous "landscape" run for the SMAP comparison --------------------------------
+
+def _continuous_schedule(cycle: list[str], phase: int, index: pd.DatetimeIndex, crops_cfg: dict,
+                         depth_m: float, weather: pd.DataFrame) -> pd.DataFrame:
+    """Repeat a rotation on one parcel: in calendar year y the parcel follows
+    cycle[(y − first year + phase) % len(cycle)]; a crop with a `sowing` date is sown that
+    year, an entry without one leaves the land bare. A season that would run past the end
+    of the weather record is left out (the parcel stays bare for those last weeks).
+    """
+    sched = pd.DataFrame({"kcb": 0.0, "zr_m": 0.0, "h_m": 0.0, "p": 0.0, "crop": "bare"}, index=index)
+    y0 = index[0].year
+    for y in range(y0, index[-1].year + 1):
+        crop_id = cycle[(y - y0 + phase) % len(cycle)]
+        cfg = crops_cfg[crop_id] or {}
+        if "sowing" not in cfg:
+            continue
+        sow = rotations._sowing_date(cfg, y)
+        end = sow + pd.Timedelta(days=rotations.season_length(cfg) - 1)
+        if sow < index[0] or end > index[-1]:
+            continue
+        curve = rotations.season_curve(cfg, sow, depth_m, weather)
+        sched.loc[curve.index, ["kcb", "zr_m", "h_m", "p"]] = curve[["kcb", "zr_m", "h_m", "p"]].to_numpy()
+        sched.loc[curve.index, "crop"] = crop_id
+    return sched
+
+
+def run_landscape(location_id: str, weather: pd.DataFrame, soilgrids: dict | None, *,
+                  start: str = "2013-10-01", depth_id: str = "medium", cycle: list[str] | None = None) -> pd.DataFrame:
+    """Daily available water of a landscape made of two parcels running the baseline
+    rotation one year apart (in any year half the land is fallow, half is wheat), averaged.
+
+    This is the engine-side series compared with SMAP L4 root-zone wetness in E1: a 9 km
+    SMAP cell mixes fields in both phases. Returns daily aw_mm / fullness_pct (landscape),
+    the two parcels (aw_mm_a/b, crop_a/b); attrs: cycle, capacity_mm, awc_used,
+    max_mass_balance_error_mm.
+    """
+    crops_cfg = _load_config("crops")
+    soil_cfg = _load_config("soil")
+    cycle = list(cycle or _rotation_list()[0]["crops"])
+    depth = next(d for d in soil_cfg["depth_classes"] if d["id"] == depth_id)
+    awc, overrides = soil_setup(location_id, soilgrids, soil_cfg)
+    soil = wb.SoilProfile.from_config(soil_cfg, awc_mm_per_m=awc["value"], depth_m=depth["depth_m"], **overrides)
+    index = pd.date_range(pd.Timestamp(start), weather.index[-1], freq="D", name="date")
+
+    cols, errors = {}, []
+    for phase, tag in ((0, "a"), (1, "b")):
+        sched = _continuous_schedule(cycle, phase, index, crops_cfg, depth["depth_m"], weather)
+        out = wb.simulate(wb.daily_inputs(weather, sched), soil,
+                          init_fraction=float(soil_cfg["initial_fill_fraction"]["value"]))
+        cols[f"aw_mm_{tag}"] = out["aw_mm"]
+        cols[f"crop_{tag}"] = sched["crop"]
+        errors.append(wb.mass_balance_error(out))
+
+    land = pd.DataFrame(cols, index=index)
+    land["aw_mm"] = (land["aw_mm_a"] + land["aw_mm_b"]) / 2.0
+    land["fullness_pct"] = (land["aw_mm"] / soil.capacity_mm * 100.0).clip(0.0, 100.0)
+    land.attrs.update(cycle=cycle, capacity_mm=soil.capacity_mm, awc_used=awc,
+                      max_mass_balance_error_mm=float(max(errors)), location_id=location_id)
+    return land
