@@ -234,3 +234,31 @@ AppEEARS SMAP isteği gelmediği için E1 kontrolü artık **SMAP yoksa MERRA-2'
 - Kapsadığı değişiklikler: yağış istasyon düzeltmesi (§20), ilçe adları, IMERG sütunu (§17), 6. kontrol MERRA-2 ile `info` (§22). 6 kontrol: 2 pass, 4 info.
 - Testler: motor 229, web 37 geçti; harita derleniyor.
 - [ ] Noktaları taşıdıktan sonra `make data` yine gerekecek (bu koşu taşıma öncesi noktalarla).
+
+## 24. 8 nokta taşındı, SMAP kaldırıldı, `make data` yapıldı (15 Kas, Ömer — senin onayınla)
+
+**Nokta seçimi:** her ilçede eski noktanın ±8 km çevresi tarandı. Piksel iki ölçütü birden geçmeli:
+1. ESA WorldCover 2021 v200 (AWS'deki açık COG): 300 m yarıçapta ≥ %60 cropland (≥ %80 olanlar öncelikli);
+2. MODIS MOD13Q1 NDVI 2020–2023: **hiçbir yıl** yazın yeşil değil (Tem ≤ 0,30, Ağu ≤ 0,28, Tem–Eyl zirvesi yok) ve en az bir yıl ilkbahar ürünü; 3×3 komşuluğun ≥ 5'i geçiyor.
+NDVI tek başına yetmedi (adayların çoğu WorldCover'a göre bozkır/mera çıktı); WorldCover tek başına sulu/kuru ayırmıyor; ikisi birlikte kullanıldı. En yakın uygun piksel seçildi.
+
+| İlçe | Eski | Yeni | km | Cropland | NDVI zirve ay / zirve / Tem |
+|---|---|---|---|---|---|
+| karapinar | 37.72, 33.48 | 37.6698, 33.4801 | 5.58 | %80 | 4 / 0.321 / 0.221 |
+| eskisehir | 39.806, 30.568 | 39.8427, 30.5945 | 4.67 | %91 | 5 / 0.476 / 0.218 |
+| aksaray | 38.371, 33.964 | 38.4031, 33.9765 | 3.74 | %88 | 5 / 0.58 / 0.27 |
+| karaman | 37.234, 33.22 | 37.1698, 33.1109 | 12.01 | %100 | 5 / 0.379 / 0.203 |
+| nigde | 37.918, 34.628 | 37.876, 34.6795 | 6.5 | %89 | 4 / 0.327 / 0.174 |
+| nevsehir | 38.576, 34.616 | 38.5385, 34.6477 | 4.99 | %85 | 5 / 0.318 / 0.254 |
+| gemerek | 39.172, 36.115 | 39.1573, 36.1379 | 2.56 | %86 | 5 / 0.398 / 0.26 |
+| bogazliyan | 39.217, 35.253 | 39.2219, 35.2406 | 1.19 | %100 | 5 / 0.46 / 0.179 |
+
+- `locations.yaml`: lat/lon, `coord_check` (yöntem + sayılar), başa yöntem notu. `coord_verified: true` kaldı (artık iki ölçütle).
+- `references.yaml`: 8 istasyon metninde "noktaya ~X km" yeniden hesaplandı (3,7–10,0 km; Karaman 10,0 km — ovanın çoğu sulu).
+- Yeniden çekildi: POWER (hücreler aynı kaldı, ~50 km), SoilGrids, IMERG, MERRA-2 (+ nem yuvası), NDVI (2020–2023 taramadan; 2013–2019 ve 2024 iniyor).
+- **Sonuç etkisi küçük** (hava aynı hücre): örn. Karapınar AWC 154,7 → 157,1; sıralamalar hemen hemen aynı. Kütle dengesi 1,3e-12 mm.
+- `locations.yaml` notlarındaki yön ifadeleri ("ilçe merkezinin batısında" vb.) eski noktaya göre yazılmıştı; yeni noktalar 1–12 km kaydı, metinleri kontrol etmek isteyebilirsin.
+
+**SMAP kaldırıldı:** nem yuvası (`data/smap/`, `smap/{id}.json`, kontrol `smap_anomaly`) NASA MERRA-2 ile dolu; şemada `latest.rootzone_m3m3` boş olabilir, `types.ts` de öyle; `export.py` varsayılan ürünü MERRA-2; harita ve web'de "SMAP" yazısı yok, rozet "model". Dosya ve id adları sözleşme bozulmasın diye aynı; istersen sonra `soil_wetness` adına çevir. `smap.py` (AppEEARS işleyicisi) ve `data/smap/appeears_*` dokunulmadı, artık kullanılmıyor.
+
+**Toprak işleme (`rotations.yaml`):** nohut 3 (TTAE Babaoğlu), mercimek 2 (TTAE Süzer), `literature`.

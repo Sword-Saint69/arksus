@@ -4,15 +4,15 @@
  "source_url": "https://gdex.ucar.edu/datasets/d736000/",
  "refs_url": "https://data.gdex.ucar.edu/d736000/kerchunk/GPM_3IMERGM_v07-remote-https.json",
  "point": {
-  "lat": 39.172,
-  "lon": 36.115
+  "lat": 39.1573,
+  "lon": 36.1379
  },
  "cell_centre": {
   "lat": 39.15,
   "lon": 36.15
  },
  "unit": "mm/month",
- "fetched_at": "2026-11-14T20:36:16Z",
+ "fetched_at": "2026-11-15T00:28:13Z",
  "months": [
   {
    "month": "2000-06",

@@ -25,6 +25,8 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 
 - Claude Code (Opus 5.5) — SMAP yerine NASA MERRA-2 toprak ıslaklığı (POWER GWETROOT): çekim, E1 kontrolünde SMAP→MERRA-2 düşüşü, testleri, harita metinleri — `engine/nobetsu/{merra2,validate}.py`, `engine/tests/{test_merra2,conftest}.py`, `data/merra2/*.json`, `map/src/strings.ts`
 - Claude Code (Opus 5.5) — POWER yağışına istasyon düzeltmesi (doğrusal ölçekleme), testleri — `engine/nobetsu/{runner,validate}.py`, `engine/config/scenarios.yaml`, `engine/tests/test_precipcorr.py`
+- Claude Code (Opus 5.5) + tarayıcı/WebSearch — 8 sulu noktanın taşınması (MODIS NDVI komşuluk taraması + ESA WorldCover), veri yenileme ve make data; SMAP'in kaldırılıp MERRA-2 ile değiştirilmesi (sözleşme, export, iki arayüz); baklagil toprak işleme kaynakları — `engine/config/{locations,references,rotations}.yaml`, `docs/contract/smap.schema.json`, `web/src/{lib/types,strings}.ts`, `web/src/sections/SoilHealth.tsx`, `map/src/*`, `data/**`, `web/public/data/**`
+
 ## Gümüş
 - Claude Code (Opus 5.5) — M0 sözleşme iskeleti: paket, config, mock runner, export/build, JSON şemaları, testler, types.ts, economics.ts — `engine/`, `docs/contract/`, `web/src/lib/`, `Makefile`
 - Claude Code (Opus 5.5) — NASA POWER çekimi, önbellek, birim/boşluk işleme ve testleri — `engine/nobetsu/power.py`, `engine/tests/test_power.py`
