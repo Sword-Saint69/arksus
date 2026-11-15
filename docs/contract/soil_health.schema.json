@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/soil_health.schema.json",
+  "title": "soil_health",
+  "description": "Soil-health card (15 Nov, docs/GUBRE.md §10): practices with evidence, organic-matter classes; computed by web/src/lib/soilhealth.ts. No money.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "om_classes",
+    "practices"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "om_classes": {
+      "type": "object",
+      "required": [
+        "rows",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "max",
+              "label"
+            ],
+            "properties": {
+              "max": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "label": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "practices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "body",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "when": {
+            "$ref": "#/$defs/when"
+          },
+          "title": {
+            "$ref": "#/$defs/text"
+          },
+          "body": {
+            "$ref": "#/$defs/text"
+          },
+          "show_model": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "text",
+                "source",
+                "type",
+                "verified"
+              ],
+              "properties": {
+                "text": {
+                  "$ref": "#/$defs/text"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "source_url": {
+                  "type": "string"
+                },
+                "type": {
+                  "$ref": "#/$defs/badge"
+                },
+                "verified": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "badge": {
+      "enum": [
+        "measured",
+        "model",
+        "official",
+        "statistic",
+        "literature",
+        "assumption",
+        "user"
+      ]
+    },
+    "text": {
+      "type": "object",
+      "required": [
+        "tr",
+        "en"
+      ],
+      "properties": {
+        "tr": {
+          "type": "string"
+        },
+        "en": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "when": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "location_id",
+          "depth",
+          "depth_known",
+          "water",
+          "om_pct",
+          "ec_ds_m",
+          "practice"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "gt": {
+            "type": "number"
+          },
+          "gte": {
+            "type": "number"
+          },
+          "lt": {
+            "type": "number"
+          },
+          "lte": {
+            "type": "number"
+          },
+          "eq": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "in": {
+            "type": "array"
+          },
+          "missing": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      }
+    }
+  }
+}

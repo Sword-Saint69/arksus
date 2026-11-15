@@ -202,6 +202,17 @@ crops:
         - { min: 500, max: 600, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 40, max_kg_per_da: 40 }, { product: can, timing: top_1, min_kg_per_da: 14, max_kg_per_da: 14 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
         - { min: 600, max: 700, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 45, max_kg_per_da: 45 }, { product: can, timing: top_1, min_kg_per_da: 16, max_kg_per_da: 16 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
         - { min: 700, max: null, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 50, max_kg_per_da: 50 }, { product: can, timing: top_1, min_kg_per_da: 18, max_kg_per_da: 18 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
+    # What farmers actually apply (shown next to the plan for comparison; never used in the calculation).
+    farmer_practice:
+      text: { tr: "Konya-Cihanbeyli'de 2023'te 70 buğday işletmesinde (36 sulu, 34 kuru) ortalama uygulama", en: "Average practice on 70 wheat farms in Konya-Cihanbeyli in 2023 (36 irrigated, 34 rainfed)" }
+      doses:
+        - { product: dap, timing: base, kg_per_da: 21.0, farms: 60 }
+        - { product: urea, timing: top_1, kg_per_da: 11.12, farms: 67 }
+      note: { tr: "Bazı işletmeler DAP yerine 11 kg/da 20-20-0 (20 işletme), üreye ek ya da yerine 7 kg/da CAN (25 işletme) kullanıyor. Çiftçilerin %60'ı son 5 yılda gübreyi artırdığını söyledi.", en: "Some farms use 11 kg/da 20-20-0 instead of DAP (20 farms) and 7 kg/da CAN with or instead of urea (25 farms). 60 % of farmers said they raised fertilizer use over the last 5 years." }
+      source: "Tapkı ve Göz 2025, Wheat Studies 14(1): 1–10 — Konya-Cihanbeyli 2023 yüz yüze anket, 70 buğday işletmesi"
+      source_url: "https://dergipark.org.tr/tr/download/article-file/4639595"
+      type: statistic
+      verified: true
     advice:
       - id: cereal_can_not_urea
         text: { en: "CAN is used for top dressing: if no rain falls for 5–10 days after spreading and it is hot, urea loses much of its nitrogen to the air; CAN loses very little.", tr: "Üst gübrede CAN kullanılır: atıştan sonra 5–10 gün yağmur yağmaz ve hava sıcak olursa üre azotunun çoğunu havaya kaybeder; CAN'da kayıp çok azdır." }
@@ -265,9 +276,14 @@ crops:
       irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
     soil_tables:
       n:
-        rainfed: { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Nohut Kuru; dipnot: baklagillerde azotun gübre yerine bakteri aşısıyla sağlanması tavsiye edilir", rows: [ { max: 1.0, kg_per_da: 5 }, { max: 2.0, kg_per_da: 4 }, { max: 3.0, kg_per_da: 3 }, { max: null, kg_per_da: 3 } ] }
+        rainfed: &chickpea_n_kuru { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Nohut Kuru; dipnot: baklagillerde azotun gübre yerine bakteri aşısıyla sağlanması tavsiye edilir", rows: [ { max: 1.0, kg_per_da: 5 }, { max: 2.0, kg_per_da: 4 }, { max: 3.0, kg_per_da: 3 }, { max: null, kg_per_da: 3 } ] }
+        # TAGEM gives only a "Kuru" row for chickpea; with some or full irrigation the dry-land row is used (assumption).
+        limited:   &chickpea_n_sulu { <<: *chickpea_n_kuru, type: assumption, verified: false, source: "TAGEM Çizelge 1'de Orta Anadolu nohut için sadece Kuru satırı var; sulamada kuru satır kullanıldı (proje varsayımı; İç Anadolu'da nohut çoğunlukla kuru tarımda yetişir)" }
+        irrigated: *chickpea_n_sulu
       p2o5:
-        rainfed: { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Nohut Kuru", rows: [ { max: 1.0, kg_per_da: 8 }, { max: 2.0, kg_per_da: 7 }, { max: 3.0, kg_per_da: 5 }, { max: 4.0, kg_per_da: 4 }, { max: 5.0, kg_per_da: 4 }, { max: 6.0, kg_per_da: 3 }, { max: 7.0, kg_per_da: 2 }, { max: null, kg_per_da: 0 } ] }
+        rainfed: &chickpea_p_kuru { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Nohut Kuru", rows: [ { max: 1.0, kg_per_da: 8 }, { max: 2.0, kg_per_da: 7 }, { max: 3.0, kg_per_da: 5 }, { max: 4.0, kg_per_da: 4 }, { max: 5.0, kg_per_da: 4 }, { max: 6.0, kg_per_da: 3 }, { max: 7.0, kg_per_da: 2 }, { max: null, kg_per_da: 0 } ] }
+        limited:   &chickpea_p_sulu { <<: *chickpea_p_kuru, type: assumption, verified: false, source: "TAGEM Çizelge 22'de Orta Anadolu nohut için sadece Kuru satırı var; sulamada kuru satır kullanıldı (proje varsayımı)" }
+        irrigated: *chickpea_p_sulu
       k2o: {}   # no chickpea row in TAGEM Çizelge 13
     fixed_n_kg_per_da:
       inoculated: { value: 3, unit: kg N/da, <<: *gkgm_legume, source: "GKGM Yemeklik Baklagil: nohutta ekimden önce, nodüller oluşana kadar 2–4 kg/da saf azot (orta değer)" }
@@ -307,9 +323,14 @@ crops:
       irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
     soil_tables:
       n:
-        rainfed: { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Mercimek Kuru; dipnot: baklagillerde azotun bakteri aşısıyla sağlanması tavsiye edilir", rows: [ { max: 1.0, kg_per_da: 5 }, { max: 2.0, kg_per_da: 4 }, { max: 3.0, kg_per_da: 3 }, { max: null, kg_per_da: 3 } ] }
+        rainfed: &lentil_n_kuru { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Mercimek Kuru; dipnot: baklagillerde azotun bakteri aşısıyla sağlanması tavsiye edilir", rows: [ { max: 1.0, kg_per_da: 5 }, { max: 2.0, kg_per_da: 4 }, { max: 3.0, kg_per_da: 3 }, { max: null, kg_per_da: 3 } ] }
+        # Same as chickpea: TAGEM gives only a "Kuru" row for lentil.
+        limited:   &lentil_n_sulu { <<: *lentil_n_kuru, type: assumption, verified: false, source: "TAGEM Çizelge 1'de Orta Anadolu mercimek için sadece Kuru satırı var; sulamada kuru satır kullanıldı (proje varsayımı; İç Anadolu'da mercimek çoğunlukla kuru tarımda yetişir)" }
+        irrigated: *lentil_n_sulu
       p2o5:
-        rainfed: { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Mercimek Kuru", rows: [ { max: 1.0, kg_per_da: 9 }, { max: 2.0, kg_per_da: 8 }, { max: 3.0, kg_per_da: 7 }, { max: 4.0, kg_per_da: 6 }, { max: 5.0, kg_per_da: 5 }, { max: 6.0, kg_per_da: 4 }, { max: 7.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        rainfed: &lentil_p_kuru { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Mercimek Kuru", rows: [ { max: 1.0, kg_per_da: 9 }, { max: 2.0, kg_per_da: 8 }, { max: 3.0, kg_per_da: 7 }, { max: 4.0, kg_per_da: 6 }, { max: 5.0, kg_per_da: 5 }, { max: 6.0, kg_per_da: 4 }, { max: 7.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        limited:   &lentil_p_sulu { <<: *lentil_p_kuru, type: assumption, verified: false, source: "TAGEM Çizelge 22'de Orta Anadolu mercimek için sadece Kuru satırı var; sulamada kuru satır kullanıldı (proje varsayımı)" }
+        irrigated: *lentil_p_sulu
       k2o: {}   # no lentil row in TAGEM Çizelge 13
     fixed_n_kg_per_da:
       inoculated: { value: 2.3, unit: kg N/da, <<: *gkgm_legume, source: "GKGM Yemeklik Baklagil: mercimekte 12–14 kg/da DAP → %18 N ile 2,2–2,5 kg N/da (orta değer 13 kg DAP = 2,3 kg N)" }

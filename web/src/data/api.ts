@@ -4,7 +4,7 @@
 // weekly ledger only when the 3D field view opens.
 
 import type {
-  AgentFile, DefaultsFile, FertilizerFile, LedgerFile, ResultsFile, SiteIndex, SmapFile, ValidationFile,
+  AgentFile, DefaultsFile, FertilizerFile, LedgerFile, ResultsFile, SiteIndex, SmapFile, SoilHealthFile, SowingFile, ValidationFile,
 } from '@/lib/types';
 
 const base = `${import.meta.env.BASE_URL}data`;
@@ -46,3 +46,5 @@ export const loadAgent = (locationId: string) => getJSON<AgentFile>(`agent/${loc
 
 export const loadLedger = (locationId: string) => getJSON<LedgerFile>(`ledger/${locationId}.json`);
 export const loadFertilizer = () => getJSON<FertilizerFile>('fertilizer.json');
+export const loadSowing = () => getJSON<SowingFile>('sowing.json');
+export const loadSoilHealth = () => getJSON<SoilHealthFile>('soil_health.json');

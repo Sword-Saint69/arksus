@@ -70,6 +70,7 @@ def test_all_referenced_products_exist(fert):
         c = fert["crops"][cid]
         refs = [x["product"] for x in c["base_products"] + c["top_products"]] + [c["k_product"]]
         refs += [d["product"] for row in c.get("guide_table", {}).get("rows", []) for d in row["doses"]]
+        refs += [d["product"] for d in c.get("farmer_practice", {}).get("doses", [])]
         assert set(refs) <= products, f"{cid}: unknown {set(refs) - products}"
         assert c["base_products"] and c["top_products"]
         assert "when" not in c["base_products"][-1] and "when" not in c["top_products"][-1], \
@@ -140,6 +141,23 @@ def test_rotation_crops_have_rainfed_tables(fert):
     for cid in ("wheat", "chickpea", "lentil"):
         for nu in ("n", "p2o5"):
             assert "rainfed" in fert["crops"][cid]["soil_tables"][nu], f"{cid}/{nu}"
+
+
+def test_rotation_crops_have_n_and_p_for_every_water_regime(fert):
+    """The water question can be "limited" or "irrigated" for any rotation crop; without a table the card had no dose.
+    TAGEM has only Kuru rows for chickpea and lentil, so their irrigated rows reuse the Kuru numbers as an assumption."""
+    for cid in ("wheat", "chickpea", "lentil"):
+        tables = fert["crops"][cid]["soil_tables"]
+        for nu in ("n", "p2o5"):
+            for r in REGIMES:
+                assert r in tables[nu], f"{cid}/{nu}/{r}: no table"
+    for cid in ("chickpea", "lentil"):
+        for nu in ("n", "p2o5"):
+            kuru = fert["crops"][cid]["soil_tables"][nu]["rainfed"]
+            for r in ("limited", "irrigated"):
+                t = fert["crops"][cid]["soil_tables"][nu][r]
+                assert t["rows"] == kuru["rows"], f"{cid}/{nu}/{r}"
+                assert t["type"] == "assumption" and t["verified"] is False, f"{cid}/{nu}/{r}: must be flagged"
 
 
 def test_rotation_crops_match_engine_crops(fert):

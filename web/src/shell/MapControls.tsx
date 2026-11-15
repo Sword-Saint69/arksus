@@ -18,12 +18,14 @@ const OVERLAYS: { id: OverlayId; key: Key; note?: Key; on: boolean }[] = [
 export function MapControls() {
   const { t, tx } = useT();
   const step = useStore((s) => s.step);
+  // From the questions on the panel is a window over the map: the controls come back when it folds.
+  const covered = useStore((s) => s.step !== 'find' && s.sheetOpen);
   const parcels = useStore((s) => s.parcels);
   const site = useStore((s) => s.core?.site);
   const [open, setOpen] = useState(false);
   const [base, setBase] = useState<BasemapId>('satellite');
   const [on, setOn] = useState<Record<OverlayId, boolean>>(() => Object.fromEntries(OVERLAYS.map((o) => [o.id, o.on])) as Record<OverlayId, boolean>);
-  if (step === 'welcome') return null;
+  if (step === 'welcome' || covered) return null;
 
   const pickBase = (id: BasemapId) => { setBase(id); withMap((m) => m.setBasemap(id)); };
   const toggle = (id: OverlayId) => { const v = !on[id]; setOn({ ...on, [id]: v }); withMap((m) => m.setOverlay(id, v)); };

@@ -1,0 +1,7 @@
+# Vercel project "nobetsu" builds only web/ (rootDirectory: web). Upload nothing else from a CLI deploy.
+/*
+!web
+web/node_modules
+web/dist
+web/.vite
+web/.env*

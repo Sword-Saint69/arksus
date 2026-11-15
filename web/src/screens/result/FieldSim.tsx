@@ -45,7 +45,7 @@ function WaterChart({ site, results, depth }: { site: SiteIndex; results: Result
 
   return (
     <figure className="m-0">
-      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={t('waterChartTitle')}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full max-w-[34rem]" role="img" aria-label={t('waterChartTitle')}>
         {/* second year gets a soft band so the two years read apart */}
         <rect x={x(12)} y={T} width={x(23) - x(12)} height={H - T - B} fill="#f1eee4" />
         {[0, 50, 100].map((v) => (

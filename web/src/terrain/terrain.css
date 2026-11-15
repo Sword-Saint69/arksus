@@ -1,0 +1,51 @@
+/* Field terrain & runoff overlay. Plain CSS (not Tailwind) because the view
+   builds its own DOM; colours come from the site's theme tokens. */
+.ter-root { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgb(10 30 20 / 0.45); font-family: var(--font-sans); color: var(--color-ink); }
+.ter-root .sim-panel { width: min(1240px, 100%); height: min(820px, 100%); display: grid; grid-template-rows: auto 1fr; background: var(--color-paper); border-radius: 22px; box-shadow: var(--shadow-panel); overflow: hidden; }
+.ter-root .sim-head { display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--color-line); }
+.ter-root .sim-head h2 { margin: 0; font-size: 20px; font-weight: 800; }
+.ter-root .sim-head p { margin: 4px 0 0; color: var(--color-muted); font-size: 14px; max-width: 760px; line-height: 1.4; }
+.ter-root .sim-close { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 0; border-radius: 12px; background: var(--color-canvas); font-size: 18px; cursor: pointer; }
+.ter-root .sim-stage { position: relative; min-height: 0; overflow: hidden; }
+.ter-root .sim-stage canvas { display: block; }
+.ter-root .sim-stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ter-root .fv-status { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--color-muted); font-size: 16px; pointer-events: none; }
+.ter-root .fv-side { position: absolute; top: 12px; left: 12px; bottom: 12px; width: 280px; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 14px; border-radius: 16px; background: rgb(251 250 245 / 0.95); border: 1px solid var(--color-line); box-shadow: var(--shadow-float); font-size: 14px; }
+.ter-root .fv-side h3 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--color-muted); font-weight: 800; }
+.ter-root .fv-side section + section { border-top: 1px solid var(--color-line); padding-top: 10px; }
+.ter-root .fv-stats, .ter-root .fv-results { display: grid; gap: 4px; margin: 0; }
+.ter-root .fv-stats div, .ter-root .fv-results div { display: flex; justify-content: space-between; gap: 8px; }
+.ter-root dt { color: var(--color-muted); }
+.ter-root dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.ter-root .fv-results { margin-top: 8px; }
+.ter-root .seg { display: flex; gap: 2px; padding: 3px; margin-bottom: 8px; border-radius: 12px; background: var(--color-canvas); }
+.ter-root .seg button { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: none; font: inherit; font-weight: 700; color: var(--color-muted); cursor: pointer; }
+.ter-root .seg button[aria-pressed="true"] { background: #fff; color: var(--color-ink); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
+.ter-root .fv-range { display: grid; gap: 2px; margin-top: 8px; color: var(--color-muted); }
+.ter-root .fv-range output { float: right; color: var(--color-ink); font-weight: 700; }
+.ter-root .fv-range input { width: 100%; accent-color: var(--color-primary); }
+.ter-root .fv-check { display: flex; align-items: center; gap: 8px; min-height: 32px; }
+.ter-root .fv-check input { accent-color: var(--color-primary); width: 18px; height: 18px; }
+.ter-root .fv-ci { color: var(--color-faint); }
+.ter-root .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--color-line); background: #fff; font: inherit; font-weight: 700; color: var(--color-ink); cursor: pointer; }
+.ter-root .btn.primary { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.ter-root .btn:disabled { opacity: .5; cursor: default; }
+.ter-root .fv-preset { width: 100%; margin-top: 6px; font-size: 13px; text-align: left; justify-content: flex-start; min-height: 40px; }
+.ter-root .fv-buttons { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-top: 10px; }
+.ter-root .fv-ramp { display: block; height: 10px; border-radius: 4px; background: linear-gradient(90deg, #440154, #3b528b, #21918c, #5ec962, #fde725); }
+.ter-root .fv-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-muted); margin: 2px 0 4px; }
+.ter-root .fv-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.ter-root .fv-legend:empty { display: none; }
+.ter-root .fv-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; }
+.ter-root .fv-chip i { width: 11px; height: 11px; border-radius: 3px; border: 1px solid rgb(0 0 0 / .15); }
+.ter-root .fv-note { margin: 0; color: var(--color-faint); font-size: 12px; line-height: 1.45; }
+.ter-root .fv-profile { position: absolute; top: 12px; right: 12px; margin: 0; padding: 8px 10px; border-radius: 14px; background: rgb(251 250 245 / 0.95); border: 1px solid var(--color-line); }
+.ter-root .fv-profile figcaption { font-size: 12px; color: var(--color-muted); margin-bottom: 2px; }
+.ter-root .fv-profile canvas { width: 300px; height: 96px; }
+@media (max-width: 760px) {
+  .ter-root { padding: 0; }
+  .ter-root .sim-panel { border-radius: 0; height: 100%; }
+  .ter-root .fv-side { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 40%; }
+  .ter-root .fv-profile { left: 8px; right: 8px; top: 8px; }
+  .ter-root .fv-profile canvas { width: 100%; }
+}

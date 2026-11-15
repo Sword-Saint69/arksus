@@ -1,0 +1,492 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/sowing.schema.json",
+  "title": "sowing",
+  "description": "How to sow (15 Nov, docs/GUBRE.md §9): sowing windows, seed rates, depth, row spacing and advice; computed by web/src/lib/sowing.ts. No money.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "mock",
+    "generated_at",
+    "seed_formula",
+    "nearest_window_note",
+    "cold_districts",
+    "crops",
+    "annual_precip_mm"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "seed_formula": {
+      "type": "object",
+      "required": [
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "nearest_window_note": {
+      "type": "object",
+      "required": [
+        "text",
+        "districts",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "districts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cold_districts": {
+      "type": "object",
+      "required": [
+        "ids",
+        "text",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "crops": {
+      "type": "object",
+      "required": [
+        "wheat",
+        "barley",
+        "lentil",
+        "chickpea"
+      ],
+      "properties": {
+        "wheat": {
+          "$ref": "#/$defs/crop"
+        },
+        "barley": {
+          "$ref": "#/$defs/crop"
+        },
+        "lentil": {
+          "$ref": "#/$defs/crop"
+        },
+        "chickpea": {
+          "$ref": "#/$defs/crop"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annual_precip_mm": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "value",
+          "unit",
+          "source",
+          "type",
+          "verified"
+        ],
+        "properties": {
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/$defs/badge"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "as_of": {
+            "type": "string"
+          },
+          "station": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "badge": {
+      "enum": [
+        "measured",
+        "model",
+        "official",
+        "statistic",
+        "literature",
+        "assumption",
+        "user"
+      ]
+    },
+    "text": {
+      "type": "object",
+      "required": [
+        "tr",
+        "en"
+      ],
+      "properties": {
+        "tr": {
+          "type": "string"
+        },
+        "en": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "when": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "gt": {
+            "type": "number"
+          },
+          "gte": {
+            "type": "number"
+          },
+          "lt": {
+            "type": "number"
+          },
+          "lte": {
+            "type": "number"
+          },
+          "eq": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "in": {
+            "type": "array"
+          },
+          "missing": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "minProperties": 1
+      }
+    },
+    "range": {
+      "type": "object",
+      "required": [
+        "min",
+        "max",
+        "unit",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "row": {
+      "type": "object",
+      "required": [
+        "min",
+        "max",
+        "unit",
+        "label",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "window": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^\\d\\d-\\d\\d$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^\\d\\d-\\d\\d$"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "advice": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "source",
+        "type",
+        "verified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/badge"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "crop": {
+      "type": "object",
+      "required": [
+        "label",
+        "types",
+        "rows",
+        "advice"
+      ],
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label",
+              "season",
+              "depth_cm"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "$ref": "#/$defs/text"
+              },
+              "season": {
+                "enum": [
+                  "autumn",
+                  "spring"
+                ]
+              },
+              "window": {
+                "type": "object",
+                "required": [
+                  "rainfed",
+                  "limited",
+                  "irrigated"
+                ],
+                "properties": {
+                  "rainfed": {
+                    "$ref": "#/$defs/window"
+                  },
+                  "limited": {
+                    "$ref": "#/$defs/window"
+                  },
+                  "irrigated": {
+                    "$ref": "#/$defs/window"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "window_text": {
+                "$ref": "#/$defs/text"
+              },
+              "seeds_per_m2": {
+                "$ref": "#/$defs/range"
+              },
+              "plants_per_m2": {
+                "$ref": "#/$defs/range"
+              },
+              "guide_kg_per_da": {
+                "$ref": "#/$defs/range"
+              },
+              "depth_cm": {
+                "$ref": "#/$defs/range"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/row"
+          }
+        },
+        "extra_kg_per_da": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/row"
+          }
+        },
+        "advice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/advice"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

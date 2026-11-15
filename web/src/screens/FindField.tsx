@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
   ArrowLeft, Check, ChevronRight, Hash, Info, LandPlot, LoaderCircle, LocateFixed, MapPin, PencilLine, Plus, Search,
   Trash2, TriangleAlert, Undo2, X,
@@ -9,7 +9,7 @@ import { mapNow, withMap } from '@/map/api';
 import { coverageOf } from '@/domain/pilots';
 import { drawnParcel, fieldAreaM2, fieldCentroid, fieldPolygons, pilotParcel, toDonum, type Parcel } from '@/domain/field';
 import type { LngLat } from '@/domain/geo';
-import { parcelAt, TkgmError } from '@/services/tkgm';
+import { onTkgmLimited, parcelAt, TkgmError, tkgmLimited } from '@/services/tkgm';
 import { Button, Card, DataBadge, Note, cn } from '@/ui/kit';
 import { SearchPlace } from './find/SearchPlace';
 import { ParcelNumber } from './find/ParcelNumber';
@@ -34,6 +34,10 @@ export function FindField() {
   const [draft, setDraft] = useState<LngLat[]>([]);
   const [zoom, setZoom] = useState(() => mapNow()?.zoom() ?? 5);
   const seq = useRef(0);
+  // TKGM said "daily limit reached": drawing goes first and the registry options are dimmed, not hidden.
+  const limited = useSyncExternalStore(onTkgmLimited, tkgmLimited);
+  // After locating or searching, a tap would ask TKGM; while it is limited, go straight to drawing there.
+  const pickMode: FindMode = limited ? 'draw' : 'tap';
 
   const commit = useCallback((next: Parcel[], fly = true) => {
     if (!next.length) {
@@ -110,7 +114,8 @@ export function FindField() {
         const at: LngLat = [pos.coords.longitude, pos.coords.latitude];
         setBusy(null);
         withMap((m) => { m.setHere(at); m.flyTo(at, 16.2); });
-        setMode('tap');
+        setDraft([]);
+        setMode(pickMode);
       },
       () => { setBusy(null); setMsg({ tone: 'warn', text: t('locateDenied') }); },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
@@ -210,11 +215,14 @@ export function FindField() {
             <h1 className="text-[1.75rem] font-black leading-tight">{t('findTitle')}</h1>
             <p className="mt-1 text-base text-muted">{t('findSub')}</p>
           </div>
+          {limited && <Note tone="info" icon={<Info size={20} />}>{t('tkgmBusyNote')}</Note>}
+          {limited && <Method icon={<PencilLine size={26} />} k="mDraw" onClick={() => open('draw')} />}
           <Method icon={<LocateFixed size={26} />} k="mLocate" onClick={locate} />
-          <Method icon={<MapPin size={26} />} title={t('tapTitle')} sub={zoom < PICK_ZOOM ? t('tapHintFar') : t('tapHintNear')} onClick={() => open('tap')} />
+          <Method icon={<MapPin size={26} />} title={t('tapTitle')} dim={limited}
+            sub={limited ? t('tkgmBusySub') : zoom < PICK_ZOOM ? t('tapHintFar') : t('tapHintNear')} onClick={() => open('tap')} />
           <Method icon={<Search size={26} />} k="mSearch" onClick={() => open('search')} />
-          <Method icon={<Hash size={26} />} k="mNumber" onClick={() => open('number')} />
-          <Method icon={<PencilLine size={26} />} k="mDraw" onClick={() => open('draw')} />
+          <Method icon={<Hash size={26} />} k="mNumber" dim={limited} sub={limited ? t('tkgmBusySub') : undefined} onClick={() => open('number')} />
+          {!limited && <Method icon={<PencilLine size={26} />} k="mDraw" onClick={() => open('draw')} />}
           <Method icon={<LandPlot size={26} />} k="mPilot" onClick={() => open('pilot')} />
         </div>
       )}
@@ -235,11 +243,12 @@ export function FindField() {
           {mode === 'search' && (
             <SearchPlace onPick={(hit) => {
               withMap((m) => (hit.bbox ? m.fitBounds(hit.bbox) : m.flyTo([hit.lon, hit.lat], 15)));
-              setMode('tap');
+              setDraft([]);
+              setMode(pickMode);
             }} />
           )}
 
-          {mode === 'number' && <ParcelNumber onFound={(p) => { commit([p]); setMode('menu'); }} />}
+          {mode === 'number' && <ParcelNumber onFound={(p) => { commit([p]); setMode('menu'); }} onDraw={() => open('draw')} />}
 
           {mode === 'draw' && (
             <div className="grid gap-3">
@@ -280,11 +289,12 @@ export function FindField() {
   );
 }
 
-function Method({ icon, k, title, sub, onClick }: { icon: React.ReactNode; k?: 'mLocate' | 'mSearch' | 'mNumber' | 'mDraw' | 'mPilot'; title?: string; sub?: string; onClick: () => void }) {
+function Method({ icon, k, title, sub, dim, onClick }: { icon: React.ReactNode; k?: 'mLocate' | 'mSearch' | 'mNumber' | 'mDraw' | 'mPilot'; title?: string; sub?: string; dim?: boolean; onClick: () => void }) {
   const { t } = useT();
+  // dim: still usable (the limit may be over), just shown as the less likely way today.
   return (
     <button type="button" onClick={onClick}
-      className="flex min-h-[4.5rem] w-full items-center gap-3.5 rounded-2xl border-2 border-line bg-white p-3.5 text-left transition hover:border-primary active:scale-[0.99]">
+      className={cn('flex min-h-[4.5rem] w-full items-center gap-3.5 rounded-2xl border-2 border-line bg-white p-3.5 text-left transition hover:border-primary active:scale-[0.99]', dim && 'opacity-60')}>
       <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">{icon}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-lg font-bold leading-tight">{title ?? t(k!)}</span>

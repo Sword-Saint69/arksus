@@ -2,7 +2,7 @@
 // It is public, keyless and sends Access-Control-Allow-Origin: *, so the browser
 // calls it directly. We only ever ask on a user action (a tap or a search), one
 // request at a time, and cache what comes back: no bulk crawling. The service has
-// a daily query limit per visitor; when it is reached the page offers drawing instead.
+// a daily query limit; when it is reached the page offers drawing instead.
 //
 // TKGM states the results are for information only and are not an official
 // document; the page repeats that next to every parcel it shows.
@@ -26,6 +26,24 @@ export class TkgmError extends Error {
   constructor(message: string, readonly notFound = false, readonly limited = false) { super(message); }
 }
 
+// Once TKGM says the daily limit is reached, the field screen puts drawing first for the rest of the
+// day (kept in localStorage with the date, so a reload remembers it). Any successful answer clears it.
+// We never work around the limit: it only changes which way of picking a field is offered first.
+const LIMIT_KEY = 'nobetsu.tkgm-limited';
+const today = () => new Date().toISOString().slice(0, 10);
+let limitedToday = (() => { try { return localStorage.getItem(LIMIT_KEY) === today(); } catch { return false; } })();
+const limitSubs = new Set<() => void>();
+function setLimited(v: boolean) {
+  if (limitedToday === v) return;
+  limitedToday = v;
+  try { if (v) localStorage.setItem(LIMIT_KEY, today()); else localStorage.removeItem(LIMIT_KEY); } catch { /* private mode */ }
+  limitSubs.forEach((f) => f());
+}
+/** True after TKGM answered "daily limit reached" today (and has not answered normally since). */
+export const tkgmLimited = () => limitedToday;
+/** For useSyncExternalStore. */
+export function onTkgmLimited(f: () => void): () => void { limitSubs.add(f); return () => { limitSubs.delete(f); }; }
+
 async function getJSON<T>(path: string, signal?: AbortSignal): Promise<T> {
   const timeout = AbortSignal.timeout(TIMEOUT_MS);
   let res: Response;
@@ -35,10 +53,11 @@ async function getJSON<T>(path: string, signal?: AbortSignal): Promise<T> {
     if ((e as Error).name === 'AbortError' && signal?.aborted) throw e;
     throw new TkgmError('TKGM unreachable');
   }
-  if (res.status === 404) throw new TkgmError('not found', true);
   // TKGM answers 403 "Günlük sorgu limitini aştınız" once its daily limit is reached. That limit is
   // theirs to set: we say so and offer drawing the field by hand instead.
-  if (res.status === 403 || res.status === 429) throw new TkgmError('daily limit', false, true);
+  if (res.status === 403 || res.status === 429) { setLimited(true); throw new TkgmError('daily limit', false, true); }
+  setLimited(false);                                        // TKGM answered: the limit is over
+  if (res.status === 404) throw new TkgmError('not found', true);
   if (!res.ok) throw new TkgmError(`TKGM HTTP ${res.status}`);
   return res.json() as Promise<T>;
 }

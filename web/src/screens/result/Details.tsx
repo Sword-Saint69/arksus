@@ -1,12 +1,14 @@
-import { Sparkles } from 'lucide-react';
 import { fmtNum, textureName, useT, hasKey, type Key } from '@/i18n';
 import { useStore } from '@/state/store';
 import type { Verdict } from '@/domain/verdict';
 import type { Weights } from '@/lib/economics';
 import type { AgentFile, ResultsFile, V } from '@/lib/types';
 import { DataBadge, Fold, SectionTitle } from '@/ui/kit';
+import { Farmer } from '@/ui/farmer/Farmer';
 
 const CRITERIA: (keyof Weights)[] = ['value', 'yield', 'soil', 'water'];
+const GLOSSARY = ['et', 'water_balance', 'available_water', 'field_capacity_vs_saturation', 'soil_moisture_anomaly', 'ph', 'organic_carbon', 'cec',
+  'p10_p50_p90', 'fallow_storage_efficiency', 'nitrogen_fixation', 'wind_exposure'] as const;
 
 /** AI commentary of the district. Shown only when the build-time guards passed (every number from the data, honest wording). */
 export function AgentCard({ agent }: { agent: AgentFile | null }) {
@@ -22,7 +24,7 @@ export function AgentCard({ agent }: { agent: AgentFile | null }) {
   ) : null);
   return (
     <section className="grid gap-2 rounded-3xl border border-line bg-white p-4">
-      <h2 className="flex flex-wrap items-center gap-2 text-xl font-extrabold"><Sparkles size={22} className="text-wheat" aria-hidden="true" /> {t('aiTitle')} <DataBadge type="model" /></h2>
+      <h2 className="flex flex-wrap items-center gap-2 text-xl font-extrabold"><Farmer size={40} /> {t('aiTitle')} <DataBadge type="model" /></h2>
       <p className="text-lg font-semibold leading-snug">{tx(r.headline)}</p>
       <Fold title={t('detailsTitle')}>
         {r.rotations.map((x) => (
@@ -102,7 +104,7 @@ export function Details({ verdict, results }: { verdict: Verdict; results: Resul
           <tbody>
             {soil.properties.map((p) => (
               <tr key={p.id} className="border-t border-line align-top">
-                <th className="py-1.5 pr-2 font-semibold">{tx(p.label)}</th>
+                <th className="py-1.5 pr-2 font-semibold">{tx(p.label)}{p.meaning && <span className="mt-0.5 block text-sm font-normal leading-snug text-muted">{tx(p.meaning)}</span>}</th>
                 <td className="py-1.5 text-right tabular-nums"><b>{fmtNum(lang, p.q50, 1)}</b> {p.unit}<span className="block text-sm text-muted">{fmtNum(lang, p.q05, 1)}–{fmtNum(lang, p.q95, 1)}</span></td>
               </tr>
             ))}
@@ -113,8 +115,15 @@ export function Details({ verdict, results }: { verdict: Verdict; results: Resul
               <th className="py-1.5 pr-2 font-semibold">{t('awc')}</th>
               <td className="py-1.5 text-right">{awc.value === null ? t('pending') : <><b>{num(awc.value)}</b> {awc.unit ?? 'mm/m'}</>} <DataBadge type={awc.type} verified={awc.verified} /></td>
             </tr>
+            {Object.entries(soil.awc_alternatives ?? {}).map(([id, a]) => (
+              <tr key={id} className="border-t border-line align-top">
+                <th className="py-1.5 pr-2 font-normal text-muted">{t('awcAlt')}<span className="block text-sm leading-snug">{a.source}</span></th>
+                <td className="py-1.5 text-right tabular-nums text-muted"><b>{num(a.value)}</b> {a.unit}{a.range_q05_q95 && <span className="block text-sm">{num(a.range_q05_q95[0])}–{num(a.range_q05_q95[1])}</span>} <DataBadge type={a.type} verified={a.verified} /></td>
+              </tr>
+            ))}
           </tbody>
         </table>
+        {soil.awc_alternatives && Object.keys(soil.awc_alternatives).length > 0 && <p className="text-sm text-muted">{t('awcAltNote')}</p>}
         <div>
           <p className="font-bold">{t('notRemote')}</p>
           <p className="text-muted">{t('notRemoteBody')}</p>
@@ -138,6 +147,18 @@ export function Details({ verdict, results }: { verdict: Verdict; results: Resul
             </li>
           ))}
         </ul>
+      </Fold>
+
+      <Fold title={t('glossaryTitle')}>
+        <p className="text-muted">{t('glossarySub')}</p>
+        <dl className="grid gap-2.5">
+          {GLOSSARY.map((g) => (
+            <div key={g}>
+              <dt className="font-bold">{t(`gl_${g}_t`)}</dt>
+              <dd className="m-0 text-muted">{t(`gl_${g}`)}</dd>
+            </div>
+          ))}
+        </dl>
       </Fold>
 
       <p className="text-sm leading-snug text-muted">{t('sources', { a: site.power_range.start, b: site.power_range.end })}</p>

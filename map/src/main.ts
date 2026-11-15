@@ -12,6 +12,7 @@ import {
 import { featureContains, loadIslands, loadProvinces, type Feature } from './vector/features';
 import { Pilots } from './pilots';
 import { ProcessSim } from './sim/ProcessSim';
+import { FieldView } from './sim/FieldView';
 import { parcelAt, parcelByNumber, TkgmError } from './tkgm';
 import { attachParcelSearch } from './ui/parcelSearch';
 import { applyStatic, getLang, setLang, t, type Key, type Lang } from './strings';
@@ -254,6 +255,7 @@ let lastPointer: PointerEvent | null = null;
 
 canvas.addEventListener('pointermove', (e) => {
   lastPointer = e;
+  if (drawing) return;
   if (e.buttons) { canvas.classList.add('dragging'); setHover(null); return; }
   if (hoverRaf) return;
   hoverRaf = requestAnimationFrame(() => { hoverRaf = 0; if (lastPointer) hoverAt(lastPointer); });
@@ -261,6 +263,7 @@ canvas.addEventListener('pointermove', (e) => {
 canvas.addEventListener('pointerleave', () => { setHover(null); $('#sb-lat').textContent = '–'; $('#sb-lon').textContent = '–'; $('#sb-elev').textContent = '–'; });
 canvas.addEventListener('pointerup', (e) => {
   canvas.classList.remove('dragging');
+  if (drawing) return;
   if (e.button !== 0 || cam.movedSincePointerDown > 5) return;
   const hit = cam.groundAt(e.clientX, e.clientY);
   if (!hit) return;
@@ -434,6 +437,7 @@ function refreshInspector() {
     setWeight: (k, v) => { pilots.setWeight(k, v); refreshInspector(); },
     resetWeights: () => { pilots.resetWeights(); refreshInspector(); },
     simulate: (f) => { openSim(f); },
+    terrain: (f) => { openTerrainFor(f); },
     select: (f) => { active = f; if (!vectors.selected.has(f.id)) select(f); else refreshInspector(); },
   });
 }
@@ -569,6 +573,7 @@ document.querySelectorAll<HTMLElement>('[data-action]').forEach((el) => el.addEv
     case 'north': cam.resetNorth(); break;
     case 'pitch': cam.togglePitch(); break;
     case 'home': goHome(); break;
+    case 'draw-area': setDrawing(!drawing); break;
   }
   wake();
 }));
@@ -585,7 +590,7 @@ addEventListener('keydown', (e) => {
   if (t.matches('input, textarea, select')) return;
   const k = e.key;
   if (k === '/') { e.preventDefault(); $<HTMLInputElement>('#search-input').focus(); }
-  else if (k === 'Escape') { parcelSearch.close(); select(null); }
+  else if (k === 'Escape') { if (drawing) setDrawing(false); else { parcelSearch.close(); select(null); } }
   else if (k === '+' || k === '=') cam.zoomBy(0.5, null, false);
   else if (k === '-' || k === '_') cam.zoomBy(2, null, false);
   else if (k === 'ArrowLeft') cam.nudge(-1, 0);
@@ -701,6 +706,100 @@ function restoreSelectionFromHash() {
 }
 
 // Process simulation -----------------------------------------------------------
+// Field terrain & runoff ---------------------------------------------------------
+let fieldView: FieldView | null = null;
+
+/** Wettest week (weekly rain total) in the nearest district's ledger, for the rain preset. */
+async function wettestWeekNear(lon: number, lat: number) {
+  const near = pilots.nearest(lon, lat, 150);
+  if (!near) return null;
+  const ledger = await pilots.ledger(String(near.feature.props.location_id)).catch(() => null);
+  if (!ledger) return null;
+  let mm = 0;
+  // Rain is the same for every rotation and depth; one series per start year is enough.
+  for (const s of ledger.series) if (s.rotation_id === 'fallow_wheat' && s.depth_id === 'medium') for (const w of s.weeks) mm = Math.max(mm, w.p_mm);
+  return mm > 0 ? { district: near.feature.name, mm } : null;
+}
+
+function openFieldView(name: string, bbox: BBox, polys: Feature['polys'] | null) {
+  if (fieldView) return;
+  const c = { x: (bbox.minX + bbox.maxX) / 2, y: (bbox.minY + bbox.maxY) / 2 };
+  const [lon, lat] = mercToLonLat(c.x, c.y);
+  fieldView = new FieldView($('#app'), {
+    name, bbox, polys, imagery: terrain.imagery.source, wettestWeek: wettestWeekNear(lon, lat),
+  }, () => { fieldView = null; wake(); });
+}
+
+function openTerrainFor(f: Feature) {
+  if (f.kind === 'pilot') {
+    // The pilot circle is 20 km across, too coarse for field-scale terrain: take
+    // a 2.4 km square around the district's point instead.
+    const c = polygonCentroid(f.polys);
+    const half = 1200 * mercScale(c.y);
+    openFieldView(f.name, { minX: c.x - half, maxX: c.x + half, minY: c.y - half, maxY: c.y + half }, null);
+    return;
+  }
+  const b = f.bbox;
+  const k = mercScale((b.minY + b.maxY) / 2);
+  // Pad around the outline so the slope leading into and out of the field shows; at least 300 m.
+  const pad = Math.max((b.maxX - b.minX) * 0.15, (b.maxY - b.minY) * 0.15, 60 * k);
+  const cx = (b.minX + b.maxX) / 2, cy = (b.minY + b.maxY) / 2;
+  const hw = Math.max((b.maxX - b.minX) / 2 + pad, 150 * k), hh = Math.max((b.maxY - b.minY) / 2 + pad, 150 * k);
+  openFieldView(f.name, { minX: cx - hw, maxX: cx + hw, minY: cy - hh, maxY: cy + hh }, f.polys);
+}
+
+// "Pick an area": drag a box on the map, as in field-drainage tools.
+let drawing = false;
+let drawStart: { x: number; y: number; ground: THREE.Vector3 } | null = null;
+const drawBox = document.createElement('div');
+drawBox.className = 'draw-box';
+drawBox.hidden = true;
+$('#app').append(drawBox);
+
+function setDrawing(on: boolean) {
+  drawing = on;
+  cam.enabled = !on;
+  drawStart = null;
+  drawBox.hidden = true;
+  canvas.classList.toggle('drawing', on);
+  $('.draw-btn').setAttribute('aria-pressed', String(on));
+  const hint = $('.hint');
+  if (on) { hint.textContent = t('fvDrawHint'); hint.hidden = false; setHover(null); } else hint.hidden = true;
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  if (!drawing || e.button !== 0) return;
+  const g = cam.groundAt(e.clientX, e.clientY);
+  if (!g) return;
+  canvas.setPointerCapture(e.pointerId);
+  drawStart = { x: e.clientX, y: e.clientY, ground: g };
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!drawing || !drawStart) return;
+  const r = canvas.getBoundingClientRect();
+  Object.assign(drawBox.style, {
+    left: `${Math.min(drawStart.x, e.clientX) - r.left}px`, top: `${Math.min(drawStart.y, e.clientY) - r.top}px`,
+    width: `${Math.abs(e.clientX - drawStart.x)}px`, height: `${Math.abs(e.clientY - drawStart.y)}px`,
+  });
+  drawBox.hidden = false;
+});
+canvas.addEventListener('pointerup', (e) => {
+  if (!drawing || !drawStart) return;
+  const end = cam.groundAt(e.clientX, e.clientY);
+  const start = drawStart.ground;
+  drawStart = null;
+  drawBox.hidden = true;
+  if (!end) return;
+  const a = sceneToMerc(start.x, start.z), b = sceneToMerc(end.x, end.z);
+  const box = { minX: Math.min(a.x, b.x), maxX: Math.max(a.x, b.x), minY: Math.min(a.y, b.y), maxY: Math.max(a.y, b.y) };
+  const k = mercScale((box.minY + box.maxY) / 2);
+  const span = Math.max(box.maxX - box.minX, box.maxY - box.minY) / k;
+  if (span < 150) { toast(t('fvTooSmall')); return; }
+  if (span > 6000) { toast(t('fvTooBig')); return; }
+  setDrawing(false);
+  openFieldView(t('fvDrawn'), box, null);
+});
+
 let sim: ProcessSim | null = null;
 async function openSim(f: Feature) {
   if (sim || !pilots.site) return;

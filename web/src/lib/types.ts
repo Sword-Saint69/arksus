@@ -195,6 +195,8 @@ export interface FertCrop {
   top_products: ProductChoice[];               // first match supplies the remaining N
   k_product: string;
   guide_table?: GuideTable;                    // a Turkish guide's product doses by target yield (shown for comparison)
+  /** What farmers actually apply (survey); shown next to the plan, never used in the calculation. */
+  farmer_practice?: Sourced & { text: Text; note?: Text; doses: { product: string; timing: Timing; kg_per_da: number; farms?: number }[] };
   advice: Advice[];
 }
 export interface FertilizerFile extends FileHeader {
@@ -209,4 +211,47 @@ export interface FertilizerFile extends FileHeader {
   products: Record<string, FertProduct>;
   crops: Record<FertCropId, FertCrop>;
   advice: Advice[];                            // general advice (all crops)
+}
+
+// §4.7 sowing.json — "nasıl ekilir" rules (15 Nov, docs/GUBRE.md §9). Computed in the browser by sowing.ts.
+// Seed amounts are kg/da and seeds or plants per m²; no money.
+export type SowCropId = 'wheat' | 'barley' | 'lentil' | 'chickpea';
+/** A sourced range; min = max for a single value. */
+export interface R extends Sourced { min: number; max: number; unit: string }
+export interface SowWindow extends Sourced { from: string; to: string }   // MM-DD, both inclusive
+export interface SowType {
+  id: string;
+  label: Text;
+  season: 'autumn' | 'spring';
+  window?: Record<WaterRegime, SowWindow>;     // dates where the source gives them
+  window_text?: Text;                         // otherwise the source's words
+  seeds_per_m2?: R;                           // viable seeds per m²
+  plants_per_m2?: R;                          // target plants per m² (chickpea)
+  guide_kg_per_da?: R;                        // the source's kg/da for drilled sowing
+  depth_cm: R;
+}
+export interface SowRow extends R { when?: When; label: Text }
+export interface SowExtra extends R { when?: When; label: Text }
+export interface SowCrop { label: Text; types: SowType[]; rows: SowRow[]; extra_kg_per_da?: SowExtra[]; advice: Advice[] }
+export interface SowingFile extends FileHeader {
+  seed_formula: Sourced;
+  nearest_window_note: { text: Text; districts: string[]; source: string; type: Badge; verified: boolean };
+  cold_districts: { ids: string[]; text: Text; source: string; type: Badge; verified: boolean };
+  crops: Record<SowCropId, SowCrop>;
+  annual_precip_mm: Record<string, V & { station?: string }>;   // MGM/WMO 1991–2020 normal per district
+}
+
+// §4.8 soil_health.json — soil-health card (15 Nov, docs/GUBRE.md §10). Computed in the browser by soilhealth.ts.
+export interface SoilEvidence extends Sourced { text: Text }
+export interface SoilPractice {
+  id: string;
+  when?: When;                // keys: location_id, depth, depth_known, water, om_pct, ec_ds_m, practice
+  title: Text;
+  body: Text;
+  show_model?: boolean;       // the card adds the engine's own numbers for this field (legume rotation)
+  evidence: SoilEvidence[];
+}
+export interface SoilHealthFile extends FileHeader {
+  om_classes: Sourced & { rows: { max: number | null; label: Text }[] };
+  practices: SoilPractice[];  // strongest evidence first
 }

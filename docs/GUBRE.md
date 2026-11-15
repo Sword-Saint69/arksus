@@ -32,8 +32,8 @@ Kullanıcı ürünü, sulama durumunu ve toprak analizini (ya da SoilGrids'ten g
 |---|---|---|---|
 | `wheat` | Buğday | evet | N, P, K: Kuru + Sulu |
 | `barley` | Arpa | hayır | N, P: Kuru + Sulu (K satırı yok → denge, ABD alım değeri) |
-| `chickpea` | Nohut | evet | N, P: Kuru (K yok → `pending`) |
-| `lentil` | Mercimek | evet | N, P: Kuru (K yok → denge, zayıf kaynak) |
+| `chickpea` | Nohut | evet | N, P: Kuru; kısıtlı/sulu su seçilirse aynı Kuru satırı `assumption` rozetiyle (TAGEM'de sulu satır yok) (K yok → `pending`) |
+| `lentil` | Mercimek | evet | N, P: Kuru; kısıtlı/sulu için aynı Kuru satırı `assumption` rozetiyle (K yok → denge, zayıf kaynak) |
 | `sugar_beet` | Şeker pancarı | hayır | N, P, K: Sulu (N tavanı 15) |
 | `potato` | Patates | hayır | N, P, K: Sulu |
 | `onion` | Kuru soğan | hayır | N, P: Sulu; K: "Sebze" satırı (**kabul**) |
@@ -122,3 +122,50 @@ const plan: FertPlan = recommend(fert, {
 - Sayı ya da kural değişikliği: `engine/config/fertilizer.yaml` (Gümüş). Ardından `cd engine && python -m nobetsu.build --out ../web/public/data` ya da sadece export.
 - Testler: `engine/tests/test_fertilizer.py` (YAML bütünlüğü, TAGEM spot değerleri, para ve yasak kelime yok) ve `web/src/lib/fertilizer.test.ts` (elle hesaplanmış planlar).
 - Yeni ürün eklemek için kod yazılmaz; YAML'a yeni bir `crops.<id>` girilir. Yalnız ürün `FertCropId` tipine ve şemanın `crops` listesine de eklenmeli (sözleşme değişikliği, Gümüş).
+
+## 9. Nasıl ekilir (15 Kas)
+
+Gübre kartının altında ikinci bir kart: **ne zaman, dekara ne kadar tohum, ne derine, hangi sıra aralığıyla**. Kurallar `engine/config/sowing.yaml` → `web/public/data/sowing.json`, hesap `web/src/lib/sowing.ts` (`sowingPlan`, `seedKgPerDa`, `windowStatus`), kart `web/src/screens/result/Sowing.tsx`. Araştırma: `reports/İç Anadolu gübre ekim toprak sağlığı.md`.
+
+| Ne | Kural | Kaynak (rozet) |
+|---|---|---|
+| Ekim penceresi | Buğday kuru 15 Eylül–10 Ekim, sulu 1–10 Ekim; arpa 21 Eylül–19 Ekim; kışlık mercimek Ekim; yazlık mercimek "Şubat sonu–Mart başı"; nohut "ilkbaharda tarlaya girilebilen ilk günler, son dondan 7–10 gün önce" (kaynağın tarih vermediği yerde tarih uydurulmaz, kaynağın sözü yazılır) | TİGEM Bölüm 4 (literature ✓), GKGM Yemeklik Baklagil (official ✓) |
+| İl penceresi yok | Konya dışındaki ilçelerde "Orta Anadolu/Konya penceresi en yakın kaynaklı değer" notu; Gemerek, Boğazlıyan ve Develi'de "soğuk ilçe: pencerenin başına kayar" (sayı yok) | assumption |
+| Tohum/m² | Ekmeklik çok kardeşlenen 500–550, az kardeşlenen 550–600, makarnalık 550–600, kışlık arpa 450–550, kışlık mercimek 300–350, nohut 100 bitki/m² | TİGEM, Adak 1999, GKGM |
+| Aralıkta hangi nokta | İyi tohum yatağı ve zamanında ekim → alt sınır; geç ekim ya da kötü yatak → üst sınır; aksi halde orta (TİGEM'in kuralı) | TİGEM |
+| kg/da | **Formül:** tohum/m² × bin tane ağırlığı (g) × 10 ÷ (saflık % × çimlenme %), çiftçinin etiket değerleriyle (rozet `user`). Kaynağın kg/da aralığı da yanında: ekmeklik 18–19, makarnalık 20–21, arpa 20–22; serpme ekimde ya da kötü yatakta +3–5; kışlık mercimekte kış zararı payı +1–2 | TİGEM, GKGM |
+| Derinlik | Tahıl 4–6 cm (kuru toprakta en az 5–6, 8 cm'den derin ekim riskli), yazlık arpa 3–4, mercimek 4–5, nohut 5–6 | TİGEM, GKGM |
+| Sıra arası | Tahıl 15–20 cm (**doğrulanmadı**); mercimek 15–20, yıllık yağış normali 350 mm'nin altındaysa 30 cm (ilçenin MGM/WMO normali, `sowing.json → annual_precip_mm`); nohut 45 (makineli çapa) ya da 30–35 (el çapası) | GKGM; tahıl yalnız arama özeti |
+| Uyarılar | Kuru toprakta derin örtme (ala tav), geç ekimde derinliği artırmama, gübre tohumla aynı bantta ise ayrı bant ya da ekimden önce serpip karıştırma (Konya'da +%14–23), çiftçinin 30 kg/da'ya çıkmasının nedeni, kışa 1–3 kardeşle girme, ilaçlı ve sertifikalı tohum, yazlık arpada %83'e kadar kayıp, nohutta ot ve aşılama | TİGEM, GKGM |
+
+Kaynaklardaki iki hata koda yansıtılmadı:
+- TİGEM'in Gerek-79 örneği "20 kg/da" yazıyor, formül **21,4** veriyor (kalite düzeltmesi atlanmış). Site kendisi hesaplıyor; `sowing.test.ts` 21,4'ü kontrol ediyor.
+- GKGM nohut kitapçığındaki 8–10 kg/da ile 100 bitki/m² hedefi iri taneli nohutta birlikte tutmuyor. Kart ikisini de gösteriyor ve "kaynak içi tutarsızlık" uyarısı veriyor; bin tane ağırlığı girilirse hedefe göre hesaplıyor.
+
+## 10. Toprak sağlığı (15 Kas)
+
+"Nasıl ekilir" kartının altında: **gübrenin ötesinde toprağı korumak için yapılabilecekler**, en güçlü kanıttan başlayarak. Kurallar `engine/config/soil_health.yaml` → `web/public/data/soil_health.json`, hesap `web/src/lib/soilhealth.ts` (`soilHealthPlan`, `modelFacts`, `omClass`), kart `web/src/screens/result/SoilHealth.tsx`.
+
+Kartın üç parçası:
+1. **Toprağın iki bilgisi:** organik madde (çiftçinin analizi ya da SoilGrids tahmini) ve Başar 2001 sınıfı (çok az / az / orta / iyi / yüksek); toprak derinliği (çiftçinin cevabı; bilinmiyorsa "orta kabul edildi").
+2. **Bu tarlada model ne buluyor?** Motorun kendi sonucu, çiftçinin derinliğinde 24 yılın ortancası: her rotasyon için 2 yılda çıplak gün, rüzgâra açık çıplak gün, sonraki buğdayın nadas sonrasına oranı ve %85 eşiğini geçip geçmediği (`defaults.yaml → decision.guardrails`).
+3. **Uygulamalar** (koşula göre), her birinin altında kaynaklı "Kanıt" listesi:
+
+| Uygulama | Ne zaman | Kaynak |
+|---|---|---|
+| Anızı yakma, tarlada bırak | her zaman | Çevre Kanunu 2872 (ceza tutarı gösterilmez), Gerek 1968 (Akkaya 2016) |
+| Sığ toprakta nadas az su biriktirir | derinlik sığ | Başkan ve Ünver 2000 (Akkaya 2016): 90 cm'de ~%18, 40 cm'de etkisiz |
+| Nadas su biriktirir ama toprağı açık bırakır | derinlik orta/derin | Akkaya 2016 |
+| Nadasın yerine baklagil | her zaman (motor sonucu tabloda) | Gültekin 2017 Konya: mercimek %87, nohut %80, fiğ %78; kışlık baklagil notu doğrulanmadı |
+| Az toprak işleme ve doğrudan ekim | her zaman | Gültekin 2017 (241 / 226 kg/da, yıllar arası büyük fark), Küçükçongar 2014 (%2 benimsenme) |
+| Organik madde düşük | organik madde < %2 | Akkaya 2016 (Konya örnekleri); yıllık artış rakamı **verilmez** |
+| Karapınar rüzgâr erozyonu | yalnız Karapınar | Konya Toprak Su Enstitüsü (perdeler, şeritler, ağaç şeritleri) |
+| Tuzluluk | analizde EC ≥ 4 dS/m | Başar 2001 |
+| Destek ve kurallar | her zaman, en sonda | ÇATAK sayfası (güncel durumu doğrulanmadı), 5403; tutar gösterilmez |
+
+Not: motorun nohut ve mercimek sonrası buğday oranı bazı ilçelerde Konya denemesinden yüksek çıkıyor (ör. Develi orta derinlikte %94–95; deneme %80–87). Kart ikisini ayrı gösteriyor: tablo modelin sonucu, "Kanıt" denemenin sonucu.
+
+## 11. Çiftçi pratiğiyle karşılaştırma (15 Kas)
+
+Buğdayda gübre kartı, planın yanında bölgedeki tipik uygulamayı gösterir: Konya-Cihanbeyli 2023 anketi, 70 buğday işletmesi (36 sulu, 34 kuru; Tapkı ve Göz 2025). Ekimle 21 kg/da DAP, ilkbaharda 11,1 kg/da üre; yani dekara yaklaşık 8,9 kg azot ve 9,7 kg P₂O₅ (`practiceNutrients`). Bu değerler hesaba girmez, sadece karşılaştırma içindir (`fertilizer.yaml → crops.wheat.farmer_practice`, rozet `statistic`). Diğer ürünler için bölgesel anket bulunamadı.
+
