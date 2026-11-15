@@ -238,3 +238,18 @@ export interface SowingFile extends FileHeader {
   crops: Record<SowCropId, SowCrop>;
   annual_precip_mm: Record<string, V & { station?: string }>;   // MGM/WMO 1991–2020 normal per district
 }
+
+// §4.8 soil_health.json — soil-health card (15 Nov, docs/GUBRE.md §10). Computed in the browser by soilhealth.ts.
+export interface SoilEvidence extends Sourced { text: Text }
+export interface SoilPractice {
+  id: string;
+  when?: When;                // keys: location_id, depth, depth_known, water, om_pct, ec_ds_m, practice
+  title: Text;
+  body: Text;
+  show_model?: boolean;       // the card adds the engine's own numbers for this field (legume rotation)
+  evidence: SoilEvidence[];
+}
+export interface SoilHealthFile extends FileHeader {
+  om_classes: Sourced & { rows: { max: number | null; label: Text }[] };
+  practices: SoilPractice[];  // strongest evidence first
+}

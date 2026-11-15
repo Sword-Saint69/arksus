@@ -19,6 +19,7 @@ import { FieldSim } from './result/FieldSim';
 import { RightNow } from './result/RightNow';
 import { Fertilizer } from './result/Fertilizer';
 import { Sowing } from './result/Sowing';
+import { SoilHealth } from './result/SoilHealth';
 import { AgentCard, Details } from './result/Details';
 import { Greenness } from './result/Greenness';
 
@@ -103,6 +104,7 @@ export function Result() {
       {irrigated && <Note tone="info">{t('fertIrrigatedNote')}</Note>}
       <Fertilizer results={results} rotationId={recId} />
       <Sowing rotationId={recId} />
+      <SoilHealth results={results} verdict={verdict} />
       {!isPilot && <Greenness />}
       <AgentCard agent={agent} />
       <Details verdict={verdict} results={results} />

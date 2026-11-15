@@ -156,3 +156,9 @@ Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **
 - `Result.tsx`'e tek satır; `data/api.ts` ve `data/hooks.ts`'e `loadSowing` / `useSowing`; `i18n/strings.ts`'e `sow*`, `seedbed_*`, `soil_*`, `drill_*` anahtarları.
 - Hesap `lib/sowing.ts`'te (Gümüş); ayrıntı `docs/GUBRE.md` §9.
 
+## 17. Toprak sağlığı kartı (15 Kas, Gümüş — yeni sitede, Gümüş'ün isteğiyle)
+
+- [ ] `web/src/screens/result/SoilHealth.tsx` (yeni): sonuç ekranında "Nasıl ekilir"in altında. Organik madde ve derinlik kutucukları, "Bu tarlada model ne buluyor?" tablosu (çıplak gün, rüzgâra açık gün, sonraki buğday / nadas ve %85 eşiği), koşula göre uygulama kartları ve her birinde "Kanıt".
+- `Result.tsx`'e tek satır; `data/api.ts` ve `data/hooks.ts`'e `loadSoilHealth` / `useSoilHealth`; `i18n/strings.ts`'e `sh*` anahtarları.
+- Hesap `lib/soilhealth.ts`'te (Gümüş); ayrıntı `docs/GUBRE.md` §10.
+

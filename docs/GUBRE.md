@@ -142,3 +142,26 @@ Kaynaklardaki iki hata koda yansıtılmadı:
 - TİGEM'in Gerek-79 örneği "20 kg/da" yazıyor, formül **21,4** veriyor (kalite düzeltmesi atlanmış). Site kendisi hesaplıyor; `sowing.test.ts` 21,4'ü kontrol ediyor.
 - GKGM nohut kitapçığındaki 8–10 kg/da ile 100 bitki/m² hedefi iri taneli nohutta birlikte tutmuyor. Kart ikisini de gösteriyor ve "kaynak içi tutarsızlık" uyarısı veriyor; bin tane ağırlığı girilirse hedefe göre hesaplıyor.
 
+## 10. Toprak sağlığı (15 Kas)
+
+"Nasıl ekilir" kartının altında: **gübrenin ötesinde toprağı korumak için yapılabilecekler**, en güçlü kanıttan başlayarak. Kurallar `engine/config/soil_health.yaml` → `web/public/data/soil_health.json`, hesap `web/src/lib/soilhealth.ts` (`soilHealthPlan`, `modelFacts`, `omClass`), kart `web/src/screens/result/SoilHealth.tsx`.
+
+Kartın üç parçası:
+1. **Toprağın iki bilgisi:** organik madde (çiftçinin analizi ya da SoilGrids tahmini) ve Başar 2001 sınıfı (çok az / az / orta / iyi / yüksek); toprak derinliği (çiftçinin cevabı; bilinmiyorsa "orta kabul edildi").
+2. **Bu tarlada model ne buluyor?** Motorun kendi sonucu, çiftçinin derinliğinde 24 yılın ortancası: her rotasyon için 2 yılda çıplak gün, rüzgâra açık çıplak gün, sonraki buğdayın nadas sonrasına oranı ve %85 eşiğini geçip geçmediği (`defaults.yaml → decision.guardrails`).
+3. **Uygulamalar** (koşula göre), her birinin altında kaynaklı "Kanıt" listesi:
+
+| Uygulama | Ne zaman | Kaynak |
+|---|---|---|
+| Anızı yakma, tarlada bırak | her zaman | Çevre Kanunu 2872 (ceza tutarı gösterilmez), Gerek 1968 (Akkaya 2016) |
+| Sığ toprakta nadas az su biriktirir | derinlik sığ | Başkan ve Ünver 2000 (Akkaya 2016): 90 cm'de ~%18, 40 cm'de etkisiz |
+| Nadas su biriktirir ama toprağı açık bırakır | derinlik orta/derin | Akkaya 2016 |
+| Nadasın yerine baklagil | her zaman (motor sonucu tabloda) | Gültekin 2017 Konya: mercimek %87, nohut %80, fiğ %78; kışlık baklagil notu doğrulanmadı |
+| Az toprak işleme ve doğrudan ekim | her zaman | Gültekin 2017 (241 / 226 kg/da, yıllar arası büyük fark), Küçükçongar 2014 (%2 benimsenme) |
+| Organik madde düşük | organik madde < %2 | Akkaya 2016 (Konya örnekleri); yıllık artış rakamı **verilmez** |
+| Karapınar rüzgâr erozyonu | yalnız Karapınar | Konya Toprak Su Enstitüsü (perdeler, şeritler, ağaç şeritleri) |
+| Tuzluluk | analizde EC ≥ 4 dS/m | Başar 2001 |
+| Destek ve kurallar | her zaman, en sonda | ÇATAK sayfası (güncel durumu doğrulanmadı), 5403; tutar gösterilmez |
+
+Not: motorun nohut ve mercimek sonrası buğday oranı bazı ilçelerde Konya denemesinden yüksek çıkıyor (ör. Develi orta derinlikte %94–95; deneme %80–87). Kart ikisini ayrı gösteriyor: tablo modelin sonucu, "Kanıt" denemenin sonucu.
+

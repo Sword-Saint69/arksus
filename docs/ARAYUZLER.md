@@ -188,6 +188,7 @@ Biçim: PLAN_MVP §4. Dosyalar `web/public/data/` altında:
 | `results/{location_id}__{scenario_id}.json` | **E2 (15 Kas):** senaryo seçilince; aynı şema, `scenario_id` dolu. Senaryolar `site_index.scenarios` (`id, label, precip_factor, temp_shift_c`; baseline ilk). Ledger ve validation sadece baseline'dan. |
 | `defaults.json` | sayfa açılınca — karar parametreleri; **fiyat/destek asla ekranda gösterilmez** |
 | `validation.json` | sayfa açılınca |
+| `soil_health.json` | **15 Kas:** toprak sağlığı kartı açılınca — uygulamalar, kanıtları ve organik madde sınıfları; hesap tarayıcıda `soilhealth.ts` ile (§15) |
 | `sowing.json` | **15 Kas:** "nasıl ekilir" kartı açılınca — ekim penceresi, tohum, derinlik, sıra arası kuralları ve ilçelerin yıllık yağış normali; hesap tarayıcıda `sowing.ts` ile (§14) |
 | `fertilizer.json` | **15 Kas:** gübre ekranı açılınca — gübre kuralları (TAGEM tabloları, ürünler, uyarılar); hesap tarayıcıda `fertilizer.ts` ile (§13) |
 | `smap/{location_id}.json` | lokasyon seçilince (**her zaman vardır**; veri yoksa `available: false`, `latest: null`, listeler boş). Mock'ta Karapınar `available: true`, Develi `false` (iki UI durumu da denenebilsin) |
@@ -346,4 +347,22 @@ export function windowStatus(from: string, to: string, today: Date): 'before' | 
 ```
 
 Kurallar: bileşende hesap yok. Kaynağın tarih vermediği yerde `window_text` gösterilir, tarih uydurulmaz. Ekim bilgisi rotasyon puanına girmez.
+
+---
+
+## 15. Toprak sağlığı API'si — `soilhealth.ts` (Gümüş) → web — SÖZLEŞME EKLENDİ 15 Kas
+
+Ek dosya; mevcut dosyalar değişmedi. Ayrıntı: `docs/GUBRE.md` §10. Kurallar `engine/config/soil_health.yaml` → `web/public/data/soil_health.json` (şema `docs/contract/soil_health.schema.json`, tipler `types.ts` §4.8 `SoilHealthFile`).
+
+```ts
+// web/src/lib/soilhealth.ts
+export function soilHealthPlan(f: SoilHealthFile, ctx: SoilHealthContext, summaries?: RotationSummary[], minRatio?: number): SoilHealthPlan;
+// SoilHealthContext: location_id?, depth, depth_known, water?, om_pct?, ec_ds_m?, practice?
+// SoilHealthPlan: om {value, label} | null, practices (koşula uyanlar, sırasıyla), model RotationFact[]
+export function modelFacts(summaries: RotationSummary[], minRatio: number): RotationFact[];
+// RotationFact: rotation_id, is_baseline, wheat_vs_fallow, passes_guardrail, bare_days, wind_days
+export function omClass(f: SoilHealthFile, om: number): Text;
+```
+
+Kurallar: bileşende hesap yok. Ceza ve destek tutarı gösterilmez. Organik madde artış hızı verilmez.
 

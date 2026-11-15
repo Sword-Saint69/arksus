@@ -1,0 +1,136 @@
+# Owner: Gümüş (Rol B). Soil-health card rules for the browser (web/src/lib/soilhealth.ts). docs/GUBRE.md §10.
+# Exported as web/public/data/soil_health.json (keys starting with "_" are dropped).
+# Source research: reports/İç Anadolu gübre ekim toprak sağlığı.md (15 Nov 2026), notes soil_health_practices.md.
+# Practices are listed strongest evidence first; each has evidence lines with their own source and badge.
+# Wording rules (AGENTS.md): no money (fines and support amounts are never shown), never "kesin", "mutlaka",
+# "yasak", "garanti". Organic-matter gain per year is NOT given: no regional measurement exists.
+# Conditions (`when`): location_id, depth (shallow / medium / deep), depth_known, water, om_pct, ec_ds_m, practice.
+
+_sources:
+  gultekin: &gultekin
+    source: "Gültekin vd. 2017, KSÜ Doğa Bil. Derg. 20 (Özel Sayı): 283–287 — Bahri Dağdaş, Konya kuru koşul 2011–2014 (318 mm), doğrudan ekim ve ön bitki denemesi"
+    source_url: "https://dergipark.org.tr/en/download/article-file/390551"
+    type: literature
+    verified: true
+  kucukcongar: &kucukcongar
+    source: "Küçükçongar, Kan, Özdemir 2014 — Konya'da doğrudan ekimin benimsenmesi anketi (Mart 2014)"
+    source_url: "https://dergipark.org.tr/tr/download/article-file/253678"
+    type: literature
+    verified: true
+  akkaya: &akkaya
+    source: "Akkaya 2016 derlemesi (Orta Anadolu kuru tarımında toprak ve su koruma; Başkan ve Ünver 2000, Gerek 1968, Konya toprak örnekleri atfı)"
+    source_url: "https://dergipark.org.tr/tr/download/article-file/262911"
+    type: literature
+    verified: true
+  topraksu: &topraksu
+    source: "T.C. Tarım ve Orman Bakanlığı, Konya Toprak Su ve Çölleşme ile Mücadele Araştırma Enstitüsü — Tarihçe (Karapınar rüzgâr erozyonu, 1962'den beri)"
+    source_url: "https://arastirma.tarimorman.gov.tr/konyatopraksu/Menu/13/Tarihce"
+    type: official
+    verified: true
+  stubble_law: &stubble_law
+    source: "Çevre Kanunu 2872: anız yakmaya idari para cezası; orman, sulak alan ve yerleşim yakınında beş katı (Bolu Valiliği 2026 duyurusu, TRT Haber). Tutar sitede gösterilmez"
+    source_url: "https://www.trthaber.com/haber/turkiye/boluda-aniz-yakanlara-dekar-basina-698-lira-ceza-uygulanacak-948830.html"
+    type: official
+    verified: true
+  basar: &basar
+    source: "Başar H. 2001, Uludağ Üniv. Zir. Fak. Derg. 15: 69–83 — toprak analiz sınıfları (organik madde, tuzluluk)"
+    source_url: "https://dergipark.org.tr/tr/download/article-file/153940"
+    type: literature
+    verified: true
+  catak: &catak
+    source: "T.C. Tarım ve Orman Bakanlığı, ÇATAK (Çevre Amaçlı Tarım Arazilerinin Korunması) destek sayfası — sayfadaki tek tarihli takvim 2015; güncel durumu doğrulanmadı. Tutar gösterilmez"
+    source_url: "https://www.tarimorman.gov.tr/Konular/Tarimsal-Destekler/Diger-Tarimsal-Amacli-Destekler/Catak-Destegi"
+    type: official
+    verified: false
+
+# Organic matter classes (%), Başar 2001. Shown next to the field's value (SoilGrids estimate or lab test).
+om_classes:
+  <<: *basar
+  rows:
+    - { max: 1.0, label: { tr: "çok az", en: "very low" } }
+    - { max: 2.0, label: { tr: "az", en: "low" } }
+    - { max: 3.0, label: { tr: "orta", en: "medium" } }
+    - { max: 4.0, label: { tr: "iyi", en: "good" } }
+    - { max: null, label: { tr: "yüksek", en: "high" } }
+
+practices:
+  - id: stubble
+    title: { tr: "Anızı yakma, tarlada bırak", en: "Do not burn the stubble; leave it on the field" }
+    body:
+      tr: "Anız toprağı rüzgâra ve yağmura karşı örter, nemi tutar ve organik maddeyi besler. Yakmak Çevre Kanunu'na aykırıdır ve idari para cezası gerektirir; orman ya da yerleşim yakınında ceza ağırlaşır. Sapın tamamını bırakamıyorsan bırakabildiğin kadarını bırak."
+      en: "Stubble covers the soil against wind and rain, keeps moisture and feeds organic matter. Burning it is against the Environment Law and is fined; near forests or villages the fine is heavier. If you cannot leave all the straw, leave what you can."
+    evidence:
+      - { text: { tr: "Anız yakmak Çevre Kanunu 2872'ye aykırı; dekar başına idari para cezası, hassas alanlarda beş katı.", en: "Burning stubble is against Environment Law 2872; a per-dekar administrative fine, five times near sensitive areas." }, <<: *stubble_law }
+      - { text: { tr: "Türkiye kuru koşulunda dekara 1000 kg sap malçı verimi %40 artırdı (Gerek 1968, Eskişehir; eski çalışma).", en: "In Turkish dryland, 1000 kg/da of straw mulch raised yield by 40 % (Gerek 1968, Eskişehir; an old study)." }, <<: *akkaya }
+
+  - id: fallow_shallow
+    when: { depth: { eq: shallow } }
+    title: { tr: "Sığ toprakta nadas az su biriktirir", en: "On shallow soil, fallow stores little water" }
+    body:
+      tr: "Toprağın sığ. Orta Anadolu'da nadas 90 cm derin toprakta yağışın yaklaşık %18'ini biriktirdi, 40 cm derin toprakta ise etkisi görülmedi. Sığ toprakta tarlayı bir yıl boş bırakmanın su kazancı düşük; nadas yılında toprak işleme ise organik maddeyi azaltır. Baklagil ya da az toprak işleme bu tarlada daha mantıklı olabilir."
+      en: "Your soil is shallow. In Central Anatolia fallow stored about 18 % of rain on a 90 cm profile and had no effect on a 40 cm one. On shallow soil, leaving the field empty for a year gains little water, while tilling it in the fallow year lowers organic matter. A legume or less tillage may make more sense on this field."
+    evidence:
+      - { text: { tr: "Nadas etkinliği 90 cm profilde ~%18, 40 cm profilde etkisiz (Başkan ve Ünver 2000).", en: "Fallow efficiency ~18 % on a 90 cm profile, no effect on 40 cm (Başkan and Ünver 2000)." }, <<: *akkaya }
+
+  - id: fallow_deep
+    when: { depth: { in: [medium, deep] } }
+    title: { tr: "Nadas su biriktirir ama toprağı açık bırakır", en: "Fallow stores water but leaves the soil bare" }
+    body:
+      tr: "Derin toprakta nadas yağışın bir kısmını sonraki buğday için biriktirir. Bedeli, tarlanın bir yıldan uzun çıplak kalması ve nadasta yapılan sürümlerin organik maddeyi azaltmasıdır. Nadası tutacaksan sürüm sayısını azalt ve anızı mümkün olduğunca uzun bırak."
+      en: "On deeper soil, fallow stores part of the rain for the next wheat. The trade-off is a field left bare for over a year and tillage passes that lower organic matter. If you keep fallow, till fewer times and leave the stubble as long as you can."
+    evidence:
+      - { text: { tr: "İşlenmiş nadas yağışın en fazla %29'unu depolayabiliyor; 90 cm profilde ~%18.", en: "Tilled fallow can store at most 29 % of the rain; ~18 % on a 90 cm profile." }, <<: *akkaya }
+
+  - id: legume_rotation
+    title: { tr: "Nadasın yerine baklagil: kışlık mercimek en yakın seçenek", en: "A legume instead of fallow: winter lentil comes closest" }
+    body:
+      tr: "Nadas yılında baklagil ekmek toprağı örter, iki yılda iki hasat verir ve kök nodülleriyle havadan azot bağlar. Bedeli, sonraki buğdayın biraz daha az vermesidir. Site bir seçeneği ancak sonraki buğday nadas sonrasının %85'inin üstünde kalıyorsa önerir."
+      en: "A legume in the fallow year covers the soil, gives two harvests in two years and fixes nitrogen from the air in its root nodules. The trade-off is a slightly smaller next wheat. The site suggests an option only if the next wheat stays above 85 % of wheat after fallow."
+    show_model: true
+    evidence:
+      - { text: { tr: "Konya denemesinde önceki ürüne göre buğday (3 yıl ortalaması): nadas 286, mercimek 249 (%87), nohut 228 (%80), fiğ 223 (%78) kg/da.", en: "Konya trial, wheat by previous crop (3-year mean): fallow 286, lentil 249 (87 %), chickpea 228 (80 %), vetch 223 (78 %) kg/da." }, <<: *gultekin }
+      - { text: { tr: "Kışlık baklagiller (kışlık mercimek, macar fiği) yazlıklara göre toprağı daha az kurutur ve sonraki buğday için daha iyi ön bitki olabilir (Ankara çalışması; doğrulanmadı).", en: "Winter legumes (winter lentil, Hungarian vetch) dry the soil less than spring ones and may be better before wheat (Ankara study; not verified)." }, source: "YÖK tez 514487 (yalnızca özet görüldü)", source_url: "https://acikbilim.yok.gov.tr/handle/20.500.12812/514487", type: literature, verified: false }
+
+  - id: direct_seeding
+    title: { tr: "Az toprak işleme ve doğrudan ekim: ortalamada benzer verim, daha az sürüm", en: "Less tillage and direct seeding: similar yield on average, fewer passes" }
+    body:
+      tr: "Doğrudan ekimde tarla hasattan ekime kadar sürülmez, tohum anızın içine ekilir. Konya denemesinde ortalama verim klasik ekime benzer çıktı ama yıllar arasında büyük farklar oldu: kurak yılda doğrudan ekim çok daha iyi, geç ekilen yılda daha kötüydü. Başarı zamanında ekime ve yabancı ot kontrolüne bağlı; geçiş yıllarında kayıp olabilir. Önce tarlanın bir parçasında denemek akıllıca olur."
+      en: "In direct seeding the field is not tilled from harvest to sowing; the seed goes into the stubble. In the Konya trial the mean yield was similar to conventional sowing but years differed a lot: much better in the dry year, worse when sown late. Success depends on timely sowing and weed control; there can be losses in the first years. Trying it on part of the field first is wise."
+    evidence:
+      - { text: { tr: "Konya 2011–2014: doğrudan ekim ortalama 241, klasik 226 kg/da; yıllar 204/234, 218/271 ve kurak yılda 301/174.", en: "Konya 2011–2014: direct seeding mean 241, conventional 226 kg/da; years 204/234, 218/271 and in the dry year 301/174." }, <<: *gultekin }
+      - { text: { tr: "2014'te Konya buğday alanının yalnızca %2'sinde uygulanıyordu; çiftçilerin %43'ü hiç duymamıştı. En büyük çekince verim kaybı korkusu.", en: "In 2014 it was used on only 2 % of Konya's wheat area; 43 % of farmers had never heard of it. The main worry was yield loss." }, <<: *kucukcongar }
+
+  - id: organic_matter
+    when: { om_pct: { lt: 2.0 } }
+    title: { tr: "Organik madde düşük: korumak artırmaktan kolay", en: "Organic matter is low: keeping it is easier than raising it" }
+    body:
+      tr: "Bu toprağın organik maddesi düşük; Konya topraklarının çoğu da öyle. Organik madde suyu ve besini tutar, toprağın kabuk bağlamasını ve uçmasını azaltır. Anızı bırakmak, sürüm sayısını azaltmak, ahır gübresi ya da kompost vermek yardımcı olur. Bölgede organik maddenin yılda ne kadar arttığına dair ölçüm bulunamadı, bu yüzden site bir artış rakamı vermez."
+      en: "This soil's organic matter is low, like most Konya soils. Organic matter holds water and nutrients and reduces crusting and blowing. Leaving stubble, tilling less and adding farmyard manure or compost help. No regional measurement of how fast organic matter rises was found, so the site gives no gain figure."
+    evidence:
+      - { text: { tr: "Konya'daki 17.521 toprak örneğinin %24,5'inde organik madde %1'in altında, %45,3'ünde %1–2 arasında.", en: "Of 17,521 Konya soil samples, 24.5 % had under 1 % organic matter and 45.3 % had 1–2 %." }, <<: *akkaya }
+
+  - id: wind_erosion
+    when: { location_id: { eq: karapinar } }
+    title: { tr: "Karapınar: rüzgâr erozyonuna karşı toprağı örtülü tut", en: "Karapınar: keep the soil covered against wind erosion" }
+    body:
+      tr: "Karapınar 1960'larda rüzgâr erozyonu yüzünden göç tehlikesi yaşadı. O zamandan beri işe yarayan önlemler: anızı kurak ve rüzgârlı dönemde ayakta bırakmak, toprak işlemeyi ve ekim şeritlerini hâkim rüzgâra dik yapmak, toprağı ince toz haline getiren tekrarlı diskaro geçişlerinden kaçınmak, tarla kenarına ağaç şeridi dikmek."
+      en: "In the 1960s wind erosion in Karapınar threatened people with leaving. What has worked since: leave the stubble standing in dry, windy periods, run tillage and crop strips across the prevailing wind, avoid repeated disc passes that turn the soil to dust, and plant tree belts at field edges."
+    evidence:
+      - { text: { tr: "İlçenin 1.595.000 dekar tarım arazisinin 1.030.000 dekarı rüzgâr erozyonundan etkilendi. Uygulanan: rüzgâra dik 1,5–2 m kamış perdeler (12–20 m arayla), rüzgâra dik 40–60 m genişlikte nadas–tahıl şeritleri, iğde, akasya, dişbudak, karaağaç ve akçaağaç şeritleri. Pulluk ve diskaroyla derin işleme erozyon nedeni sayıldı.", en: "1,030,000 of the district's 1,595,000 dekars of farmland were hit by wind erosion. Used: 1.5–2 m reed screens across the wind (12–20 m apart), fallow–grain strips 40–60 m wide across the wind, belts of oleaster, acacia, ash, elm and maple. Deep ploughing and disc harrowing were named as a cause." }, <<: *topraksu }
+
+  - id: salinity
+    when: { ec_ds_m: { gte: 4 } }
+    title: { tr: "Tuzluluk: önce analiz, sonra drenaj ya da jips", en: "Salinity: test first, then drainage or gypsum" }
+    body:
+      tr: "Toprak analizindeki tuzluluk çoğu ürünün verimini sınırlayacak düzeyde. Tuz sorunu bölgede daha çok drenajı kötü, sulanan alçak ovalarda görülür. Jips ya da drenaj kararından önce EC, pH ve değişebilir sodyum (ESP) analizini ziraat mühendisiyle değerlendirin; tuza dayanıklı ürün seçimi için gübre kartındaki uyarıya bakın."
+      en: "The salinity in your soil test is at a level that limits most crops. In the region, salt problems are mostly on poorly drained, irrigated lowlands. Before deciding on gypsum or drainage, review EC, pH and exchangeable sodium (ESP) with an agronomist; for a salt-tolerant crop see the note in the fertilizer card."
+    evidence:
+      - { text: { tr: "EC 4–8 dS/m: çoğu ürünün verimi sınırlanır; 8–16: yalnız dayanıklı ürünler tatmin edici verir.", en: "EC 4–8 dS/m: most crops are limited; 8–16: only tolerant crops yield well." }, <<: *basar }
+
+  - id: support
+    title: { tr: "Destek ve kurallar için ilçe tarım müdürlüğü", en: "For support and rules: the district agriculture office" }
+    body:
+      tr: "Toprak koruma uygulamaları için devlet destekleri (ör. ÇATAK) ve toprak koruma kuralları (5403 sayılı Kanun) yıllara göre değişir. Güncel durumu ilçe tarım müdürlüğüne sorun."
+      en: "State support for soil-conservation practices (e.g. ÇATAK) and soil-protection rules (Law 5403) change over the years. Ask the district agriculture office about the current state."
+    evidence:
+      - { text: { tr: "ÇATAK sayfasındaki tek tarihli takvim 2015'e ait; 2025–2027'de açık olup olmadığı doğrulanamadı.", en: "The only dated schedule on the ÇATAK page is from 2015; whether it runs in 2025–2027 was not confirmed." }, <<: *catak }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { AgentFile, FertilizerFile, LedgerFile, ResultsFile, SmapFile, SowingFile } from '@/lib/types';
-import { loadAgent, loadFertilizer, loadLedger, loadResults, loadSmap, loadSowing } from './api';
+import type { AgentFile, FertilizerFile, LedgerFile, ResultsFile, SmapFile, SoilHealthFile, SowingFile } from '@/lib/types';
+import { loadAgent, loadFertilizer, loadLedger, loadResults, loadSmap, loadSoilHealth, loadSowing } from './api';
 
 export type Async<T> = { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: T };
 
@@ -37,3 +37,4 @@ export const useLedger = (locationId: string | null, wanted: boolean): Async<Led
 export const useFertilizer = (): Async<FertilizerFile> => useAsync('fertilizer', loadFertilizer);
 
 export const useSowing = (): Async<SowingFile> => useAsync('sowing', loadSowing);
+export const useSoilHealth = (): Async<SoilHealthFile> => useAsync('soil_health', loadSoilHealth);

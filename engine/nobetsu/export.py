@@ -190,6 +190,12 @@ def _sowing(mock: bool, ts: str) -> dict:
             "annual_precip_mm": {k: v for k, v in normals.items() if isinstance(v, dict) and "value" in v}}
 
 
+def _soil_health(mock: bool, ts: str) -> dict:
+    """Soil-health card rules (docs/GUBRE.md §10): soil_health.yaml without "_" keys. No money, no amounts of fines."""
+    cfg = copy.deepcopy(config.load("soil_health"))
+    return {**_header(mock, ts), **{k: v for k, v in cfg.items() if not k.startswith("_")}}
+
+
 def _smap(location_id: str, mock: bool, ts: str) -> dict:
     base = {**_header(mock, ts), "location_id": location_id, "available": False,
             "product": "NASA MERRA-2 soil wetness (GWETROOT, GWETTOP) via NASA POWER monthly", "cell_km": 55,
@@ -207,7 +213,7 @@ def _smap(location_id: str, mock: bool, ts: str) -> dict:
 def write_all(outputs: dict[str, dict], checks: list[dict], mock: bool, out_dir: str = "web/public/data",
               weather_meta: dict[str, dict] | None = None,
               scenario_outputs: dict[str, dict[str, dict]] | None = None) -> None:
-    """Write site_index, defaults, validation, fertilizer, sowing, results/*, ledger/*, smap/* under out_dir.
+    """Write site_index, defaults, validation, fertilizer, sowing, soil_health, results/*, ledger/*, smap/* under out_dir.
 
     weather_meta: optional {location_id: weather.attrs} for elevation_m and power_range.
     scenario_outputs: optional {location_id: {scenario_id: EngineOutput}} (E2) -> results/{loc}__{scenario}.json;
@@ -227,6 +233,8 @@ def write_all(outputs: dict[str, dict], checks: list[dict], mock: bool, out_dir:
         _write(out / "fertilizer.json", _fertilizer(mock, ts))
     if config.exists("sowing"):
         _write(out / "sowing.json", _sowing(mock, ts))
+    if config.exists("soil_health"):
+        _write(out / "soil_health.json", _soil_health(mock, ts))
     for loc_id, o in outputs.items():
         _write(out / "results" / f"{loc_id}.json", _results(o, mock, ts))
         _write(out / "ledger" / f"{loc_id}.json", _ledger(o, mock, ts))
