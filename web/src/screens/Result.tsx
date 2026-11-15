@@ -16,6 +16,7 @@ import { CropIcon, RotationName } from '@/ui/crops';
 import { Options } from './result/Options';
 import { WhatIf } from './result/WhatIf';
 import { FieldSim } from './result/FieldSim';
+import { FieldTerrain } from './result/FieldTerrain';
 import { RightNow } from './result/RightNow';
 import { Fertilizer } from './result/Fertilizer';
 import { AgentCard, Details } from './result/Details';
@@ -98,6 +99,8 @@ export function Result() {
         </>
       )}
 
+      {/* Terrain and runoff matter for every field, irrigated or not. */}
+      <FieldTerrain />
       <RightNow smap={smap} location={location} />
       {irrigated && <Note tone="info">{t('fertIrrigatedNote')}</Note>}
       <Fertilizer results={results} rotationId={recId} />

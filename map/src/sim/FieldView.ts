@@ -727,14 +727,20 @@ export class FieldView {
 
   // -------------------------------------------------------------------------
 
-  private loop = () => {
+  private lastFrame = performance.now();
+  private loop = (now: number) => {
     this.raf = requestAnimationFrame(this.loop);
+    const realDt = Math.min(0.25, Math.max(0, (now - this.lastFrame) / 1000));
+    this.lastFrame = now;
     if (this.running && this.runoff) {
       const total = this.RAIN_HOURS * 3600;
       const rate = this.rainMm / 1000 / total;        // m/s while it rains
       const infil = this.infilMmH / 1000 / 3600;
-      // 60 s of simulated time per frame (6 × 10 s): two hours play in ~2 s at 60 fps.
-      for (let k = 0; k < 6; k++) this.runoff.step(10, this.runoff.time < total ? rate : 0, infil);
+      // Tied to the clock, not to frames: 1 real second = 30 simulated minutes, so
+      // two hours play in ~4 s on a fast laptop and on a phone alike (a busy page
+      // behind the view used to slow it to a crawl). At most 40 steps per frame.
+      const steps = Math.min(40, Math.max(1, Math.round((realDt * 1800) / 10)));
+      for (let k = 0; k < steps; k++) this.runoff.step(10, this.runoff.time < total ? rate : 0, infil);
       this.updateWater();
       this.results();
       // Stop an hour after the rain ends; by then the field has mostly drained or ponded.
