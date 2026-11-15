@@ -1,4 +1,5 @@
-import type { DepthId } from '@/lib/types';
+import type { DepthId, WaterRegime } from '@/lib/types';
+import type { SoilTest } from '@/lib/fertilizer';
 import type { PriorityId } from '@/utils/priorities';
 
 // Farmer accounts.
@@ -18,6 +19,9 @@ export type Field = {
   priority: PriorityId;
   note: string;
   createdAt: string;
+  /** Fertilizer plan inputs (15 Nov, docs/GUBRE.md). Older fields have neither; the plan then uses defaults. */
+  soilTest?: SoilTest;        // the farmer's own lab values (badge: user)
+  water?: WaterRegime;        // default 'rainfed'
 };
 
 export type Farmer = {

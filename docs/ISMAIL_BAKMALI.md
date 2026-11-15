@@ -142,3 +142,11 @@ Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **
 - [ ] `fertilizer.json` + `fertilizer.ts` (`soilFromResults`, `recommend`); bileşende hesap yok, sadece çağrı.
 - [ ] Para yok, `null` sayı değildir, her sayının rozeti `source.type`; pancar/patates/soğanda kuru tarım seçeneğini gri göster.
 
+**Güncelleme (15 Kas, Gümüş — senin dosyalarında, Gümüş'ün isteğiyle):** gübre kartı siteye eklendi; gözden geçir, istediğin gibi değiştir.
+- `web/src/sections/FertilizerPlan.tsx` (yeni): tarla sayfasında önerinin altında. Önerilen rotasyonun ürünleri çip olarak (fallow hariç), "Başka ürün" listesi, sulama seçimi, aşılı tohum (baklagil) ve kombine mibzer kutuları. Plan: ne zaman → hangi gübre → dekara kg + tüm tarla kg (dönüm × kg/da). "Neden bu miktarlar?": saf besin, yöntem, kullanılan toprak değerleri ve rozetleri, hedef verim, toprak bayrakları, Toros karşılaştırması. Öneriler listesi ve "Toprak analizim" formu (değerler tarlaya kaydedilir, rozet `senin değerin`).
+- `web/src/utils/fertilizerView.ts` + test (yeni): gruplama, toprak birleştirme, tarla toplamı, sayı okuma.
+- `web/src/auth/accounts.ts`: `Field`'a isteğe bağlı `soilTest?` ve `water?` eklendi (eski tarlalar etkilenmez).
+- `web/src/pages/FieldDetail.tsx`: karta tek satırlık bağlantı. `web/src/strings.ts`: `fert*`, `water_*`, `nutrient_*`, `basis_*`, `flag_*`, `soil_*` anahtarları.
+- `.claude/launch.json`: `web` dev sunucusu (port 5174).
+- [ ] Pancar/patates/soğanda kuru tarım hâlâ seçilebiliyor (plan "kaynak bekleniyor" der); istersen gri yap.
+

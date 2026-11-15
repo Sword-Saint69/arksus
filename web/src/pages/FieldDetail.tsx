@@ -7,6 +7,7 @@ import { t, tx, type Key, type Lang } from '@/strings';
 import { fmtNum, fmtPct } from '@/utils/format';
 import { ROTATION_COLOR } from '@/utils/series';
 import { simRoute } from '@/utils/mapUrl';
+import { FertilizerPlan } from '@/sections/FertilizerPlan';
 
 /**
  * One field in plain words: the most suitable crop order, why, and three facts
@@ -79,6 +80,8 @@ export function FieldDetail({ data, lang, id }: { data: SiteData; lang: Lang; id
           </dl>
         </section>
       )}
+
+      {status !== 'loading' && <FertilizerPlan data={data} lang={lang} field={field} rotationId={d?.recommended ?? null} />}
 
       <a href={simRoute(field.locationId, field.depthId)} className="group flex items-center gap-4 rounded-2xl border border-line bg-[#eef4f7] p-5 hover:border-[#3d7ea6]">
         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#3d7ea6] text-xl text-white" aria-hidden="true">▶</span>
