@@ -1,7 +1,7 @@
 # Owner: Gümüş (Rol B). ARAYUZLER §4. 13 Central Anatolia points, one per province (14 Nov: location list opened).
 # Each point: rainfed-farming district, cropland checked with ESA WorldCover 2021 (does NOT separate irrigated from rainfed),
 # 3–10 km from the WMO 1991–2020 normals station used for precip_vs_mgm. Elevation comes from the NASA POWER header.
-# 15 Nov (Ömer, with Gümüş's OK): 8 points that MODIS NDVI showed as irrigated were moved to pixels that are both
+# 15 Nov (Ömer, with Gümüş's OK): 9 points (Develi added later the same day) that MODIS NDVI showed as irrigated were moved to pixels that are both
 # ≥ 60 % WorldCover cropland within 300 m AND never summer-green in MODIS NDVI 2020–2023 (rainfed). See coord_check.
 locations:
 - id: karapinar
@@ -19,10 +19,10 @@ locations:
   name: Develi
   district: Develi
   province: Kayseri
-  lat: 38.43
-  lon: 35.47
+  lat: 38.4302
+  lon: 35.444
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %89 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Kayseri Bölge 17196 (~29 km)'
+  coord_check: '15 Kas, Ömer: eski nokta 38.43, 35.47 MODIS NDVI''de 12 yılın 7''sinde yazın yeşildi (sulu görünüyordu), taşındı (2.26 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %90 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.337), Temmuz 0.228. Yakın WMO istasyonu: Kayseri Bölge 17196 (~29 km)'
   note:
     en: Cropland north of Develi town (Develi plain). Representative of the district, not a specific field.
     tr: Develi ilçe merkezinin kuzeyinde tarım alanı (Develi ovası). İlçeyi temsil eder, belirli bir tarla değildir.
