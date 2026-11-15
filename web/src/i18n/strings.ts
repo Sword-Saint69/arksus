@@ -76,6 +76,8 @@ export const S = {
   noParcelHere: { tr: 'Bu noktada kayıtlı parsel yok (yol, dere ya da kadastro dışı alan olabilir).', en: 'No registered parcel here (it may be a road, a stream or land outside the cadastre).' },
   tkgmFail: { tr: 'Parsel servisine ulaşılamadı. Biraz sonra tekrar dene ya da tarlanı elle çiz.', en: 'The parcel service could not be reached. Try again shortly or draw the field by hand.' },
   tkgmLimit: { tr: 'TKGM’nin günlük parsel sorgu sınırı doldu. Tarlanı elle çizebilir ya da yarın tekrar deneyebilirsin.', en: 'TKGM’s daily parcel query limit has been reached. You can draw the field by hand or try again tomorrow.' },
+  tkgmBusyNote: { tr: 'Tapu servisi (TKGM) bugünkü sorgu sınırına ulaştı. Şimdilik en kolayı tarlanı haritada çizmek; tapudan seçim yarın yeniden çalışır.', en: 'The land registry service (TKGM) has reached today’s query limit. For now, drawing your field on the map is easiest; picking from the registry works again tomorrow.' },
+  tkgmBusySub: { tr: 'Tapu servisi bugün yoğun', en: 'Land registry service is busy today' },
   tkgmNote: {
     tr: 'Kaynak: TKGM Parsel Sorgu. Bilgi amaçlıdır, resmi belge yerine geçmez.',
     en: 'Source: TKGM Parcel Query. For information only, not an official document.',

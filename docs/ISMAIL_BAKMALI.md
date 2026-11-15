@@ -163,3 +163,12 @@ Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **
 - Hesap `lib/soilhealth.ts`'te (Gümüş); ayrıntı `docs/GUBRE.md` §10.
 - [ ] (15 Kas, Gümüş) Gübre kartına geri gelenler: "Tohum Rhizobium ile aşılı" (sadece baklagil) ve "Kombine mibzer" kutuları; analiz yokken "sadece azot" uyarısı ve buğdayda Toros rehberinin dozunu gösteren "Analizin yoksa" kutusu (`screens/result/Fertilizer.tsx`, `i18n/strings.ts` `fertInoculated`, `fertBanding`, `fertOnlyN`, `fertGuideTitle`, `fertGuideSub`).- [ ] (15 Kas, Gümüş) Gübre kartında buğday için "Bölgede çiftçi ne yapıyor?" kutusu (Cihanbeyli 2023 anketi; `practiceNutrients`), `i18n/strings.ts` `fertPractice*` anahtarları.
 
+
+
+## 18. Canlı site ve TKGM günlük sınırı (15 Kas, Gümüş — Gümüş'ün isteğiyle)
+
+Site canlıda: https://nobetsu.vercel.app (Vercel projesi `nobetsu`, kök `web/`; şimdilik CLI ile deploy, GitHub bağlantısı Vercel uygulamasına repo izni bekliyor). Canlıda TKGM `nobetsu.vercel.app`'ten gelen isteklere ilk istekte bile 403 "Günlük sorgu limitini aştınız" diyor; site adresini gizleyerek sınırı aşmıyoruz.
+- [ ] `services/tkgm.ts`: 403/429 gelince "bugün sınırlı" diye hatırlanır (`localStorage` `nobetsu.tkgm-limited` = tarih); TKGM normal cevap verince silinir. `tkgmLimited()`, `onTkgmLimited()` (useSyncExternalStore için). Test: `tkgm.test.ts` "daily limit memory".
+- [ ] `screens/FindField.tsx`: sınır varken menüde bilgi notu (`tkgmBusyNote`), "Haritada elle çiz" en üste çıkar; "Tarlanın üstüne dokun" ve "Ada / parsel" soluk görünür (`tkgmBusySub`) ama tıklanabilir kalır. Konum ve arama sonrası `tap` yerine doğrudan `draw` açılır.
+- [ ] `screens/find/ParcelNumber.tsx`: il/ilçe/mahalle listeleri sınırda `tkgmFail` yerine `tkgmLimit` yazar, il kutusu "Yükleniyor…"da takılı kalmaz, hata notunda "Haritada elle çiz" düğmesi (`onDraw`).
+- Ayrıca canlıda: `web/.env.local` ve Vercel'de `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` var (Supabase projesi `nobetsu`, Frankfurt); kodda henüz kullanılmıyor. Giriş ekranı için `package.json`'a `@supabase/supabase-js` gerekecek.

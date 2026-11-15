@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { parseTkgmArea, toParcel } from './tkgm';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { onTkgmLimited, parcelAt, parseTkgmArea, TkgmError, tkgmLimited, toParcel } from './tkgm';
 
 // The response of parsel/37.876000/34.679500/ (checked 15 Nov 2026).
 const SAMPLE = {
@@ -46,5 +46,24 @@ describe('TKGM', () => {
     expect(p.areaBadge).toBe('model');
     expect(p.areaM2).toBeGreaterThan(58_000);
     expect(p.areaM2).toBeLessThan(62_000);
+  });
+});
+
+describe('daily limit memory', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const answer = (status: number, body: unknown = {}) =>
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(body), { status })));
+
+  it('a 403 marks TKGM as limited and tells subscribers; the next normal answer clears it', async () => {
+    const seen: boolean[] = [];
+    const off = onTkgmLimited(() => seen.push(tkgmLimited()));
+    answer(403, 'Günlük sorgu limitini aştınız.');
+    await expect(parcelAt(37.876, 34.6795)).rejects.toMatchObject({ limited: true });
+    expect(tkgmLimited()).toBe(true);
+    answer(404);                                            // TKGM answers again (no parcel there)
+    await expect(parcelAt(37.877, 34.6795)).rejects.toBeInstanceOf(TkgmError);
+    expect(tkgmLimited()).toBe(false);
+    expect(seen).toEqual([true, false]);
+    off();
   });
 });
