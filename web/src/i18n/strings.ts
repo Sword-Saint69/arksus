@@ -624,6 +624,18 @@ export const S = {
   sectionsReset: { tr: 'Moda göre sıfırla', en: 'Reset to the mode' },
   settingsSavedAccount: { tr: 'Ayarların hesabınla birlikte bu cihazda saklanır.', en: 'Your settings are kept with your account on this device.' },
   settingsSavedDevice: { tr: 'Ayarlar bu cihazda saklanır. Giriş yaparsan hesabınla birlikte saklanır.', en: 'Settings are kept on this device. Sign in to keep them with your account.' },
+  // Coming season only (hero) and the other crops that also pass
+  heroSeason: { tr: 'Önümüzdeki sezon ({y} hasadı):', en: 'Coming season ({y} harvest):' },
+  heroThenWheat: { tr: 'Ertesi yıl buğday ekilir.', en: 'Wheat follows the year after.' },
+  heroThenChoice: { tr: 'Buğday hasadından sonraki yıl için en uygunu: {crop}.', en: 'For the year after the wheat harvest, the most suitable is {crop}.' },
+  altTitle: { tr: 'Başka neler ekilebilir?', en: 'What else could you plant?' },
+  altSub: { tr: 'Verimlilik eşiklerini geçen diğer ürünler. Önerilenden daha az uygunlar ama denenebilir.', en: 'Other crops that pass the productivity thresholds. Less suitable than the suggestion, but possible.' },
+  altTitleLater: { tr: 'Buğdaydan sonra ({y} hasadı)', en: 'After the wheat ({y} harvest)' },
+  altSubLater: { tr: 'Tarlan nadasta ya da baklagildeydi, bu güz sıra buğdayda. Asıl seçim ondan sonraki yıl için:', en: 'Your field was fallow or under a legume, so wheat is due this autumn. The real choice is for the year after:' },
+  altBest: { tr: 'En uygun', en: 'Most suitable' },
+  altClose: { tr: 'Neredeyse aynı', en: 'Almost as suitable' },
+  altLess: { tr: 'Daha az uygun', en: 'Less suitable' },
+  altNone: { tr: 'Eşikleri geçen başka ürün yok. Neden elendiklerini aşağıda görebilirsin.', en: 'No other crop passes the thresholds. You can see below why they were left out.' },
   // Result menu
   secMenu: { tr: 'Sonuç bölümleri', en: 'Result sections' },
   secNext: { tr: 'Sonraki: {s}', en: 'Next: {s}' },

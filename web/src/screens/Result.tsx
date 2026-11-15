@@ -5,14 +5,15 @@ import { depthFor, useStore } from '@/state/store';
 import { useDistrict } from '@/data/hooks';
 import { withMap } from '@/map/api';
 import { fieldPolygons } from '@/domain/field';
-import { harvestYears, practiceOf, stageOf, twoYearPlan } from '@/domain/history';
+import { harvestYears, practiceOf, stageOf } from '@/domain/history';
+import { nextSeason, type NextSeason } from '@/domain/nextSeason';
 import { weightsFor } from '@/domain/priorities';
 import { ROTATION_COLOR_ON_MAP } from '@/domain/sim';
 import { buildVerdict, type Verdict } from '@/domain/verdict';
 import { inputsFromDefaults } from '@/lib/economics';
 import type { CropId, RotationId } from '@/lib/types';
 import { Button, Card, DataBadge, Note, cn } from '@/ui/kit';
-import { CropIcon, RotationName } from '@/ui/crops';
+import { CropIcon } from '@/ui/crops';
 import { Options } from './result/Options';
 import { WhatIf } from './result/WhatIf';
 import { FieldSim } from './result/FieldSim';
@@ -90,7 +91,7 @@ export function Result() {
           {answers.water === 'irrigated' && <Note tone="warn" icon={<Info size={20} />}>{t('irrShown')}</Note>}
           {answers.water === 'limited' && <Note tone="info" icon={<Info size={20} />}>{t('qWaterSub')}</Note>}
           <Hero verdict={verdict} />
-          <NextStep verdict={verdict} />
+          <OtherChoices verdict={verdict} />
           <Blocked verdict={verdict} />
           <Note tone="info" icon={<Info size={20} />}>
             {!isPilot && distanceKm !== null && <b>{t('covered', { name: location.name, km: num(distanceKm, distanceKm < 10 ? 1 : 0) })} </b>}
@@ -221,17 +222,21 @@ function closeText(v: Verdict, t: ReturnType<typeof useT>['t'], tx: ReturnType<t
 function Hero({ verdict }: { verdict: Verdict }) {
   const { t, tx, lang } = useT();
   const priority = useStore((s) => s.answers.priority);
+  const history = useStore((s) => s.answers.history);
   const [speaking, setSpeaking] = useState(false);
   const [copied, setCopied] = useState(false);
   const rec = verdict.recommended;
   useEffect(() => () => { window.speechSynthesis?.cancel(); }, []);
 
-  if (!rec) return <Note tone="bad" icon={<Ban size={20} />}>{t('recNone')}</Note>;
+  const next = useSeason(verdict, history);
+  if (!rec || !next) return <Note tone="bad" icon={<Ban size={20} />}>{t('recNone')}</Note>;
+  const crop = t(`crop_${next.crop}` as Key);
+  const thenLine = next.wheatNow ? t('heroThenChoice', { crop: t(`crop_${next.then}` as Key).toLocaleLowerCase(lang) }) : t('heroThenWheat');
   const why = t(`why_${rec.ranked.driver}` as Key);
   const close = closeText(verdict, t, tx);
   const blocked = verdict.blocked.map((b) => `${tx(b.rotation.label)}: ${b.ranked.blocked.map((r) => t(`block_${r}` as Key)).join(' ')}`);
   const summary = [
-    `${t('recTitle')}: ${tx(rec.rotation.label).replace('→', lang === 'tr' ? 'sonra' : 'then')}.`,
+    `${t('recTitle')}: ${t('heroSeason', { y: next.harvestYear })} ${crop}. ${thenLine}`,
     why, close,
     blocked.length ? `${t('recBlocked')}: ${blocked.join(' ')}` : t('noBlocked'),
     translate(lang, 'supports'),
@@ -250,7 +255,7 @@ function Hero({ verdict }: { verdict: Verdict }) {
     setSpeaking(true);
   };
   const share = async () => {
-    const text = `NöbetSu · ${summary.replace(lang === 'tr' ? ' sonra ' : ' then ', ' → ')}`;
+    const text = `NöbetSu · ${summary}`;
     try {
       if (navigator.share) await navigator.share({ text });
       else { await navigator.clipboard.writeText(text); setCopied(true); window.setTimeout(() => setCopied(false), 2500); }
@@ -260,7 +265,9 @@ function Hero({ verdict }: { verdict: Verdict }) {
   return (
     <section aria-labelledby="rec-title" className="animate-rise rounded-[1.75rem] bg-gradient-to-br from-primary-strong to-primary p-5 text-white shadow-sm">
       <p id="rec-title" className="text-sm font-extrabold uppercase tracking-[0.08em] text-gold">{t('recTitle')}</p>
-      <p className="mt-2.5 text-[2rem] font-black leading-[1.1]"><RotationName rotation={rec.rotation} size="lg" onDark /></p>
+      <p className="mt-2 text-base font-bold text-white/85">{t('heroSeason', { y: next.harvestYear })}</p>
+      <p className="mt-1 flex items-center gap-3 text-[2.4rem] font-black leading-[1.05]"><CropIcon crop={next.crop} size={40} /> {crop}</p>
+      <p className="mt-1.5 text-base text-white/85">{thenLine}</p>
       <p className="mt-3 text-xl font-semibold leading-snug">{why}</p>
       <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-white/85">
         {t('recDriver', { d: t(`crit_${rec.ranked.driver}` as Key) })} <DataBadge type="model" />
@@ -287,28 +294,45 @@ function Hero({ verdict }: { verdict: Verdict }) {
 
 const cropNote = (c: CropId): Key => (c === 'fallow' ? 'cropNote_fallow' : c === 'wheat' ? 'cropNote_wheat' : 'cropNote_legume');
 
-/** What the suggestion means for the seasons ahead, starting from what the farmer said was last on the field. */
-function NextStep({ verdict }: { verdict: Verdict }) {
+/** The coming season for this field: the suggested sequence laid on what the farmer said was last on it. */
+function useSeason(verdict: Verdict, history: ReturnType<typeof useStore.getState>['answers']['history']): NextSeason | null {
+  return useMemo(() => nextSeason(stageOf(history), verdict, harvestYears(new Date())[2]), [verdict, history]);
+}
+
+/**
+ * Other crops that also pass the guardrails for the first-year slot. When wheat
+ * is due now, the first-year choice is the year after, so the suggested crop
+ * is listed here as well.
+ */
+function OtherChoices({ verdict }: { verdict: Verdict }) {
   const { t } = useT();
   const history = useStore((s) => s.answers.history);
-  const rec = verdict.recommended;
-  if (!rec) return null;
-  const stage = stageOf(history);
+  const next = useSeason(verdict, history);
+  if (!next) return null;
   const practice = practiceOf(history);
-  const plan = twoYearPlan(stage, rec.rotation.crops, harvestYears(new Date())[2]);
+  const items: { crop: CropId; tag: Key; best?: boolean }[] = [
+    ...(next.wheatNow ? [{ crop: next.then, tag: 'altBest' as Key, best: true }] : []),
+    ...next.alternatives.map((a) => ({ crop: a.crop, tag: (a.close ? 'altClose' : 'altLess') as Key })),
+  ];
   return (
     <Card className="grid gap-3">
-      <h2 className="flex items-center gap-2 text-xl font-extrabold"><CalendarDays size={22} className="text-primary" aria-hidden="true" /> {t('nextTitle')}</h2>
-      <p className="text-lg leading-snug">{t(`stage_${stage}` as Key, { first: t(`crop_${rec.rotation.crops[0]}` as Key) })}</p>
-      <ol className="grid grid-cols-2 gap-2.5">
-        {plan.map((y, i) => (
-          <li key={y.harvestYear} className={cn('grid gap-1 rounded-2xl p-3', i === 0 ? 'bg-primary-soft' : 'bg-canvas')}>
-            <span className="text-sm font-bold text-muted">{t('seasonOf', { y: y.harvestYear })}</span>
-            <span className="flex items-center gap-2 text-xl font-black"><CropIcon crop={y.crop} size={26} /> {t(`crop_${y.crop}` as Key)}</span>
-            <span className="text-sm leading-snug text-muted">{t(cropNote(y.crop))}</span>
-          </li>
-        ))}
-      </ol>
+      <h2 className="flex items-center gap-2 text-xl font-extrabold"><CalendarDays size={22} className="text-primary" aria-hidden="true" />
+        {next.wheatNow ? t('altTitleLater', { y: next.harvestYear + 1 }) : t('altTitle')}</h2>
+      <p className="text-[15px] leading-snug text-muted">{t(next.wheatNow ? 'altSubLater' : 'altSub')}</p>
+      {items.length ? (
+        <ul className="grid gap-2">
+          {items.map((it) => (
+            <li key={it.crop} className={cn('flex items-center gap-3 rounded-2xl p-3', it.best ? 'bg-primary-soft' : 'bg-canvas')}>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-primary"><CropIcon crop={it.crop} size={24} /></span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-lg font-extrabold leading-tight">{t(`crop_${it.crop}` as Key)}</span>
+                <span className="block text-sm leading-snug text-muted">{t(cropNote(it.crop))}</span>
+              </span>
+              <span className={cn('shrink-0 rounded-full px-2.5 py-1 text-xs font-bold', it.best ? 'bg-primary text-white' : 'bg-white text-muted')}>{t(it.tag)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-[15px]">{t('altNone')}</p>}
       {practice !== 'unknown' && <p className="text-[15px] leading-snug text-muted">{t(`practice_${practice}` as Key)}</p>}
     </Card>
   );
