@@ -16,3 +16,5 @@ Thumbs.db
 coverage/
 *.tsbuildinfo
 .ruff_cache/
+.vercel
+.env*
