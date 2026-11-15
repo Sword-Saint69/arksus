@@ -1,12 +1,15 @@
+import { UserRound } from 'lucide-react';
 import { useT } from '@/i18n';
 import { useStore } from '@/state/store';
 import { cn } from '@/ui/kit';
 
-/** Brand on the left, language on the right. Nothing else competes with the map. */
+/** Brand on the left; profile and language on the right. Nothing else competes with the map. */
 export function TopBar() {
   const { t, lang } = useT();
   const setLang = useStore((s) => s.setLang);
   const go = useStore((s) => s.go);
+  const user = useStore((s) => s.user);
+  const setProfileOpen = useStore((s) => s.setProfileOpen);
   return (
     <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 p-3 md:p-4">
       <button type="button" onClick={() => go('welcome')} aria-label={t('appName')}
@@ -18,6 +21,14 @@ export function TopBar() {
         </svg>
         <span className="text-xl font-black tracking-tight">{t('appName')}</span>
       </button>
+      <div className="pointer-events-auto flex items-center gap-2">
+      <button type="button" onClick={() => setProfileOpen(true)} aria-label={user ? t('profileOf', { u: user }) : t('profileTitle')} title={user ?? t('profileTitle')}
+        className="flex min-h-12 items-center gap-2 rounded-2xl bg-[#0f1e16]/80 px-2 text-white shadow-float backdrop-blur hover:bg-[#0f1e16]">
+        {user
+          ? <span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-xl bg-gold text-lg font-black uppercase text-primary-strong">{user[0]}</span>
+          : <UserRound size={22} aria-hidden="true" className="mx-1" />}
+        <span className="hidden max-w-32 truncate pr-1.5 text-base font-bold md:inline">{user ?? t('signIn')}</span>
+      </button>
       <div role="group" aria-label={t('language')} className="pointer-events-auto flex rounded-2xl bg-[#0f1e16]/80 p-1 shadow-float backdrop-blur">
         {(['tr', 'en'] as const).map((l) => (
           <button key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}
@@ -25,6 +36,7 @@ export function TopBar() {
             {l}
           </button>
         ))}
+      </div>
       </div>
     </header>
   );

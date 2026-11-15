@@ -8,6 +8,8 @@ import type { Core } from '@/data/api';
 import type { Parcel } from '@/domain/field';
 import { EMPTY_HISTORY, type History, type PastCrop } from '@/domain/history';
 import type { PriorityId } from '@/domain/priorities';
+import { DEFAULT_PREFS, normalizePrefs, type Prefs } from '@/domain/sections';
+import { currentAccount, logout, savePrefs, type Account } from '@/domain/auth';
 
 export type Lang = 'tr' | 'en';
 export type Step = 'welcome' | 'find' | 'questions' | 'analyzing' | 'result';
@@ -46,6 +48,11 @@ interface State {
   sheetOpen: boolean;
   /** The two-year view is playing on the map. */
   sim: boolean;
+  /** Simple or advanced result, and the sections picked by hand. */
+  prefs: Prefs;
+  /** Device-only trial account (domain/auth.ts); null when signed out. */
+  user: string | null;
+  profileOpen: boolean;
 
   setLang(lang: Lang): void;
   setCore(core: Core): void;
@@ -58,11 +65,15 @@ interface State {
   setHistory(i: 0 | 1 | 2, crop: PastCrop | null): void;
   setSheetOpen(open: boolean): void;
   setSim(on: boolean): void;
+  setPrefs(p: Prefs): void;
+  signedIn(a: Account): void;
+  signOut(): void;
+  setProfileOpen(open: boolean): void;
   reset(): void;
 }
 
 const KEY = 'nobetsu.v2';
-type Saved = Pick<State, 'lang' | 'step' | 'parcels' | 'locationId' | 'distanceKm' | 'answers'>;
+type Saved = Pick<State, 'lang' | 'step' | 'parcels' | 'locationId' | 'distanceKm' | 'answers' | 'prefs'>;
 
 function load(): Partial<Saved> {
   try {
@@ -84,6 +95,7 @@ function initialLang(): Lang {
 }
 
 const saved = typeof localStorage === 'undefined' ? {} : load();
+const account = currentAccount();
 
 export const useStore = create<State>((set) => ({
   lang: saved.lang ?? initialLang(),
@@ -98,6 +110,9 @@ export const useStore = create<State>((set) => ({
   answers: saved.answers ?? EMPTY_ANSWERS,
   sheetOpen: true,
   sim: false,
+  prefs: account?.prefs ?? normalizePrefs(saved.prefs ?? DEFAULT_PREFS),
+  user: account?.username ?? null,
+  profileOpen: false,
 
   setLang: (lang) => set({ lang }),
   setCore: (core) => set({ core, coreError: false }),
@@ -115,13 +130,18 @@ export const useStore = create<State>((set) => ({
   setSheetOpen: (sheetOpen) => set({ sheetOpen }),
   // On a phone the panel steps aside so the field is visible while it plays.
   setSim: (sim) => set({ sim, sheetOpen: !sim }),
+  // A signed-in farmer's settings follow the account.
+  setPrefs: (prefs) => set((s) => { if (s.user) savePrefs(s.user, prefs); return { prefs }; }),
+  signedIn: (a) => set({ user: a.username, prefs: a.prefs }),
+  signOut: () => { logout(); set({ user: null }); },
+  setProfileOpen: (profileOpen) => set({ profileOpen }),
   reset: () => set({ step: 'welcome', question: 0, findMode: 'menu', sim: false, parcels: [], locationId: null, distanceKm: null, answers: EMPTY_ANSWERS }),
 }));
 
 // Kept on this device only: no account, nothing sent anywhere.
 useStore.subscribe((s) => {
   try {
-    const out: Saved = { lang: s.lang, step: s.step, parcels: s.parcels, locationId: s.locationId, distanceKm: s.distanceKm, answers: s.answers };
+    const out: Saved = { lang: s.lang, step: s.step, parcels: s.parcels, locationId: s.locationId, distanceKm: s.distanceKm, answers: s.answers, prefs: s.prefs };
     localStorage.setItem(KEY, JSON.stringify(out));
   } catch { /* storage blocked (private tab): the page still works */ }
 });
