@@ -198,7 +198,7 @@ def fake_smap(location_id: str) -> dict:
                        "surface_wetness": 0.20 + 0.20 * _wave(mm, 12, 1.0)})
     return {
         "available": True,
-        "latest": {"date": "2026-11-10", "rootzone_wetness": 0.31, "rootzone_m3m3": 0.18, "percentile_for_month": 40},
+        "latest": {"date": "2026-11-01", "rootzone_wetness": 0.31, "rootzone_m3m3": None, "percentile_for_month": 40},  # MERRA-2 slot: no m3/m3
         "monthly_climatology": clim,
         "monthly_series": series,
     }
