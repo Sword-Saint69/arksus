@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Ban, BookOpen, CalendarDays, CalendarRange, ChartScatter, ChevronRight, CirclePlay, CloudSun, Columns3, Gauge, Info, Leaf, MapPin, Mountain, Pencil, Share2, Shovel, Sparkles, Sprout, Square, Star, Volume2 } from 'lucide-react';
+import { Ban, BookOpen, CalendarDays, CalendarRange, ChartScatter, ChevronRight, CirclePlay, CloudSun, Columns3, Gauge, Info, Leaf, MapPin, Mountain, Pencil, Settings2, Share2, Shovel, Sparkles, Sprout, Square, Star, Volume2 } from 'lucide-react';
 import { translate, useT, type Key } from '@/i18n';
 import { depthFor, useStore } from '@/state/store';
 import { useDistrict } from '@/data/hooks';
@@ -23,6 +23,7 @@ import { Fertilizer } from './result/Fertilizer';
 import { Sowing } from './result/Sowing';
 import { AgentCard, Details } from './result/Details';
 import { Greenness } from './result/Greenness';
+import { showFor, visible, type Mode, type SectionId } from '@/domain/sections';
 
 /** The answer, simplest first: what suits this land, why, what to do next. Everything else is below it. */
 export function Result() {
@@ -32,6 +33,7 @@ export function Result() {
   const locationId = useStore((s) => s.locationId);
   const distanceKm = useStore((s) => s.distanceKm);
   const answers = useStore((s) => s.answers);
+  const prefs = useStore((s) => s.prefs);
   const go = useStore((s) => s.go);
   const reset = useStore((s) => s.reset);
   const setQuestion = useStore((s) => s.setQuestion);
@@ -113,7 +115,7 @@ export function Result() {
     { id: 'greenness', key: 'secGreenness', icon: Leaf, body: isPilot ? null : <Greenness /> },
     { id: 'ai', key: 'secAi', icon: Sparkles, body: agent?.guards.passed && agent.report ? <AgentCard agent={agent} /> : null },
     { id: 'details', key: 'secDetails', icon: BookOpen, body: <Details verdict={verdict} results={results} /> },
-  ].filter((x): x is Section => x.body !== null) as Section[];
+  ].filter((x) => x.body !== null && visible(prefs, x.id as SectionId)) as Section[];
 
   return (
     // One column the width of the panel: a long word or a row of buttons may not widen the page on a phone.
@@ -134,7 +136,7 @@ export function Result() {
 
 type SectionKey = 'secSummary' | 'secOptions' | 'secClimates' | 'secTwoYears' | 'secCalendar' | 'secWhatIf' | 'secTerrain'
   | 'secNow' | 'secFertilizer' | 'secSowing' | 'secGreenness' | 'secAi' | 'secDetails';
-interface Section { id: string; key: SectionKey; icon: typeof Star; body: ReactNode }
+interface Section { id: SectionId; key: SectionKey; icon: typeof Star; body: ReactNode }
 
 /**
  * The result as a menu: one subject at a time instead of one long page. A list
@@ -143,13 +145,13 @@ interface Section { id: string; key: SectionKey; icon: typeof Star; body: ReactN
  */
 function Sections({ sections }: { sections: Section[] }) {
   const { t } = useT();
-  const [active, setActive] = useState(sections[0].id);
+  const [active, setActive] = useState<SectionId>(sections[0].id);
   const nav = useRef<HTMLElement>(null);
   const i = Math.max(0, sections.findIndex((s) => s.id === active));
   const current = sections[i];
   const next = sections[i + 1];
 
-  const open = (id: string) => {
+  const open = (id: SectionId) => {
     setActive(id);
     nav.current?.parentElement?.closest('.thin-scroll')?.scrollTo({ top: 0 });
     // keep the chosen chip in view on a phone
@@ -157,7 +159,9 @@ function Sections({ sections }: { sections: Section[] }) {
   };
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start md:gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start md:gap-6">
+      <div className="grid gap-2 md:sticky md:top-0">
+      <ModeSwitch />
       <nav ref={nav} aria-label={t('secMenu')}
         className="sticky top-0 z-10 -mx-4 flex gap-2 overflow-x-auto bg-paper px-4 py-2 [scrollbar-width:none] md:mx-0 md:grid md:max-h-[calc(100dvh-15rem)] md:gap-0.5 md:overflow-y-auto md:p-0">
         {sections.map((s) => {
@@ -173,6 +177,7 @@ function Sections({ sections }: { sections: Section[] }) {
           );
         })}
       </nav>
+      </div>
       <div key={current.id} className="grid max-w-3xl animate-fade gap-5">
         {current.body}
         {next && (
@@ -181,6 +186,29 @@ function Sections({ sections }: { sections: Section[] }) {
           </Button>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Simple or advanced, one tap away; the full list of sections is in the settings. */
+function ModeSwitch() {
+  const { t } = useT();
+  const prefs = useStore((s) => s.prefs);
+  const setPrefs = useStore((s) => s.setPrefs);
+  const setProfileOpen = useStore((s) => s.setProfileOpen);
+  const pick = (mode: Mode) => setPrefs({ mode, show: showFor(mode) });
+  return (
+    <div className="flex items-center gap-2">
+      <div role="radiogroup" aria-label={t('modeLabel')} className="flex flex-1 rounded-2xl bg-canvas p-1">
+        {(['simple', 'advanced'] as const).map((m) => (
+          <button key={m} type="button" role="radio" aria-checked={prefs.mode === m} onClick={() => pick(m)}
+            className={cn('min-h-10 flex-1 rounded-xl px-3 text-[15px] font-extrabold', prefs.mode === m ? 'bg-white text-primary shadow-sm' : 'text-muted')}>
+            {t(m === 'simple' ? 'modeSimple' : 'modeAdvanced')}
+          </button>
+        ))}
+      </div>
+      <button type="button" onClick={() => setProfileOpen(true)} aria-label={t('settings')} title={t('settings')}
+        className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-canvas text-primary hover:bg-primary-soft"><Settings2 size={20} /></button>
     </div>
   );
 }

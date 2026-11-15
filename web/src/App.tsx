@@ -8,6 +8,7 @@ import { DEMO_ANSWERS, demoLocation } from '@/domain/demo';
 import { MapControls } from '@/shell/MapControls';
 import { Panel } from '@/shell/Panel';
 import { TopBar } from '@/shell/TopBar';
+import { Profile } from '@/shell/Profile';
 import { Welcome } from '@/screens/Welcome';
 import { FindField } from '@/screens/FindField';
 import { Questions } from '@/screens/Questions';
@@ -27,6 +28,7 @@ export default function App() {
   const sim = useStore((s) => s.sim);
   const hasField = useStore((s) => s.parcels.length > 0 && !!s.locationId);
   const go = useStore((s) => s.go);
+  const profileOpen = useStore((s) => s.profileOpen);
 
   useEffect(() => {
     loadCore().then((c) => {
@@ -83,6 +85,7 @@ export default function App() {
       )}
       {sim && core && step === 'result' && <SimHud />}
       <MapControls />
+      {profileOpen && <Profile />}
     </div>
   );
 }
