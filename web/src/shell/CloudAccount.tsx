@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { FileText, LogIn, LogOut, ShieldCheck, Trash2 } from 'lucide-react';
-import { useT } from '@/i18n';
+import { FileText, LogOut, ShieldCheck, Trash2, UserRound } from 'lucide-react';
+import { useT, type Key } from '@/i18n';
 import { useStore } from '@/state/store';
 import { useCloud } from '@/state/cloud';
 import { hasConsent, LLM_CONSENT_OPEN } from '@/domain/consent';
@@ -8,10 +8,10 @@ import { Markdown } from '@/ui/Markdown';
 import { Button, Note, cn } from '@/ui/kit';
 import { noticeBody, useLegalText } from './ConsentDialog';
 
-/** The account part of the profile panel when Supabase is configured: Google sign-in and the farmer's permissions. */
+/** The account part of the profile panel when Supabase is configured: email + password, and the farmer's permissions. */
 export function CloudAccount() {
   const { t } = useT();
-  const { ready, user, consents, error, signIn, signOut, decide, deleteAccount } = useCloud();
+  const { ready, user, consents, error, signOut, decide, deleteAccount } = useCloud();
   const locationId = useStore((s) => s.locationId);
   const site = useStore((s) => s.core?.site);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -29,9 +29,9 @@ export function CloudAccount() {
   if (!user) {
     return (
       <section className="grid gap-3 rounded-2xl border border-line bg-white p-4" aria-label={t('accountTitle')}>
-        <Button variant="primary" size="lg" block onClick={() => void signIn()} icon={<LogIn size={22} />}>{t('gSignIn')}</Button>
+        <div className="flex items-center gap-2 text-lg font-extrabold"><UserRound size={22} className="text-primary" aria-hidden="true" /> {t('accountTitle')}</div>
+        <EmailForm />
         <p className="text-sm text-muted">{t('gSignInNote')}</p>
-        {error && <Note tone="warn">{t('gError')}</Note>}
         <LegalLinks open={text} setOpen={setText} />
       </section>
     );
@@ -76,6 +76,56 @@ export function CloudAccount() {
       </div>
       {confirmDelete && <p className="text-sm text-muted">{t('gDeleteNote')}</p>}
     </section>
+  );
+}
+
+const MIN_PASSWORD = 8;
+
+function EmailForm() {
+  const { t } = useT();
+  const signIn = useCloud((s) => s.signIn);
+  const signUp = useCloud((s) => s.signUp);
+  const [tab, setTab] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ tone: 'warn' | 'info'; key: Key } | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (tab === 'register' && pass.length < MIN_PASSWORD) { setMsg({ tone: 'warn', key: 'eErr_weak_password' }); return; }
+    setBusy(true); setMsg(null);
+    const r = tab === 'login' ? await signIn(email, pass) : await signUp(email, pass);
+    setBusy(false);
+    if (r === null) { setPass(''); return; }                       // signed in: the panel switches to the account
+    setMsg(r === 'check_mail' ? { tone: 'info', key: 'eCheckMail' } : { tone: 'warn', key: `eErr_${r}` as Key });
+  };
+
+  const input = 'min-h-12 rounded-2xl border-2 border-line bg-white px-3 text-base font-normal focus:border-primary focus:outline-none';
+  return (
+    <>
+      <div role="tablist" className="flex rounded-2xl bg-canvas p-1">
+        {(['login', 'register'] as const).map((k) => (
+          <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => { setTab(k); setMsg(null); }}
+            className={cn('min-h-10 flex-1 rounded-xl text-[15px] font-extrabold', tab === k ? 'bg-white text-primary shadow-sm' : 'text-muted')}>
+            {t(k === 'login' ? 'signIn' : 'signUp')}
+          </button>
+        ))}
+      </div>
+      <form className="grid gap-3" onSubmit={submit} noValidate>
+        <label className="grid gap-1 text-[15px] font-semibold">
+          {t('eEmail')}
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} required className={input} />
+        </label>
+        <label className="grid gap-1 text-[15px] font-semibold">
+          {t('password')}
+          <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} autoComplete={tab === 'login' ? 'current-password' : 'new-password'} required className={input} />
+          {tab === 'register' && <span className="text-sm font-normal text-muted">{t('passwordHelp', { n: MIN_PASSWORD })}</span>}
+        </label>
+        {msg && <Note tone={msg.tone}>{t(msg.key)}</Note>}
+        <Button type="submit" variant="primary" size="lg" disabled={busy || !email.includes('@') || !pass}>{t(tab === 'login' ? 'signIn' : 'signUp')}</Button>
+      </form>
+    </>
   );
 }
 

@@ -16,7 +16,7 @@ Tarla sınırı, ada/parsel numarası ve konumun bu işleme **girmez**.
 **Nasıl kullanılır?**
 - Kaydın, aynı sezonun iki kez sayılmaması için hesabına bağlı tutulur ve sadece veritabanında durur.
 - Dışarıya sadece **ilçe toplamları** verilir (örnek: "Kaman, 2027 hasadı: buğday 120 tarla, nohut 45 tarla"). Bir ilçede [5]'ten az kayıt varsa o ilçenin sayısı gösterilmez.
-- Bu toplamlar sitede herkese açık gösterilebilir; Tarım ve Orman Bakanlığı, kooperatifler ve araştırmacılarla paylaşılabilir. Adın, e-postan ve tek tek kayıtların paylaşılmaz.
+- Bu toplamlar sitede herkese açık gösterilebilir; Tarım ve Orman Bakanlığı, kooperatifler ve araştırmacılarla paylaşılabilir. E-postan ve tek tek kayıtların paylaşılmaz.
 - Veritabanı Supabase'in Almanya'daki (Frankfurt, AB) sunucusundadır.
 
 **Geri alırsan:** Kaydın hesabından silinir ve bundan sonraki toplamlara girmez. Daha önce yayınlanmış toplamlar kişiye bağlanamadığı için geriye dönük değiştirilmez.
@@ -32,7 +32,7 @@ Tarla sınırı, ada/parsel numarası ve konumun bu işleme **girmez**.
 **Neden istiyoruz?** NöbetSu'nun çiftçiye sade Türkçeyle cevap veren tarım asistanını geliştirmek ve eğitmek için gerçek kullanım örneklerine ihtiyaç var.
 
 **Hangi veri?** Asistana yazdığın sorular; sorulara verdiğin cevaplar (sulama, toprak derinliği, öncelikler, girersen toprak analizi değerlerin); sitenin sana gösterdiği sonuçlar; tarlanın il ve ilçesi.
-**Adın, e-posta adresin ve Google hesap numaran bu veriden silinir.** Tarla sınırı ve konumun bu işleme girmez.
+**E-posta adresin ve hesap numaran bu veriden silinir.** Tarla sınırı ve konumun bu işleme girmez.
 
 **Nasıl kullanılır?**
 - Bu veriler dil modelinin eğitiminde ve test edilmesinde kullanılır.

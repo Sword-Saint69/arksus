@@ -7,7 +7,7 @@
 
 ## Kısaca
 
-- **Google ile giriş yaparsan** adını, e-posta adresini ve Google hesap numaranı alırız. Başka bir şey almayız.
+- **Hesap açarsan** e-posta adresini ve şifreni alırız. Şifren şifrelenmiş (geri çözülemeyen) halde saklanır; biz de göremeyiz. Adını sormayız.
 - **Tarlanın sınırı, ada/parsel numarası ve telefonunun konumu sunucumuza gönderilmez;** sadece senin tarayıcında kalır.
 - **Hesabına kaydettiğimiz:** sorulara verdiğin cevaplar, site ayarların ve tarlanın bulunduğu **il ve ilçe**. Böylece bir dahaki girişte kaldığın yerden devam edersin.
 - **İlçe bazında ekim istatistiği** ve **dil modeli geliştirme** için verini **sadece ayrıca izin verirsen** kullanırız. İzin vermesen de site aynı şekilde çalışır.
@@ -29,9 +29,8 @@ Aşağıda bunların ayrıntısı var.
 
 | Veri türü | Ne | Nereden |
 |---|---|---|
-| Kimlik | Google hesabındaki görünen adın | Google ile giriş |
-| İletişim | E-posta adresin | Google ile giriş |
-| Hesap bilgisi | Google hesap numaran (Google'ın verdiği kimlik numarası), hesabın açılış ve son giriş tarihi | Google ile giriş, otomatik |
+| İletişim | E-posta adresin | Hesap açarken sen yazarsın |
+| Hesap bilgisi | Şifren (sadece şifrelenmiş, geri çözülemeyen hali), hesabına verilen numara, hesabın açılış ve son giriş tarihi | Hesap açarken sen yazarsın, otomatik |
 | Tarla ve tercih bilgisi | Tarlanın bulunduğu il ve ilçe; sulama durumu, toprak derinliği, öncelikler gibi sorulara verdiğin cevaplar; girersen toprak analizi değerlerin; sitenin sana önerdiği ekim sırası ve seçtiğin ürün; site ayarların | Sitede kendin girersin |
 | İşlem güvenliği | IP adresi, tarayıcı bilgisi, giriş ve hata kayıtları | Otomatik (barındırma ve veritabanı hizmeti) |
 | Onay kayıtları | Hangi metni, hangi sürümüyle, ne zaman okuduğun ya da hangi izni verdiğin/geri aldığın | Sitede kendin işaretlersin |
@@ -44,7 +43,7 @@ Aşağıda bunların ayrıntısı var.
 
 | Amaç | Kullanılan veri | Hukuki sebep (Kanun md. 5) |
 |---|---|---|
-| Hesabını açmak ve giriş yapmanı sağlamak | Kimlik, iletişim, hesap bilgisi | Bir sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (md. 5/2-c): sitenin kullanım koşulları |
+| Hesabını açmak ve giriş yapmanı sağlamak | İletişim, hesap bilgisi | Bir sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (md. 5/2-c): sitenin kullanım koşulları |
 | Cevaplarını ve ayarlarını saklayıp bir sonraki girişte geri getirmek | Tarla ve tercih bilgisi | md. 5/2-c |
 | Siteyi güvenli çalıştırmak, kötüye kullanımı önlemek, hataları bulmak | İşlem güvenliği | Temel hak ve özgürlüklerine zarar vermemek kaydıyla meşru menfaatimiz (md. 5/2-f) |
 | Hangi metni okuduğunu ve hangi izni verdiğini kanıtlayabilmek | Onay kayıtları | Hukuki yükümlülük (md. 5/2-ç) ve bir hakkın tesisi, kullanılması veya korunması (md. 5/2-e) |
@@ -58,7 +57,7 @@ Açık rıza gerektiren iki amaç için izin vermezsen ya da izni sonradan geri 
 
 Elektronik ortamda, üç yoldan:
 
-1. **Google ile giriş:** Google'ın sana gösterdiği izin ekranında onayladığın ad, e-posta ve hesap numarası bize iletilir.
+1. **Hesap açma:** E-posta adresini ve şifreni hesap açma formuna sen yazarsın.
 2. **Site formları:** Sorulara verdiğin cevaplar ve ayarlar, sen kaydettiğinde hesabına yazılır.
 3. **Otomatik:** Siteyi kullanırken barındırma ve veritabanı hizmetleri güvenlik için IP adresi ve tarayıcı bilgisini kayda alır.
 
@@ -68,12 +67,11 @@ Elektronik ortamda, üç yoldan:
 |---|---|---|
 | Supabase Inc. | Veritabanı ve giriş (kimlik doğrulama) hizmeti; verilerin burada saklanır | Sunucu: Almanya (Frankfurt, AB) |
 | Vercel Inc. | Sitenin barındırılması ve sunulması; güvenlik kayıtları | [Bölge doğrulanacak: AB / ABD] |
-| Google LLC | Sadece giriş sırasında kimliğini doğrulamak için. Google'a tarla ya da cevap bilgisi göndermeyiz. | ABD ve diğer ülkeler |
 | Yetkili kamu kurum ve kuruluşları | Kanuna dayanan talep olursa, talep kadarı | Türkiye |
 
-**İlçe istatistikleri:** Açık rıza verdiysen, ekim tercihin başka çiftçilerinkiyle birlikte **ilçe toplamı** olarak sayılır (örnek: "Kaman, 2027 hasadı: buğday 120 tarla, nohut 45 tarla"). Bu toplu sayılar kişiye bağlanamaz; sitede herkese açık gösterilebilir, Tarım ve Orman Bakanlığı, kooperatifler ve araştırmacılarla paylaşılabilir. Bir ilçede [5]'ten az kayıt varsa o ilçenin sayısı gösterilmez. Adın, e-postan ya da tek tek kayıtların bu kişilerle paylaşılmaz.
+**İlçe istatistikleri:** Açık rıza verdiysen, ekim tercihin başka çiftçilerinkiyle birlikte **ilçe toplamı** olarak sayılır (örnek: "Kaman, 2027 hasadı: buğday 120 tarla, nohut 45 tarla"). Bu toplu sayılar kişiye bağlanamaz; sitede herkese açık gösterilebilir, Tarım ve Orman Bakanlığı, kooperatifler ve araştırmacılarla paylaşılabilir. Bir ilçede [5]'ten az kayıt varsa o ilçenin sayısı gösterilmez. E-postan ya da tek tek kayıtların bu kişilerle paylaşılmaz.
 
-**Yurt dışına aktarım (Kanun md. 9):** Supabase, Vercel ve Google'ın sunucuları Türkiye dışındadır; bu nedenle verilerin yurt dışına aktarılır. Bu aktarım için [Kurul'un ilan ettiği standart sözleşme imzalanıp imzadan sonraki 5 iş günü içinde Kişisel Verileri Koruma Kurumu'na bildirilecektir — hukukçu onayıyla tamamlanacak].
+**Yurt dışına aktarım (Kanun md. 9):** Supabase ve Vercel'in sunucuları Türkiye dışındadır; bu nedenle verilerin yurt dışına aktarılır. Bu aktarım için [Kurul'un ilan ettiği standart sözleşme imzalanıp imzadan sonraki 5 iş günü içinde Kişisel Verileri Koruma Kurumu'na bildirilecektir — hukukçu onayıyla tamamlanacak].
 
 ## 6. Ne kadar süre saklıyoruz?
 
@@ -93,7 +91,7 @@ Kanun'un 11. maddesi kapsamındaki haklarına sahipsin. Kısaca: verinin işleni
 **Nasıl başvurursun?**
 
 - Sitede: **Profil → Hesabımı sil** ile hesabını ve verilerini kendin silebilirsin; **Profil → İzinlerim** ile açık rızanı geri alabilirsin.
-- Diğer talepler için: [kvkk@… adresine] e-posta ya da [tebligat adresine] yazılı başvuru. Başvurunda adını, e-posta adresini ve talebini yazman yeterli. Başvurular Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ'e göre değerlendirilir.
+- Diğer talepler için: [kvkk@… adresine] e-posta ya da [tebligat adresine] yazılı başvuru. Başvurunda hesabındaki e-posta adresini ve talebini yazman yeterli. Başvurular Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ'e göre değerlendirilir.
 - Başvurunu en geç **30 gün** içinde ücretsiz yanıtlarız.
 
 ---

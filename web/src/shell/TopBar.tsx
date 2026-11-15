@@ -9,7 +9,7 @@ export function TopBar() {
   const { t, lang } = useT();
   const setLang = useStore((s) => s.setLang);
   const go = useStore((s) => s.go);
-  // With Supabase configured the Google account is the account; otherwise the device-only trial.
+  // With Supabase configured its account is the account; otherwise the device-only trial.
   const trialUser = useStore((s) => s.user);
   const cloudUser = useCloud((s) => s.user);
   const user = cloudEnabled ? (cloudUser ? cloudUser.name || cloudUser.email : null) : trialUser;

@@ -1,4 +1,4 @@
-// Supabase: Google sign-in, consent log, the farmer's own saved answers, district planting intent.
+// Supabase: email + password sign-in, consent log, the farmer's own saved answers, district planting intent.
 // Tables and access rules: supabase/migrations/20261115_consent_profiles_intents.sql (owner: Gümüş).
 // What may be stored is fixed by docs/legal/: il + ilçe only, never the field's shape or GPS.
 // Without VITE_SUPABASE_* (tests, a fork) `cloud` is null and the site keeps its device-only trial sign-in.
@@ -17,15 +17,35 @@ export interface CloudUser { id: string; name: string; email: string }
 
 export const toCloudUser = (u: User): CloudUser => ({
   id: u.id,
-  name: String(u.user_metadata?.full_name ?? u.user_metadata?.name ?? u.email ?? ''),
+  name: String(u.user_metadata?.full_name ?? u.user_metadata?.name ?? ''),
   email: u.email ?? '',
 });
 
 const need = () => { if (!cloud) throw new Error('cloud off'); return cloud; };
 
-export async function signInWithGoogle(): Promise<void> {
-  // Back to the page the farmer was on; Supabase's redirect list must allow this origin.
-  const { error } = await need().auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+export type AuthFail = 'invalid_credentials' | 'user_exists' | 'weak_password' | 'not_confirmed' | 'rate_limit' | 'other';
+
+/** Supabase error codes → the few cases the page explains in words. */
+export function authFail(e: { code?: string; message?: string } | null | undefined): AuthFail {
+  const c = e?.code ?? '';
+  if (c === 'invalid_credentials') return 'invalid_credentials';
+  if (c === 'user_already_exists' || c === 'email_exists') return 'user_exists';
+  if (c === 'weak_password') return 'weak_password';
+  if (c === 'email_not_confirmed') return 'not_confirmed';
+  if (c === 'over_email_send_rate_limit' || c === 'over_request_rate_limit') return 'rate_limit';
+  return 'other';
+}
+
+export async function signUpEmail(email: string, password: string): Promise<{ confirmed: boolean }> {
+  const { data, error } = await need().auth.signUp({ email, password });
+  if (error) throw error;
+  // Supabase answers an already used address with a user that has no identities (no error, by design).
+  if (data.user && data.user.identities?.length === 0) throw { code: 'user_already_exists' };
+  return { confirmed: !!data.session };
+}
+
+export async function signInEmail(email: string, password: string): Promise<void> {
+  const { error } = await need().auth.signInWithPassword({ email, password });
   if (error) throw error;
 }
 

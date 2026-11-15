@@ -1,11 +1,11 @@
-// Google sign-in state, apart from the main store so the device-only trial (domain/auth.ts) stays untouched.
+// Account (Supabase email + password) state, apart from the main store so the device-only trial (domain/auth.ts) stays untouched.
 // While signed in, the farmer's answers and settings are saved to their own profile row and restored
 // on the next sign-in. The field's shape stays on the device: only il + ilçe leave it.
 
 import { create } from 'zustand';
 import {
-  cloud, deleteMyAccount, loadConsents, loadProfile, recordConsents, saveProfile, signInWithGoogle, signOutCloud,
-  toCloudUser, type CloudUser,
+  authFail, cloud, deleteMyAccount, loadConsents, loadProfile, recordConsents, saveProfile, signInEmail, signOutCloud,
+  signUpEmail, toCloudUser, type AuthFail, type CloudUser,
 } from '@/services/cloud';
 import { districtOf, latestConsents, needsNotice, NO_CONSENTS, type ConsentKind, type ConsentState } from '@/domain/consent';
 import { normalizePrefs } from '@/domain/sections';
@@ -19,7 +19,10 @@ interface CloudState {
   /** True once the signed-in user's consent log has been read (the consent dialog waits for it). */
   consentsLoaded: boolean;
   error: string | null;
-  signIn(): Promise<void>;
+  /** null on success; otherwise why it failed. */
+  signIn(email: string, password: string): Promise<AuthFail | null>;
+  /** 'check_mail' when Supabase still asks for an email confirmation. */
+  signUp(email: string, password: string): Promise<AuthFail | 'check_mail' | null>;
   signOut(): Promise<void>;
   /** Appends decisions to the log and reloads the latest state. */
   decide(items: { kind: ConsentKind; granted: boolean }[]): Promise<void>;
@@ -34,9 +37,13 @@ export const useCloud = create<CloudState>((set, get) => ({
   consents: NO_CONSENTS,
   consentsLoaded: false,
   error: null,
-  signIn: async () => {
+  signIn: async (email, password) => {
     set({ error: null });
-    try { await signInWithGoogle(); } catch (e) { set({ error: (e as Error).message }); }
+    try { await signInEmail(email.trim(), password); return null; } catch (e) { return authFail(e as { code?: string }); }
+  },
+  signUp: async (email, password) => {
+    set({ error: null });
+    try { return (await signUpEmail(email.trim(), password)).confirmed ? null : 'check_mail'; } catch (e) { return authFail(e as { code?: string }); }
   },
   signOut: async () => { try { await signOutCloud(); } finally { set({ user: null, consents: NO_CONSENTS, consentsLoaded: false }); } },
   decide: async (items) => {

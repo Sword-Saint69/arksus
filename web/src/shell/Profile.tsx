@@ -36,7 +36,7 @@ export function Profile() {
           <h2 id="profile-title" className="text-2xl font-black">{t('profileTitle')}</h2>
           <button type="button" onClick={() => setOpen(false)} aria-label={t('close')} className="grid h-11 w-11 place-items-center rounded-xl hover:bg-canvas"><X size={22} /></button>
         </header>
-        {/* Google sign-in when Supabase is configured; otherwise the device-only trial. */}
+        {/* Supabase account (email + password) when configured; otherwise the device-only trial. */}
         {cloudEnabled ? <CloudAccount /> : <AccountBox />}
         <SettingsBox />
       </div>

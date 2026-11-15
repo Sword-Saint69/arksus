@@ -21,7 +21,7 @@ export function useLegalText(file: 'aydinlatma-metni.md' | 'acik-riza-metni.md')
 export const noticeBody = (md: string) => withoutTickLines(md.replace(/\n\*Bu kutu bir onay[^\n]*\n?/, '\n'));
 
 /**
- * After the first Google sign-in (and whenever the notice changes): the notice, acknowledged with
+ * After the first sign-in (and whenever the notice changes): the notice, acknowledged with
  * "okudum ve anladım", and the one optional consent, each on its own (KVKK principle decision 2026/347).
  * Nothing about the farmer is saved before this is done.
  */

@@ -1,6 +1,6 @@
 # docs/legal — KVKK metinleri (Gümüş)
 
-Google ile giriş ve ilçe bazında ekim istatistiği için hazırlanan metinler. **İkisi de taslak; hukukçu kontrolünden geçmeden sitede yayınlanmaz.**
+Hesap girişi (Supabase, e-posta + şifre; Google kullanılmıyor, 15 Kas kararı) ve ilçe bazında ekim istatistiği için hazırlanan metinler. **İkisi de taslak; hukukçu kontrolünden geçmeden sitede yayınlanmaz.**
 
 | Dosya | Sürüm kimliği | Kullanıcıdan ne alınır |
 |---|---|---|
@@ -27,13 +27,13 @@ Sürüm kimliği değişirse (metin değişirse) kullanıcıya yeni metin bir ke
 
 - [x] **Veri sorumlusu kim?** Ekip kararı (15 Kas, Gümüş): **NöbetSu ekibi**, tek bir kişiye indirgenmez; beş üye birlikte sorumlu, ortak başvuru e-postası. Doldurulacak: üyelerin adları, ortak e-posta, tebligat adresi.
 - [ ] Ekip tüzel kişi olmadığı için "birlikte veri sorumlusu" yazımının KVKK'da yeterli olup olmadığı hukukçuya sorulacak (Kanun'da müşterek veri sorumluluğu açıkça düzenlenmemiş).
-- [ ] **Yurt dışı aktarım (md. 9):** 2024 değişikliğinden (7499 sayılı Kanun, 1 Haziran 2024) beri düzenli aktarımda açık rıza tek başına yetmiyor. Supabase / Vercel / Google için Kurul'un standart sözleşmesi imzalanıp 5 iş günü içinde Kurum'a bildirilmeli. Hukukçuya sorulacak; hackathon süresinde yapılamazsa metindeki köşeli parantez açık kalır ve gerçek kullanıcı verisi toplanmaz (sadece demo).
+- [ ] **Yurt dışı aktarım (md. 9):** 2024 değişikliğinden (7499 sayılı Kanun, 1 Haziran 2024) beri düzenli aktarımda açık rıza tek başına yetmiyor. Supabase / Vercel için Kurul'un standart sözleşmesi imzalanıp 5 iş günü içinde Kurum'a bildirilmeli. Hukukçuya sorulacak; hackathon süresinde yapılamazsa metindeki köşeli parantez açık kalır ve gerçek kullanıcı verisi toplanmaz (sadece demo).
 - [ ] **Vercel bölgesi:** fonksiyon/log bölgesi doğrulanacak (AB mi ABD mi).
 - [ ] **Saklama süreleri:** 30 gün (hesap silme), 1 yıl (güvenlik kaydı), onay kayıtları için süre — ekip kararı / hukukçu.
 - [ ] **İlçe eşiği:** 5'ten az kayıtlı ilçe gösterilmez (öneri; ekip kararı).
 - [ ] **Dil modeli sağlayıcısı:** eğitim kim tarafından, nerede yapılacak? Bilinmeden İzin 2 yayınlanmamalı ya da kapalı tutulmalı.
 - [ ] **VERBİS kaydı** gerekip gerekmediği (ölçeğe bağlı) — hukukçu.
-- [ ] Google OAuth izin ekranı bir gizlilik politikası adresi istiyor: aydınlatma metni sitede `/gizlilik` gibi bir adreste yayınlanmalı (İsmail).
+- [ ] Aydınlatma metni giriş yapmadan da okunabiliyor (Profil → Aydınlatma metni, `/legal/aydinlatma-metni.md`); ayrı bir `/gizlilik` sayfası istenirse İsmail.
 
 ## Veritabanı için (Supabase, sonraki adım)
 

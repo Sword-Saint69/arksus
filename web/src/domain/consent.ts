@@ -1,4 +1,4 @@
-// Consent and the district record for the Google sign-in (docs/legal/README.md). Owner: Gümüş.
+// Consent and the district record for the account sign-in (docs/legal/README.md). Owner: Gümüş.
 // Pure logic, tested in consent.test.ts; services/cloud.ts talks to Supabase, state/cloud.ts holds the state.
 
 import type { Parcel } from './field';

@@ -367,7 +367,7 @@ export function omClass(f: SoilHealthFile, om: number): Text;
 Kurallar: bileşende hesap yok. Ceza ve destek tutarı gösterilmez. Organik madde artış hızı verilmez.
 
 
-## 16. Google girişi, onay ve ilçe ekim kaydı — Supabase (Gümüş) → web — SÖZLEŞME EKLENDİ 15 Kas
+## 16. Hesap girişi (Supabase e-posta + şifre), onay ve ilçe ekim kaydı — Supabase (Gümüş) → web — SÖZLEŞME EKLENDİ 15 Kas
 
 İlk kez sunucuya kullanıcı verisi yazılıyor. Ne yazılabileceğini `docs/legal/` belirler: **sadece il + ilçe; tarla sınırı, ada/parsel, GPS sunucuya gitmez.**
 
