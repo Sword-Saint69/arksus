@@ -33,6 +33,7 @@ OLLAMA_URL = "http://localhost:11434/api/chat"
 DEFAULT_MODEL = "qwen2.5:14b"
 MAX_STEPS = 10
 MAX_FIXES = 2
+NUM_CTX = 8192        # 16k pushed a 24 GB Mac into swap (1.7 tok/s); reports need ~5k tokens
 EXEMPT_NUMBERS = {float(x) for x in range(0, 13)} | {24.0, 100.0}   # counts, months, "24 years", "%100"
 BANNED = ("önerilen", "öneririm", "tavsiye", "en iyi", "en iyisi", "yasak", "kâr garantili", "kar garantili",
           "recommended", "recommend", "best choice", "the best", "banned", "profit guaranteed")
@@ -73,7 +74,7 @@ REPORT_SCHEMA = {
 
 def ollama_chat(model: str, messages: list[dict], tools: list[dict] | None = None, fmt: dict | None = None,
                 timeout: int = 900) -> dict:
-    body = {"model": model, "messages": messages, "stream": False, "options": {"temperature": 0.2, "num_ctx": 16384}}
+    body = {"model": model, "messages": messages, "stream": False, "options": {"temperature": 0.2, "num_ctx": NUM_CTX}}
     if tools:
         body["tools"] = [{"type": "function", "function": t} for t in tools]
     if fmt:
