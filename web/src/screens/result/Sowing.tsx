@@ -64,7 +64,7 @@ function SowingCard({ f, rotationId }: { f: SowingFile; rotationId: string | nul
   const range = (a: number, b: number, d = 0) => (a === b ? num(a, d) : `${num(a, d)}–${num(b, d)}`);
 
   return (
-    <section className="grid gap-3" aria-labelledby="sow-title">
+    <section className="grid grid-cols-[minmax(0,1fr)] gap-3" aria-labelledby="sow-title">
       <SectionTitle sub={t('sowIntro')}><span id="sow-title">{t('sowTitle')}</span></SectionTitle>
 
       {/* crop and type */}
@@ -78,9 +78,9 @@ function SowingCard({ f, rotationId }: { f: SowingFile; rotationId: string | nul
         ))}
       </div>
       {f.crops[crop].types.length > 1 && (
-        <label className="grid gap-1 text-[15px] font-semibold">
+        <label className="grid min-w-0 gap-1 text-[15px] font-semibold">
           {t('sowType')}
-          <select value={type.id} onChange={(e) => setTypeId(e.target.value)} className="min-h-12 rounded-2xl border-2 border-line bg-white px-3 text-base">
+          <select value={type.id} onChange={(e) => setTypeId(e.target.value)} className="min-h-12 w-full min-w-0 truncate rounded-2xl border-2 border-line bg-white px-3 text-base">
             {f.crops[crop].types.map((x) => <option key={x.id} value={x.id}>{tx(x.label)}</option>)}
           </select>
         </label>

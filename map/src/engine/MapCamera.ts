@@ -26,6 +26,8 @@ export class MapCamera {
   heading = 0;
   pitch = 0;
   onChange: () => void = () => {};
+  /** False while another tool (area drawing) owns the pointer. */
+  enabled = true;
   /** Farthest the camera may pull back. */
   maxDistance = MAX_DIST;
   /** Scene-space box the view centre must stay in (the map is limited to one country). */
@@ -93,6 +95,7 @@ export class MapCamera {
   }
 
   private onDown = (e: PointerEvent) => {
+    if (!this.enabled) return;
     this.dom.setPointerCapture(e.pointerId);
     this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     this.fly = null;
@@ -168,6 +171,7 @@ export class MapCamera {
   };
 
   private onWheel = (e: WheelEvent) => {
+    if (!this.enabled) return;
     e.preventDefault();
     this.fly = null;
     const delta = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
