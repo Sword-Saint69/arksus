@@ -66,17 +66,17 @@ Her bulduğun değeri `docs/SOURCES.md`'deki hazır satıra yaz: **değer · bir
 
 - [ ] **T+0–1: Web iskeleti** — `web/` içinde Vite + React + TS + Tailwind + shadcn/ui + Recharts + vitest; Vercel bağlantısı (root = `web`); boş sayfa Vercel'de açılıyor → M0 — ⏳ kalan: Vercel bağlantısı (root = `web`, `vercel.json` hazır); iskelet ve testler `ismail/web`'de
 - [ ] **T+1–4: Mock veriyle tek sayfa** — başlık + lokasyon/derinlik seçimi + 3 rotasyon kartı + mock bandı + rozetler → Vercel'de → M1 — ⏳ kalan: Vercel; sayfa gerçek veriyle `ismail/web`'de (öneri kartı, kartlar, rozetler, 13 ilçe)
-- [x] **T+4–6: Grafik A (24 iklim, 2 yıllık net, şerit grafik)** — ✅ 01:41 (ismail/web; 14 Kas kararıyla 2 yıllık net yerine buğday verim oranı)
-- [ ] **T+6–8: Grafik B (haftalık su defteri, yıl seçici)**
-- [ ] **T+8–9: "Senin rakamların" giriş paneli economics.ts'e bağlı; gerçek veriye geçiş** → M2
+- [x] **T+4–6: Grafik A (24 iklim, 2 yıllık net, şerit grafik)** — ✅ 01:41 (ismail/web; 14 Kas kararıyla 2 yıllık net yerine buğday verim oranı); 15 Kas yeni sitede "Geçmiş iklimlerde buğday"
+- [x] **T+6–8: Grafik B (haftalık su defteri, yıl seçici)** · ✅ 15 Kas (haritada oynatılan iki yıl, haftalık defterden; yıl seçicili)
+- [x] **T+8–9: "Senin rakamların" giriş paneli economics.ts'e bağlı; gerçek veriye geçiş** → M2 · iptal: para gösterilmiyor; gerçek veriye geçildi
 - [x] **T+9–10.5: Öncelik kaydırıcıları + "Neden bu strateji?" çekmecesi** — M3'te düşürülmez — ✅ 01:37 (ismail/web; 4 kaydırıcı, §11)
 - [x] **T+10.5–12: Toprak sağlığı bölümü** — ilçe toprak kartı, "uydunun söyleyemedikleri" kutusu, toprak doluluk eğrisi, SMAP paneli (veri yoksa "yakında") — M3'te düşürülmez — ✅ 01:41 (ismail/web)
-- [ ] **T+12–13.5: Grafik C (tarla takvimi), flip ızgarası, kanıt paneli, sözlük ipuçları, footer** — zaman yetmezse önce flip ızgarası, sonra Grafik C düşer
-- [ ] **T+13.5–14: Telefon (375 px) geçişi, rozetler, metin cilası** → M3
-- [ ] **T+14–15: Genişletme E4 (Türkçe dil düğmesi)**
-- [ ] **T+15–17: Genişletme E2 senaryo seçici (Gümüş tipleri ekledikten sonra)**
-- [ ] **T+17–19: Genişletme E3 GRACE grafiği, sonra E7 (harita)**
-- [ ] **T+19–21: Video için temiz ekran durumu; hata düzeltmeleri**
+- [x] **T+12–13.5: Grafik C (tarla takvimi), flip ızgarası, kanıt paneli, sözlük ipuçları, footer** — zaman yetmezse önce flip ızgarası, sonra Grafik C düşer · ✅ 15 Kas (tarla takvimi, "Yıl nasıl geçerse", kanıt paneli, 12 terimlik sözlük)
+- [x] **T+13.5–14: Telefon (375 px) geçişi, rozetler, metin cilası** → M3 · ✅ 15 Kas (375 px'te yatay taşma yok)
+- [x] **T+14–15: Genişletme E4 (Türkçe dil düğmesi)** · ✅ (TR/EN düğmesi)
+- [x] **T+15–17: Genişletme E2 senaryo seçici (Gümüş tipleri ekledikten sonra)** · ✅ ("İklim değişirse?" kartı)
+- [x] **T+17–19: Genişletme E3 GRACE grafiği, sonra E7 (harita)** · E7 ✅ (harita, tarla seçimi, 3B arazi ve yağmur suyu); E3 atlandı: GRACE verisi yok
+- [x] **T+19–21: Video için temiz ekran durumu; hata düzeltmeleri** · ✅ 15 Kas (`?demo=karapinar` gibi bir bağlantı, sabit cevaplarla temiz sonuç ekranını açar)
 
 ---
 

@@ -3,6 +3,8 @@ import { loadCore } from '@/data/api';
 import { useT } from '@/i18n';
 import { useStore } from '@/state/store';
 import { withMap } from '@/map/api';
+import { pilotParcel } from '@/domain/field';
+import { DEMO_ANSWERS, demoLocation } from '@/domain/demo';
 import { MapControls } from '@/shell/MapControls';
 import { Panel } from '@/shell/Panel';
 import { TopBar } from '@/shell/TopBar';
@@ -27,7 +29,21 @@ export default function App() {
   const go = useStore((s) => s.go);
 
   useEffect(() => {
-    loadCore().then(useStore.getState().setCore, useStore.getState().setCoreError);
+    loadCore().then((c) => {
+      const st = useStore.getState();
+      st.setCore(c);
+      // ?demo=<location_id>: a clean result screen for recordings, whatever this browser remembered.
+      const loc = demoLocation(c.site, location.search);
+      if (loc) {
+        st.reset();
+        st.setField([pilotParcel(loc)], loc.id, 0);
+        for (const [k, v] of Object.entries(DEMO_ANSWERS)) st.answer(k as keyof typeof DEMO_ANSWERS, v as never);
+        st.go('result');
+        const url = new URL(location.href);
+        url.searchParams.delete('demo');
+        history.replaceState(null, '', url);
+      }
+    }, useStore.getState().setCoreError);
   }, []);
   useEffect(() => {
     document.documentElement.lang = lang;

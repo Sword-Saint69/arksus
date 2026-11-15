@@ -16,6 +16,7 @@ import { CropIcon, RotationName } from '@/ui/crops';
 import { Options } from './result/Options';
 import { WhatIf } from './result/WhatIf';
 import { FieldSim } from './result/FieldSim';
+import { FieldCalendar, YearStrip } from './result/Charts';
 import { FieldTerrain } from './result/FieldTerrain';
 import { RightNow } from './result/RightNow';
 import { Fertilizer } from './result/Fertilizer';
@@ -66,7 +67,8 @@ export function Result() {
   const isPilot = parcels[0]?.source === 'pilot';
 
   return (
-    <div className="grid gap-5">
+    // One column the width of the panel: a long word or a row of buttons may not widen the page on a phone.
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <header className="grid gap-1">
         <p className="flex flex-wrap items-center gap-1.5 text-base font-bold text-muted">
           <MapPin size={18} aria-hidden="true" /> {t('resFor', { name: `${location.name}, ${location.province}`, depth: depthLabel })}
@@ -95,7 +97,9 @@ export function Result() {
             {t('coveredNote')}
           </Note>
           <Options verdict={verdict} />
+          <YearStrip results={results} depth={depth} />
           <FieldSim results={results} depth={depth} />
+          <FieldCalendar results={results} depth={depth} />
           <WhatIf verdict={verdict} locationId={location.id} />
         </>
       )}
