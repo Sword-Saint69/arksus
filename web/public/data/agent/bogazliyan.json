@@ -1,0 +1,187 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T08:03:18Z",
+ "location_id": "bogazliyan",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Boğazlıyan'da İki Yıllık Rotasyonlar Karşılaştırılması",
+   "en": "Two-Year Rotations Comparison in Boğazlıyan"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunu azaltır, buğday ekiminde daha az su gerekliliği.",
+      "en": "Fallow period reduces soil moisture, less water needed at wheat sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Bare soil increases wind erosion and water loss.",
+      "en": "Bare soil increases wind erosion and water loss."
+     },
+     {
+      "tr": "Toprak suyunu azalması, ekim su gereksinimini artırabilir.",
+      "en": "Soil moisture reduction may increase sowing water requirements."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekimden önce toprağı suya kapatır, ekim su gereksinimini azaltır.",
+      "en": "Chickpea planting seals soil, reducing sowing water requirements."
+     },
+     {
+      "tr": "Nohut toprak suyunu artırır, ekim su gereksinimini azaltır.",
+      "en": "Chickpea increases soil moisture, reducing sowing water requirements."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Nohut ekimden sonra toprak suyunu azalabilir.",
+      "en": "Chickpea planting may reduce soil moisture after harvest."
+     },
+     {
+      "tr": "Nohut ekimden sonra toprak suyunu azalması, ekim su gereksinimini artırabilir.",
+      "en": "Chickpea planting may reduce soil moisture, increasing sowing water requirements."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekimden önce toprağı suya kapatır, ekim su gereksinimini azaltır.",
+      "en": "Lentil planting seals soil, reducing sowing water requirements."
+     },
+     {
+      "tr": "Mercimek ekimden önce toprağı suya kapatır, ekim su gereksinimini azaltır.",
+      "en": "Lentil planting seals soil, reducing sowing water requirements."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Mercimek ekimden sonra toprak suyunu azalabilir.",
+      "en": "Lentil planting may reduce soil moisture after harvest."
+     },
+     {
+      "tr": "Mercimek ekimden sonra toprak suyunu azalması, ekim su gereksinimini artırabilir.",
+      "en": "Lentil planting may reduce soil moisture, increasing sowing water requirements."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak testi gerekli: fosfor, potasyum, mikroelementler ve kompaktlik.",
+    "en": "Soil test needed: phosphorus, potassium, micronutrients, and compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI en yüksek değerleri Mayıs ayında, en düşük değerler Ocak, Ekim ve Kasım aylarında.",
+    "en": "NDVI peaks in May, lowest in January, October, and November."
+   },
+   {
+    "tr": "NASA MERRA-2 modeli, toprak ıslaklığı %45 (96. percentile).",
+    "en": "NASA MERRA-2 model, soil moisture 45% (96th percentile)."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2024) - Nadas → Buğday: 28 mm su, 0.46 buğday verimlilik oranı.",
+    "en": "Baseline climate (2001-2024) - Fallow → Wheat: 28 mm water, 0.46 wheat yield ratio."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2024) - Nohut → Buğday: 0 mm su, 0.41 buğday verimlilik oranı.",
+    "en": "Baseline climate (2001-2024) - Chickpea → Wheat: 0 mm water, 0.41 wheat yield ratio."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2024) - Mercimek → Buğday: 4 mm su, 0.41 buğday verimlilik oranı.",
+    "en": "Baseline climate (2001-2024) - Lentil → Wheat: 4 mm water, 0.41 wheat yield ratio."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 bir model, uydu ölçümü değil.",
+    "en": "MERRA-2 is a model, not a satellite measurement."
+   },
+   {
+    "tr": "İstasyon verisi, yerel bir noktayı ölçer, genel bölgeyi temsil etmez.",
+    "en": "Station data measures a single point, not the entire district."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın: fosfor, potasyum, mikroelementler ve kompaktlik.",
+    "en": "Conduct a soil test: phosphorus, potassium, micronutrients, and compaction."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "bogazliyan",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "bogazliyan",
+    "depth_class": "medium",
+    "scenario_id": "baseline",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ]
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "bogazliyan",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "bogazliyan",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "bogazliyan",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "bogazliyan"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

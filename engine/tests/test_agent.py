@@ -67,6 +67,7 @@ def test_tools_register_their_numbers():
 def test_guard_flags_invented_numbers_and_wording(fallow_water):
     reg = Registry(); Tools(LOC, registry=reg).rotations()
     assert agent.check_report(_report(fallow_water), reg) == []
+    assert agent.check_report(_report(fallow_water, " (%57 oran)"), reg) == []   # 0.57 ratio written as 57%
     p = agent.check_report(_report("987654"), reg)
     assert any("987654" in x for x in p)
     p = agent.check_report(_report(fallow_water, " En iyi seçim nadastır."), reg)
@@ -92,6 +93,40 @@ def test_run_marks_failure_when_model_keeps_inventing(fallow_water):
     fake = FakeModel([_report("987654")] * (agent.MAX_FIXES + 1))
     rec = agent.run_district(LOC, chat=fake)
     assert rec["guards"]["passed"] is False and rec["guards"]["problems"]
+
+
+def test_rewrite_prompt_stays_bounded(fallow_water):
+    """Each report attempt is a fresh prompt (rules + tool results + last problems), not the growing chat."""
+    class Recorder(FakeModel):
+        def __call__(self, model, messages, tools=None, fmt=None):
+            if fmt:
+                self.calls.append({"size": sum(len(m["content"]) for m in messages), "roles": [m["role"] for m in messages]})
+            return super().__call__(model, messages, tools, fmt)
+    fake = Recorder([_report("987654"), _report("987654"), _report(fallow_water)])
+    rec = agent.run_district(LOC, chat=fake)
+    sizes = [c for c in fake.calls if "size" in c]
+    assert rec["guards"]["passed"] and len(sizes) == 3
+    assert all("assistant" not in c["roles"] and "tool" not in c["roles"] for c in sizes)
+    assert sizes[2]["size"] - sizes[1]["size"] < 50          # no growth between rewrites
+    assert sizes[1]["size"] - sizes[0]["size"] < 400         # only the problem list is added
+
+
+def test_tool_loop_stops_once_every_source_is_read(fallow_water):
+    fake = FakeModel([_report(fallow_water)])                 # calls all 6 tools in its first step
+    agent.run_district(LOC, chat=fake)
+    assert [c["tools"] for c in fake.calls] == [True, False]  # one tool step, then the report
+
+
+def test_tool_ignores_unexpected_arguments_from_model(fallow_water):
+    class HallucinatingArgs(FakeModel):
+        def __call__(self, model, messages, tools=None, fmt=None):
+            if tools and not any(m["role"] == "tool" for m in messages):
+                return {"content": "", "tool_calls": [
+                    {"function": {"name": t["name"], "arguments": {"location_id": LOC, "depth_id": "medium"}}}
+                    for t in tools]}
+            return super().__call__(model, messages, tools, fmt)
+    rec = agent.run_district(LOC, chat=HallucinatingArgs([_report(fallow_water)]))
+    assert rec["guards"]["passed"] and not any(u.get("forced") for u in rec["tools_used"])
 
 
 def test_forced_tools_when_model_skips_them(fallow_water):

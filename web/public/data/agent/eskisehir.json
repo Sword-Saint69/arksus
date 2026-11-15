@@ -1,0 +1,216 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T06:30:28Z",
+ "location_id": "eskisehir",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Eskişehir'de Üç İki-Yıl Döngüsü Karşılaştırması",
+   "en": "Three Two-Year Rotations Compared in Eskişehir"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun ekimde 52 mm olabilir.",
+      "en": "Fallow period soil water can be 52 mm at sowing."
+     },
+     {
+      "tr": "331 gün açık toprak.",
+      "en": "331 days of bare soil."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "128 gün su baskısı.",
+      "en": "128 days of water stress."
+     },
+     {
+      "tr": "55% buğday hasılat oranı.",
+      "en": "55% wheat yield ratio."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekimi azot üretir.",
+      "en": "Chickpea fixes nitrogen."
+     },
+     {
+      "tr": "Ekimde toprak suyu 0 mm.",
+      "en": "Soil water at sowing is 0 mm."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "183 gün su baskısı.",
+      "en": "183 days of water stress."
+     },
+     {
+      "tr": "45% buğday hasılat oranı.",
+      "en": "45% wheat yield ratio."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekimi azot üretir.",
+      "en": "Lentil fixes nitrogen."
+     },
+     {
+      "tr": "Ekimde toprak suyu 7 mm.",
+      "en": "Soil water at sowing is 7 mm."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "176 gün su baskısı.",
+      "en": "176 days of water stress."
+     },
+     {
+      "tr": "46% buğday hasılat oranı.",
+      "en": "46% wheat yield ratio."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak organik karbonu 10.2 g/kg.",
+    "en": "Soil organic carbon is 10.2 g/kg."
+   },
+   {
+    "tr": "Toprak su kapasitesi 144 mm/m.",
+    "en": "Available water capacity is 144 mm/m."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI en yüksek seviyesi Nisan ayında.",
+    "en": "NDVI peak in April."
+   },
+   {
+    "tr": "MERRA-2 toprak ıslaklığı %37.",
+    "en": "MERRA-2 soil wetness is 37%."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklimde (2001–2026) 55% buğday hasılat oranı.",
+    "en": "In the past climate (2001–2026) wheat yield ratio is 55%."
+   },
+   {
+    "tr": "Yüzde 10 daha az yağışlı iklimde 48% buğday hasılat oranı.",
+    "en": "In a 10% drier climate, wheat yield ratio is 48%."
+   },
+   {
+    "tr": "1 °C daha sıcak iklimde 53% buğday hasılat oranı.",
+    "en": "In a 1 °C warmer climate, wheat yield ratio is 53%."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "Azot, fosfor, potasyum, mikroelementler ve toprak sıkışması için toprak testi gereklidir.",
+    "en": "Soil test is needed for nitrogen, phosphorus, potassium, micronutrients, and compaction."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "NöbetSu'ya ekonomik analiz ekleyin.",
+    "en": "Ask NöbetSu to add an economic analysis."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "eskssehir",
+    "province": "Eskişehir",
+    "coordinates": [
+     35.1667,
+     39.5
+    ],
+    "elevation": 1000,
+    "check": "nearest station",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "depth_class": "medium",
+    "scenario_id": "baseline",
+    "district_name": "eskssehir",
+    "rotation": [
+     "fallow",
+     "wheat"
+    ]
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "eskssehir",
+    "rotation": [
+     "chickpea",
+     "wheat"
+    ],
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "scenario_id": "baseline",
+    "district_name": "eskssehir",
+    "rotation": [
+     "lentil",
+     "wheat"
+    ],
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "eskssehir",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "eskssehir"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {},
+   "forced": true
+  },
+  {
+   "tool": "checks",
+   "args": {},
+   "forced": true
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

@@ -1,0 +1,207 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T07:44:09Z",
+ "location_id": "cankiri",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Çankırı'da Üç İki-Yıl Döngüsünün Karşılaştırılması",
+   "en": "Comparison of Three Two-Year Rotations in Çankırı"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması, buğday ekiminde daha az su gereksinimi.",
+      "en": "Less soil moisture in fallow period, less water needed at wheat sowing."
+     },
+     {
+      "tr": "Daha az tillaj, toprak zararını azaltır.",
+      "en": "Less tillage, reduces soil damage."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla açık toprak, toprak erozyonu ve su kaybı riski.",
+      "en": "More bare soil, risk of soil erosion and water loss."
+     },
+     {
+      "tr": "Nitratenin kaybı, azot uygulamasına ihtiyaç.",
+      "en": "Nitrate loss, need for nitrogen application."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nötrofil, toprak suyunun azalmasını azaltır.",
+      "en": "Nitrogen-fixing, reduces soil moisture depletion."
+     },
+     {
+      "tr": "Azot kaybını azaltır, azot uygulamasına ihtiyaç duymaz.",
+      "en": "Reduces nitrogen loss, no need for nitrogen application."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla tillaj, toprak zararını artırır.",
+      "en": "More tillage, increases soil damage."
+     },
+     {
+      "tr": "Nohut ekiminde az su, buğday ekiminde daha az su.",
+      "en": "Less water at chickpea sowing, less water at wheat sowing."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Nötrofil, toprak suyunun azalmasını azaltır.",
+      "en": "Nitrogen-fixing, reduces soil moisture depletion."
+     },
+     {
+      "tr": "Azot kaybını azaltır, azot uygulamasına ihtiyaç duymaz.",
+      "en": "Reduces nitrogen loss, no need for nitrogen application."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az tillaj, toprak zararını azaltır.",
+      "en": "Less tillage, reduces soil damage."
+     },
+     {
+      "tr": "Mercimek ekiminde az su, buğday ekiminde daha az su.",
+      "en": "Less water at lentil sowing, less water at wheat sowing."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak su kapasitesi 140.4 mm/m, toprak zararını azaltır.",
+    "en": "Soil water capacity 140.4 mm/m, reduces soil damage."
+   },
+   {
+    "tr": "Toprak testi gerekli: fosfor, potasyum, mikroelementler ve toprak sıkışması.",
+    "en": "Soil test needed: phosphorus, potassium, micronutrients, and compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI en yüksek mayıs ayında, en düşük Ocak, Ekim ve Ağustos aylarında.",
+    "en": "NDVI peaks in May, lowest in January, October, and August."
+   },
+   {
+    "tr": "NASA MERRA-2 modeli, toprak ıslaklığı %46, bu ay için %67 percentil.",
+    "en": "NASA MERRA-2 model, soil wetness 46%, 67th percentile for this month."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Nadas → Buğday: 67 mm su, 0.63 yield ratio.",
+    "en": "Baseline climate (2001-2026) - Fallow → Wheat: 67 mm water, 0.63 yield ratio."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Nohut → Buğday: 1 mm su, 0.55 yield ratio.",
+    "en": "Baseline climate (2001-2026) - Chickpea → Wheat: 1 mm water, 0.55 yield ratio."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Mercimek → Buğday: 9 mm su, 0.56 yield ratio.",
+    "en": "Baseline climate (2001-2026) - Lentil → Wheat: 9 mm water, 0.56 yield ratio."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 bir model, uydu ölçümü değildir.",
+    "en": "MERRA-2 is a model, not a satellite measurement."
+   },
+   {
+    "tr": "Senaryolar hassasiyet adımları, olasılık tahminleri değildir.",
+    "en": "Scenarios are sensitivity steps, not probability forecasts."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın: fosfor, potasyum, mikroelementler ve sıkışma.",
+    "en": "Conduct a soil test: phosphorus, potassium, micronutrients, and compaction."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "cankiri",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "cankiri",
+    "rotation": "fallow-wheat",
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "cankiri",
+    "rotation": "chickpea-wheat",
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "cankiri",
+    "rotation": "lentil-wheat",
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "cankiri",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "cankiri"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "cankiri",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "cankiri"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

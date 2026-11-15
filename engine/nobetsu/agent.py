@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import datetime, timezone
 
 import requests
@@ -31,9 +32,11 @@ from nobetsu.agent_tools import ROTATIONS, TOOL_SPECS, Registry, Tools, numbers_
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
 DEFAULT_MODEL = "qwen2.5:14b"
-MAX_STEPS = 10
+MAX_STEPS = 1
 MAX_FIXES = 2
 NUM_CTX = 8192        # 16k pushed a 24 GB Mac into swap (1.7 tok/s); reports need ~5k tokens
+TOOL_STEP_TOKENS = 300  # without a cap the model wrote a 1k-token essay inside the tool loop (~7 min at 3 tok/s)
+REPORT_TOKENS = 2800    # allows a full report without truncating JSON mid-string
 EXEMPT_NUMBERS = {float(x) for x in range(0, 13)} | {24.0, 100.0}   # counts, months, "24 years", "%100"
 BANNED = ("önerilen", "öneririm", "tavsiye", "en iyi", "en iyisi", "yasak", "kâr garantili", "kar garantili",
           "recommended", "recommend", "best choice", "the best", "banned", "profit guaranteed")
@@ -50,22 +53,26 @@ Rules:
 - Results are for a typical field in the district under 24 past climates, not the farmer's own field.
 - Satellites cannot tell phosphorus, potassium, micronutrients or compaction: say a soil test is needed.
 - MERRA-2 is a NASA model, not a measurement; scenarios are sensitivity steps, not forecasts.
-- Plain words a farmer understands. Turkish first; the English text says the same thing."""
+- Keep every array concise (2–3 short items per section). Plain words a farmer understands. Turkish first; the English text says the same thing."""
 
 LT = {"type": "object", "properties": {"tr": {"type": "string"}, "en": {"type": "string"}}, "required": ["tr", "en"]}
+def _arr(max_items: int = 2) -> dict:
+    return {"type": "array", "items": LT, "minItems": 1, "maxItems": max_items}
+
+
 REPORT_SCHEMA = {
     "type": "object",
     "properties": {
         "headline": LT,
-        "rotations": {"type": "array", "items": {"type": "object", "properties": {
+        "rotations": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "object", "properties": {
             "rotation_id": {"type": "string", "enum": list(ROTATIONS)},
-            "strengths": {"type": "array", "items": LT}, "risks": {"type": "array", "items": LT}},
+            "strengths": _arr(2), "risks": _arr(2)},
             "required": ["rotation_id", "strengths", "risks"]}},
-        "soil_health": {"type": "array", "items": LT},
-        "satellites": {"type": "array", "items": LT},
-        "climate_scenarios": {"type": "array", "items": LT},
-        "uncertainties": {"type": "array", "items": LT},
-        "ask_local_expert": {"type": "array", "items": LT},
+        "soil_health": _arr(2),
+        "satellites": _arr(2),
+        "climate_scenarios": _arr(3),
+        "uncertainties": _arr(2),
+        "ask_local_expert": _arr(2),
     },
     "required": ["headline", "rotations", "soil_health", "satellites", "climate_scenarios", "uncertainties",
                  "ask_local_expert"],
@@ -77,8 +84,10 @@ def ollama_chat(model: str, messages: list[dict], tools: list[dict] | None = Non
     body = {"model": model, "messages": messages, "stream": False, "options": {"temperature": 0.2, "num_ctx": NUM_CTX}}
     if tools:
         body["tools"] = [{"type": "function", "function": t} for t in tools]
+        body["options"]["num_predict"] = TOOL_STEP_TOKENS   # a tool step is a few calls, never the report
     if fmt:
         body["format"] = fmt
+        body["options"]["num_predict"] = REPORT_TOKENS
     r = requests.post(OLLAMA_URL, json=body, timeout=timeout)
     r.raise_for_status()
     return r.json()["message"]
@@ -103,7 +112,7 @@ def _texts(report: dict) -> list[str]:
 def check_report(report: dict, registry: Registry) -> list[str]:
     """Problems that make a report unusable (empty list = passes)."""
     problems = []
-    known = registry.numbers | EXEMPT_NUMBERS
+    known = registry.numbers | EXEMPT_NUMBERS | {round(k * 100, 2) for k in registry.numbers if 0 <= abs(k) <= 1.5}
     unknown = sorted({x for t in _texts(report) for x in numbers_in(t)
                       if not any(abs(x - k) <= max(0.011, 0.005 * abs(k)) for k in known)})
     if unknown:
@@ -118,6 +127,18 @@ def check_report(report: dict, registry: Registry) -> list[str]:
     return problems
 
 
+def _log(location_id: str, msg: str) -> None:
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {location_id}: {msg}", file=sys.stderr, flush=True)
+
+
+def report_prompt(location_id: str, depth_id: str, facts: dict[str, str]) -> str:
+    """The report request: tool results inlined once, so every attempt has the same, bounded size."""
+    body = "\n".join(f"### {name}\n{text}" for name, text in facts.items())
+    return (f"District id: {location_id}. Depth class: {depth_id}.\nTool results:\n{body}\n\n"
+            "Write the report now as JSON matching the schema. Every number from the tool results above; "
+            "Turkish and English; trade-offs, no choice for the farmer.")
+
+
 def run_district(location_id: str, model: str = DEFAULT_MODEL, depth_id: str = "medium", chat=ollama_chat) -> dict:
     reg = Registry()
     tools = Tools(location_id, depth_id, reg)
@@ -125,7 +146,9 @@ def run_district(location_id: str, model: str = DEFAULT_MODEL, depth_id: str = "
             {"role": "user", "content": f"District id: {location_id}. Depth class: {depth_id}. "
                                         "Gather the facts with the tools, then say you are ready."}]
     used = []
-    for _ in range(MAX_STEPS):
+    facts: dict[str, str] = {}          # tool name → last result (JSON text), for the report prompt
+    for step in range(MAX_STEPS):
+        _log(location_id, f"tool step {step + 1} ({len(facts)}/{len(TOOL_SPECS)} sources read)…")
         m = chat(model, msgs, tools=TOOL_SPECS)
         msgs.append({"role": "assistant", "content": m.get("content", ""), "tool_calls": m.get("tool_calls") or []})
         calls = m.get("tool_calls") or []
@@ -137,23 +160,38 @@ def run_district(location_id: str, model: str = DEFAULT_MODEL, depth_id: str = "
             if isinstance(args, str):
                 args = json.loads(args or "{}")
             try:
-                result = getattr(tools, fn)(**args) if fn in {t["name"] for t in TOOL_SPECS} else {"error": f"unknown tool {fn}"}
+                fn_obj = getattr(tools, fn) if fn in {t["name"] for t in TOOL_SPECS} else None
+                if fn_obj is None:
+                    result = {"error": f"unknown tool {fn}"}
+                else:
+                    valid_args = {k: v for k, v in args.items()
+                                  if k in next(t for t in TOOL_SPECS if t["name"] == fn)["parameters"]["properties"]}
+                    result = fn_obj(**valid_args)
             except Exception as e:  # noqa: BLE001 — tool errors go back to the model
                 result = {"error": str(e)}
             used.append({"tool": fn, "args": args})
-            msgs.append({"role": "tool", "content": json.dumps(result, ensure_ascii=False), "tool_name": fn})
+            text = json.dumps(result, ensure_ascii=False)
+            if "error" not in result:
+                facts[fn] = text
+            msgs.append({"role": "tool", "content": text, "tool_name": fn})
+        if all(t["name"] in facts for t in TOOL_SPECS):
+            break                       # every source read; another step only repeats calls or starts writing
     # make sure every source was read even if the model skipped one
     for t in TOOL_SPECS:
-        if t["name"] not in {u["tool"] for u in used}:
-            result = getattr(tools, t["name"])()
+        if t["name"] not in facts:
+            facts[t["name"]] = json.dumps(getattr(tools, t["name"])(), ensure_ascii=False)
             used.append({"tool": t["name"], "args": {}, "forced": True})
-            msgs.append({"role": "user", "content": f"Result of {t['name']} (you did not call it): "
-                                                    + json.dumps(result, ensure_ascii=False)})
 
-    msgs.append({"role": "user", "content": "Write the report now as JSON matching the schema. Every number from the tool "
-                                            "results above; Turkish and English; trade-offs, no choice for the farmer."})
-    report, problems = None, ["not generated"]
+    # Report phase: a fresh, fixed-size prompt each attempt (rules + tool results + problems of the last
+    # attempt). Re-sending the whole conversation grew 4.6k → 6.1k → 8.1k tokens and overflowed the 8k context.
+    base = report_prompt(location_id, depth_id, facts)
+    report, problems, history = None, ["not generated"], []
     for attempt in range(MAX_FIXES + 1):
+        msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": base}]
+        if history:
+            msgs.append({"role": "user", "content": "Your previous attempt was rejected. Write the whole JSON again and "
+                                                    "avoid these problems:\n- " + "\n- ".join(history[-1])})
+        _log(location_id, f"report attempt {attempt + 1}/{MAX_FIXES + 1}…")
         m = chat(model, msgs, fmt=REPORT_SCHEMA)
         try:
             report = json.loads(m.get("content") or "{}")
@@ -163,8 +201,8 @@ def run_district(location_id: str, model: str = DEFAULT_MODEL, depth_id: str = "
             problems = check_report(report, reg)
         if not problems:
             break
-        msgs.append({"role": "assistant", "content": m.get("content", "")})
-        msgs.append({"role": "user", "content": "Fix these problems and return the whole JSON again:\n- " + "\n- ".join(problems)})
+        _log(location_id, "guards: " + " | ".join(problems))
+        history.append(problems)
 
     return {
         "schema_version": "1.0", "mock": False,
@@ -184,14 +222,24 @@ def main() -> None:
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--only", nargs="*")
     ap.add_argument("--depth", default="medium")
+    ap.add_argument("--force", action="store_true", help="re-run even when a passing report already exists")
     a = ap.parse_args()
     out_dir = config.WEB_DATA_DIR / "agent"
     out_dir.mkdir(parents=True, exist_ok=True)
     for loc in config.location_ids():
         if a.only and loc not in a.only:
             continue
+        out_path = out_dir / f"{loc}.json"
+        if not a.force and not a.only and out_path.exists():
+            try:
+                old = json.loads(out_path.read_text(encoding="utf-8"))
+                if old.get("guards", {}).get("passed") and old.get("report"):
+                    print(f"{loc}: already passed (skip; use --force to regenerate)", flush=True)
+                    continue
+            except Exception:  # noqa: BLE001
+                pass
         rec = run_district(loc, a.model, a.depth)
-        (out_dir / f"{loc}.json").write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
+        out_path.write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
         g = rec["guards"]
         print(f"{loc}: guards {'ok' if g['passed'] else 'FAILED'} (rewrites {g['rewrites']}, tools {len(rec['tools_used'])})"
               + ("" if g["passed"] else f" — {g['problems']}"), flush=True)
