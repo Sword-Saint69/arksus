@@ -14,6 +14,7 @@ import { inputsFromDefaults } from '@/lib/economics';
 import type { CropId, RotationId } from '@/lib/types';
 import { Button, Card, DataBadge, Note, cn } from '@/ui/kit';
 import { CropIcon } from '@/ui/crops';
+import { Farmer } from '@/ui/farmer/Farmer';
 import { Options } from './result/Options';
 import { WhatIf } from './result/WhatIf';
 import { FieldSim } from './result/FieldSim';
@@ -264,8 +265,14 @@ function Hero({ verdict }: { verdict: Verdict }) {
 
   return (
     <section aria-labelledby="rec-title" className="animate-rise rounded-[1.75rem] bg-gradient-to-br from-primary-strong to-primary p-5 text-white shadow-sm">
-      <p id="rec-title" className="text-sm font-extrabold uppercase tracking-[0.08em] text-gold">{t('recTitle')}</p>
-      <p className="mt-2 text-base font-bold text-white/85">{t('heroSeason', { y: next.harvestYear })}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p id="rec-title" className="text-sm font-extrabold uppercase tracking-[0.08em] text-gold">{t('recTitle')}</p>
+          <p className="mt-2 text-base font-bold text-white/85">{t('heroSeason', { y: next.harvestYear })}</p>
+        </div>
+        {/* The guide reads the suggestion aloud with "Listen". */}
+        <Farmer mood={speaking ? 'talking' : 'idle'} size={58} title={t('farmerName')} className="-mt-1 shrink-0" />
+      </div>
       <p className="mt-1 flex items-center gap-3 text-[2.4rem] font-black leading-[1.05]"><CropIcon crop={next.crop} size={40} /> {crop}</p>
       <p className="mt-1.5 text-base text-white/85">{thenLine}</p>
       <p className="mt-3 text-xl font-semibold leading-snug">{why}</p>

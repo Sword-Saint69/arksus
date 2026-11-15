@@ -1,10 +1,10 @@
-import { Sparkles } from 'lucide-react';
 import { fmtNum, textureName, useT, hasKey, type Key } from '@/i18n';
 import { useStore } from '@/state/store';
 import type { Verdict } from '@/domain/verdict';
 import type { Weights } from '@/lib/economics';
 import type { AgentFile, ResultsFile, V } from '@/lib/types';
 import { DataBadge, Fold, SectionTitle } from '@/ui/kit';
+import { Farmer } from '@/ui/farmer/Farmer';
 
 const CRITERIA: (keyof Weights)[] = ['value', 'yield', 'soil', 'water'];
 const GLOSSARY = ['et', 'water_balance', 'available_water', 'field_capacity_vs_saturation', 'soil_moisture_anomaly', 'ph', 'organic_carbon', 'cec',
@@ -24,7 +24,7 @@ export function AgentCard({ agent }: { agent: AgentFile | null }) {
   ) : null);
   return (
     <section className="grid gap-2 rounded-3xl border border-line bg-white p-4">
-      <h2 className="flex flex-wrap items-center gap-2 text-xl font-extrabold"><Sparkles size={22} className="text-wheat" aria-hidden="true" /> {t('aiTitle')} <DataBadge type="model" /></h2>
+      <h2 className="flex flex-wrap items-center gap-2 text-xl font-extrabold"><Farmer size={40} /> {t('aiTitle')} <DataBadge type="model" /></h2>
       <p className="text-lg font-semibold leading-snug">{tx(r.headline)}</p>
       <Fold title={t('detailsTitle')}>
         {r.rotations.map((x) => (

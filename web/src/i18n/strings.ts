@@ -636,6 +636,9 @@ export const S = {
   altClose: { tr: 'Neredeyse aynı', en: 'Almost as suitable' },
   altLess: { tr: 'Daha az uygun', en: 'Less suitable' },
   altNone: { tr: 'Eşikleri geçen başka ürün yok. Neden elendiklerini aşağıda görebilirsin.', en: 'No other crop passes the thresholds. You can see below why they were left out.' },
+  // The guide
+  farmerName: { tr: 'NöbetSu çiftçisi', en: 'The NöbetSu farmer' },
+  farmerHello: { tr: 'Merhaba! Tarlana ne ekeceğini birlikte bulalım.', en: 'Hello! Let’s find out together what to plant on your field.' },
   // Result menu
   secMenu: { tr: 'Sonuç bölümleri', en: 'Result sections' },
   secNext: { tr: 'Sonraki: {s}', en: 'Next: {s}' },
