@@ -287,7 +287,7 @@ def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs:
     return checks
 
 
-# --- E1: SMAP L4 root-zone anomaly comparison (PLAN_EXPANSION E1) ---------------------------
+# --- E1: model soil water vs NASA MERRA-2 root-zone wetness (SMAP dropped 15 Nov) -------------
 # Not yet part of run_checks(): the contract has exactly five checks. A sixth id
 # (`smap_anomaly`) needs Gümüş to extend validation.schema.json first.
 
@@ -319,11 +319,11 @@ def _smap_monthly(smap: dict) -> pd.Series:
 
 
 def smap_comparison(landscape: pd.DataFrame, smap: dict) -> dict:
-    """Compare monthly model fullness (landscape run) with SMAP root-zone wetness.
+    """Compare monthly model fullness (landscape run) with root-zone wetness from the soil-wetness slot (MERRA-2).
 
     Both are reduced to standardised monthly anomalies over the overlapping months, so the
-    different definitions (fullness = share of available water capacity; SMAP wetness =
-    degree of saturation of a 9 km model cell) do not matter for the correlation.
+    different definitions (fullness = share of available water capacity; MERRA-2 wetness =
+    degree of saturation of a ~55 km reanalysis cell) do not matter for the correlation.
     """
     days = landscape["fullness_pct"].groupby(landscape.index.to_period("M")).size()
     model = landscape["fullness_pct"].resample("MS").mean() / 100.0
@@ -348,62 +348,46 @@ def smap_comparison(landscape: pd.DataFrame, smap: dict) -> dict:
     return out
 
 
-def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dict],
-                       fallback: dict[str, dict] | None = None) -> dict:
-    """Sixth check (E1) in the validation.json item format; `info` or `pending`.
+def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dict]) -> dict:
+    """Sixth check (E1): model soil-water fullness vs NASA MERRA-2 root-zone soil wetness.
 
-    Per location: NASA SMAP L4 when its file is `available`; otherwise NASA MERRA-2 root-zone soil
-    wetness (via POWER, data/merra2/{id}.json) as a stand-in. `fallback`: None reads the MERRA-2
-    cache; pass {} to use SMAP only. Each district line names the source it used.
+    `smaps` are the soil-wetness slot files (data/smap/{id}.json, contract name kept). Since 15 Nov
+    they hold NASA MERRA-2 (via POWER, nobetsu.merra2); SMAP L4 was dropped. Check id unchanged.
     """
-    if fallback is None:
-        from nobetsu import merra2
-        fallback = merra2.load_cached(landscapes.keys())
-    parts, used = [], set()
+    parts = []
     for loc, land in landscapes.items():
-        src, data = "SMAP", smaps.get(loc) or {}
-        if not data.get("available"):
-            src, data = "MERRA-2", (fallback or {}).get(loc) or {}
+        data = smaps.get(loc) or {}
         if not data.get("available"):
             continue
         s = smap_comparison(land, data)
         if s["n_months"] < SMAP_MIN_MONTHS:
             continue
-        used.add(src)
         parts.append(
-            f"{_name(loc)} [{src}]: ρ = {s['spearman_anomaly']:.2f} for monthly anomalies, "
+            f"{_name(loc)}: ρ = {s['spearman_anomaly']:.2f} for monthly anomalies, "
             f"{s['spearman_seasonal']:.2f} for the seasonal cycle "
             f"({s['n_months']} months, {s['first_month'][:7]} → {s['last_month'][:7]}); "
-            f"wettest month model {s['model_wettest_month']} / {src} {s['smap_wettest_month']}, "
-            f"driest model {s['model_driest_month']} / {src} {s['smap_driest_month']}"
+            f"wettest month model {s['model_wettest_month']} / MERRA-2 {s['smap_wettest_month']}, "
+            f"driest model {s['model_driest_month']} / MERRA-2 {s['smap_driest_month']}"
         )
     if not parts:
         return _check("smap_anomaly", "pending", "", "",
-                      "Waiting for NASA SMAP L4 root-zone data for the points.",
-                      "Noktalar için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
-    refs = []
-    if "SMAP" in used:
-        refs.append("NASA SMAP L4 SPL4SMGP v8 root-zone wetness, 9 km cell, monthly means")
-    if "MERRA-2" in used:
-        from nobetsu import merra2
-        refs.append(f"{merra2.PRODUCT} ({merra2.CELL}); stand-in while SMAP L4 is not delivered")
-    en = ("Spearman correlation between the model's soil-water fullness (a landscape where half the land is "
-          "fallow and half is wheat each year, medium soil) and NASA root-zone soil wetness, month by month "
-          "(anomalies) and over the average year (seasonal cycle). It checks the timing of wet and dry spells, "
-          "not absolute agreement.")
-    tr = ("Modelin toprak suyu doluluğu (her yıl arazinin yarısı nadas, yarısı buğday; orta derinlik) ile NASA "
-          "kök bölgesi toprak ıslaklığı arasındaki Spearman korelasyonu: ay ay (anomali) ve ortalama yıl boyunca "
-          "(mevsim döngüsü). Islak ve kuru dönemlerin zamanlamasını kontrol eder, mutlak uyumu değil.")
-    if "MERRA-2" in used:
-        en += (" MERRA-2 is a NASA reanalysis model, not a satellite measurement, and POWER's weather that "
-               "drives our engine also comes from MERRA-2, so the two are not independent: agreement partly "
-               "reflects the shared weather.")
-        tr += (" MERRA-2 bir NASA yeniden analiz modelidir, uydu ölçümü değildir; motorumuzu çalıştıran POWER "
-               "havası da MERRA-2'den gelir. Bu yüzden ikisi bağımsız değildir, uyumun bir kısmı ortak havadan gelir.")
-    if "SMAP" in used:
-        en += " SMAP L4 is a satellite-assisted model of a 9 km mixed cell and knows nothing about our rotations."
-        tr += " SMAP L4, 9 km'lik karışık bir hücrenin uydu destekli modelidir ve bizim rotasyonlarımızı bilmez."
-    return _check("smap_anomaly", "info", "; ".join(parts), "; ".join(refs), en, tr)
+                      "Waiting for NASA MERRA-2 soil wetness at the points (python -m nobetsu.merra2).",
+                      "Noktalar için NASA MERRA-2 toprak ıslaklığı bekleniyor (python -m nobetsu.merra2).")
+    from nobetsu import merra2
+    return _check(
+        "smap_anomaly", "info", "; ".join(parts), f"{merra2.PRODUCT} ({merra2.CELL}), monthly means",
+        "Spearman correlation between the model's soil-water fullness (a landscape where half the land is fallow "
+        "and half is wheat each year, medium soil) and NASA MERRA-2 root-zone soil wetness, month by month "
+        "(anomalies) and over the average year (seasonal cycle). It checks the timing of wet and dry spells, not "
+        "absolute agreement. MERRA-2 is a NASA reanalysis model, not a satellite measurement, and POWER's weather "
+        "that drives our engine also comes from MERRA-2, so the two are not independent: agreement partly reflects "
+        "the shared weather.",
+        "Modelin toprak suyu doluluğu (her yıl arazinin yarısı nadas, yarısı buğday; orta derinlik) ile NASA MERRA-2 "
+        "kök bölgesi toprak ıslaklığı arasındaki Spearman korelasyonu: ay ay (anomali) ve ortalama yıl boyunca "
+        "(mevsim döngüsü). Islak ve kuru dönemlerin zamanlamasını kontrol eder, mutlak uyumu değil. MERRA-2 bir NASA "
+        "yeniden analiz modelidir, uydu ölçümü değildir; motorumuzu çalıştıran POWER havası da MERRA-2'den gelir. Bu "
+        "yüzden ikisi bağımsız değildir, uyumun bir kısmı ortak havadan gelir.",
+    )
 
 
 # --- MODIS NDVI vs the engine's crop calendar ------------------------------------------------

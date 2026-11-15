@@ -34,20 +34,29 @@ def _merra_from(land):
                                                    "surface_wetness": None} for d, v in m.items()]}
 
 
-def test_check_uses_merra2_when_smap_missing(landscape):
-    c = validate.check_smap_anomaly({"karapinar": landscape}, {"karapinar": {"available": False}},
-                                    {"karapinar": _merra_from(landscape)})
-    assert c["status"] == "info" and "[MERRA-2]" in c["value"]
+def test_check_reads_the_soil_wetness_slot_and_names_merra2(landscape):
+    c = validate.check_smap_anomaly({"karapinar": landscape}, {"karapinar": _merra_from(landscape)})
+    assert c["status"] == "info" and "MERRA-2" in c["value"]
     assert "MERRA-2" in c["reference"] and "not independent" in c["note"]["en"]
-    assert "SMAP L4 SPL4SMGP" not in c["reference"]
+    assert "SMAP" not in c["value"] + c["reference"] + c["note"]["en"] + c["note"]["tr"]
 
 
-def test_check_prefers_smap_when_available(landscape):
-    smap = {**_merra_from(landscape), "available": True}
-    c = validate.check_smap_anomaly({"karapinar": landscape}, {"karapinar": smap}, {"karapinar": _merra_from(landscape)})
-    assert "[SMAP]" in c["value"] and "MERRA-2" not in c["reference"]
+def test_check_pending_without_data(landscape):
+    c = validate.check_smap_anomaly({"karapinar": landscape}, {})
+    assert c["status"] == "pending" and "SMAP" not in c["note"]["en"]
 
 
-def test_check_pending_without_either(landscape):
-    c = validate.check_smap_anomaly({"karapinar": landscape}, {}, {})
-    assert c["status"] == "pending"
+def test_to_contract_shape():
+    months = pd.date_range("2013-01-01", "2016-12-01", freq="MS")
+    vals = [0.3 + 0.2 * ((m.month in (1, 2, 3)) - (m.month in (7, 8, 9))) for m in months]
+    d = merra2.to_contract(merra2.parse(_raw(months, vals), "karapinar"))
+    assert d["available"] is True and "MERRA-2" in d["product"] and d["cell_km"] == 55.0
+    assert [c["month"] for c in d["monthly_climatology"]] == list(range(1, 13))
+    assert all(0 <= c["p10"] <= c["p50"] <= c["p90"] <= 1 for c in d["monthly_climatology"])
+    assert d["latest"]["date"] == "2016-12-01" and d["latest"]["rootzone_m3m3"] is None
+    assert 0 <= d["latest"]["percentile_for_month"] <= 100
+    assert set(d["monthly_series"][0]) == {"month_start", "rootzone_wetness", "surface_wetness"}
+
+
+def test_to_contract_unavailable_without_rows():
+    assert merra2.to_contract({"monthly_series": []})["available"] is False

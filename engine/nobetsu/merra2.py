@@ -1,14 +1,15 @@
 """NASA MERRA-2 root-zone and surface soil wetness at the NöbetSu points, via NASA POWER.
 
-Stand-in for NASA SMAP L4 in the E1 comparison while the AppEEARS SMAP request has not been
-delivered (15 Nov team decision: no mock data). Parameters GWETROOT ("Root Zone Soil Wetness",
+Replaces NASA SMAP L4 (15 Nov team decision: the AppEEARS SMAP request was never delivered, SMAP is
+dropped, no mock data). It fills the soil-wetness slot of the contract (data/smap/{id}.json →
+web/public/data/smap/{id}.json; the file name is kept so the contract does not break). Parameters GWETROOT ("Root Zone Soil Wetness",
 upper ~1 m, 0 = completely dry … 1 = saturated) and GWETTOP (surface), monthly, from the POWER
 monthly point API (community AG, source MERRA-2 per the response header). No login needed.
 
 NOT independent of the engine: POWER's meteorology, which drives the engine, also comes from
 MERRA-2. Agreement partly reflects shared weather; it compares two water-balance models.
 
-    python -m nobetsu.merra2            # all locations → data/merra2/{id}.json
+    python -m nobetsu.merra2            # all locations → data/merra2/{id}.json + data/smap/{id}.json
     python -m nobetsu.merra2 --refresh
 
 The cache has the same monthly_series shape as data/smap/{id}.json (contract §4.3b), so
@@ -32,6 +33,8 @@ PARAMS = ("GWETROOT", "GWETTOP")
 PRODUCT = "NASA MERRA-2 soil wetness (GWETROOT, GWETTOP) via NASA POWER monthly"
 SOURCE_URL = "https://power.larc.nasa.gov/docs/"
 CELL = "MERRA-2 grid, 0.5° × 0.625°"
+CELL_KM = 55.0       # 0.5° of latitude ≈ 55.6 km; 0.625° of longitude at 38° N ≈ 54.7 km
+SMAP_SLOT_DIR = config.DATA_DIR / "smap"
 FILL = -999.0
 CACHE_DIR = config.DATA_DIR / "merra2"
 
@@ -90,6 +93,41 @@ def load_cached(location_ids) -> dict[str, dict]:
     return out
 
 
+def to_contract(cache: dict) -> dict:
+    """Soil-wetness slot of the contract (smap.schema.json) from a MERRA-2 cache: monthly series,
+    P10/P50/P90 per calendar month, latest month with its percentile among the same calendar months.
+    rootzone_m3m3 is null: MERRA-2 GWETROOT is a degree of saturation, not a volumetric content."""
+    import numpy as np
+    rows = [r for r in cache.get("monthly_series", [])
+            if r.get("rootzone_wetness") is not None and r.get("surface_wetness") is not None]
+    if not rows:
+        return {"available": False, "product": PRODUCT, "cell_km": CELL_KM, "latest": None,
+                "monthly_climatology": [], "monthly_series": []}
+    series = [{"month_start": r["month_start"], "rootzone_wetness": round(float(r["rootzone_wetness"]), 3),
+               "surface_wetness": round(float(r["surface_wetness"]), 3)} for r in rows]
+    clim = []
+    for m in range(1, 13):
+        vals = np.array([r["rootzone_wetness"] for r in series if int(r["month_start"][5:7]) == m], dtype=float)
+        if len(vals):
+            clim.append({"month": m, "p10": round(float(np.percentile(vals, 10)), 3),
+                         "p50": round(float(np.percentile(vals, 50)), 3), "p90": round(float(np.percentile(vals, 90)), 3)})
+    last = series[-1]
+    same = np.array([r["rootzone_wetness"] for r in series if r["month_start"][5:7] == last["month_start"][5:7]], dtype=float)
+    pct = 100.0 * float((same <= last["rootzone_wetness"]).mean())
+    return {"available": True, "product": PRODUCT, "cell_km": CELL_KM,
+            "latest": {"date": last["month_start"], "rootzone_wetness": last["rootzone_wetness"],
+                       "rootzone_m3m3": None, "percentile_for_month": round(pct, 1)},
+            "monthly_climatology": clim, "monthly_series": series}
+
+
+def write_slot(location_id: str, cache: dict) -> Path:
+    SMAP_SLOT_DIR.mkdir(parents=True, exist_ok=True)
+    path = SMAP_SLOT_DIR / f"{location_id}.json"
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(to_contract(cache), f, ensure_ascii=False, indent=0)
+    return path
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--refresh", action="store_true")
@@ -97,10 +135,13 @@ def main() -> None:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     for loc in config.load("locations")["locations"]:
         if cache_path(loc["id"]).exists() and not a.refresh:
+            with cache_path(loc["id"]).open(encoding="utf-8") as f:
+                write_slot(loc["id"], json.load(f))
             continue
         data = fetch(loc["id"], float(loc["lat"]), float(loc["lon"]))
         with cache_path(loc["id"]).open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=0)
+        write_slot(loc["id"], data)
         ok = [r for r in data["monthly_series"] if r["rootzone_wetness"] is not None]
         print(f"{loc['id']}: {len(ok)} months, {ok[0]['month_start'][:7]} → {ok[-1]['month_start'][:7]}, sources {data['header_sources']}")
 
