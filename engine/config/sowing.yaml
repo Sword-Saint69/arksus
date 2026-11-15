@@ -206,6 +206,20 @@ crops:
   lentil:
     label: { tr: "Mercimek", en: "Lentil" }
     types:
+      # Spring lentil first: the engine models lentil as spring-sown (crops.yaml, 1 March; TTAE: green lentil is
+      # spring-sown in Central Anatolia), so the card's default matches the rotation the site suggests.
+      - id: spring_large
+        label: { tr: "Yazlık, iri taneli yeşil", en: "Spring, large green" }
+        season: spring
+        window_text: { tr: "Şubat sonu–Mart başı", en: "Late February–early March" }
+        guide_kg_per_da: { min: 10, max: 12, unit: kg/da, <<: *gkgm, source: "GKGM: iri yeşil mercimek yazlık ekimde 10–12 kg/da" }
+        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
+      - id: spring_small
+        label: { tr: "Yazlık, küçük taneli (kırmızı)", en: "Spring, small-seeded (red)" }
+        season: spring
+        window_text: { tr: "Şubat sonu–Mart başı", en: "Late February–early March" }
+        guide_kg_per_da: { min: 7, max: 8, unit: kg/da, <<: *gkgm, source: "GKGM: küçük taneli mercimek yazlık ekimde 7–8 kg/da" }
+        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
       - id: winter_large
         label: { tr: "Kışlık, iri taneli yeşil", en: "Winter, large green" }
         season: autumn
@@ -225,18 +239,6 @@ crops:
           irrigated: { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM: Ekim ayı" }
         seeds_per_m2: { min: 300, max: 350, unit: "tohum/m²", <<: *adak }
         guide_kg_per_da: { min: 8, max: 10, unit: kg/da, <<: *gkgm, source: "GKGM: küçük taneli mercimek kışlık ekimde 8–10 kg/da" }
-        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
-      - id: spring_large
-        label: { tr: "Yazlık, iri taneli yeşil", en: "Spring, large green" }
-        season: spring
-        window_text: { tr: "Şubat sonu–Mart başı", en: "Late February–early March" }
-        guide_kg_per_da: { min: 10, max: 12, unit: kg/da, <<: *gkgm, source: "GKGM: iri yeşil mercimek yazlık ekimde 10–12 kg/da" }
-        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
-      - id: spring_small
-        label: { tr: "Yazlık, küçük taneli (kırmızı)", en: "Spring, small-seeded (red)" }
-        season: spring
-        window_text: { tr: "Şubat sonu–Mart başı", en: "Late February–early March" }
-        guide_kg_per_da: { min: 7, max: 8, unit: kg/da, <<: *gkgm, source: "GKGM: küçük taneli mercimek yazlık ekimde 7–8 kg/da" }
         depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
     rows:
       - { when: { annual_precip_mm: { lt: 350 } }, min: 30, max: 30, unit: cm, label: { tr: "Yıllık yağış 350 mm'nin altında", en: "Annual rain below 350 mm" }, <<: *gkgm, source: "GKGM: yıllık yağışı 350 mm'nin altındaki yerlerde 30 cm sıra arası daha dar sıralardan fazla verim verdi" }

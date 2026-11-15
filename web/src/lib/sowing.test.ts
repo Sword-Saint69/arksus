@@ -74,6 +74,11 @@ describe('lentil and chickpea', () => {
     const d = sowingPlan(F, { crop: 'lentil', water: 'rainfed', locationId: 'develi' });
     expect(d.rows.map((r) => [r.min, r.max])).toEqual([[15, 20]]);
   });
+  it('default lentil type is spring (the engine sows lentil on 1 March)', () => {
+    const p = sowingPlan(F, { crop: 'lentil', water: 'rainfed' });
+    expect(p.type.id).toBe('spring_large');
+    expect(p.type.season).toBe('spring');
+  });
   it('winter lentil adds the 1–2 kg/da winter-kill margin: large green 14–15 → 15–17', () => {
     const p = sowingPlan(F, { crop: 'lentil', water: 'rainfed', typeId: 'winter_large' });
     expect(p.guide).toMatchObject({ min: 15, max: 17 });

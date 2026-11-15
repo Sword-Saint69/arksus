@@ -82,10 +82,10 @@ practices:
       - { text: { tr: "İşlenmiş nadas yağışın en fazla %29'unu depolayabiliyor; 90 cm profilde ~%18.", en: "Tilled fallow can store at most 29 % of the rain; ~18 % on a 90 cm profile." }, <<: *akkaya }
 
   - id: legume_rotation
-    title: { tr: "Nadasın yerine baklagil: kışlık mercimek en yakın seçenek", en: "A legume instead of fallow: winter lentil comes closest" }
+    title: { tr: "Nadasın yerine baklagil: mercimek en yakın seçenek", en: "A legume instead of fallow: lentil comes closest" }
     body:
-      tr: "Nadas yılında baklagil ekmek toprağı örter, iki yılda iki hasat verir ve kök nodülleriyle havadan azot bağlar. Bedeli, sonraki buğdayın biraz daha az vermesidir. Site bir seçeneği ancak sonraki buğday nadas sonrasının %85'inin üstünde kalıyorsa önerir."
-      en: "A legume in the fallow year covers the soil, gives two harvests in two years and fixes nitrogen from the air in its root nodules. The trade-off is a slightly smaller next wheat. The site suggests an option only if the next wheat stays above 85 % of wheat after fallow."
+      tr: "Nadas yılında baklagil ekmek toprağı örter, iki yılda iki hasat verir ve kök nodülleriyle havadan azot bağlar. Bedeli, sonraki buğdayın biraz daha az vermesidir. Site bir seçeneği ancak sonraki buğday nadas sonrasının %85'inin üstünde kalıyorsa önerir. Motor mercimeği ve nohudu ilkbaharda ekilmiş olarak hesaplar."
+      en: "A legume in the fallow year covers the soil, gives two harvests in two years and fixes nitrogen from the air in its root nodules. The trade-off is a slightly smaller next wheat. The site suggests an option only if the next wheat stays above 85 % of wheat after fallow. The model treats lentil and chickpea as spring-sown."
     show_model: true
     evidence:
       - { text: { tr: "Konya denemesinde önceki ürüne göre buğday (3 yıl ortalaması): nadas 286, mercimek 249 (%87), nohut 228 (%80), fiğ 223 (%78) kg/da.", en: "Konya trial, wheat by previous crop (3-year mean): fallow 286, lentil 249 (87 %), chickpea 228 (80 %), vetch 223 (78 %) kg/da." }, <<: *gultekin }

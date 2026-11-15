@@ -29,16 +29,19 @@ export function Fertilizer({ results, rotationId }: { results: ResultsFile; rota
   const [crop, setCrop] = useState<FertCropId>(crops[0]);
   useEffect(() => { setCrop(cropsForRotation(site, rotationId)[0]); }, [site, rotationId]);
   const water: WaterRegime = answers.water ?? 'rainfed';
+  // Unchecked shows the "inoculate" advice and the TAGEM table N; checked uses the GKGM starter dose.
+  const [inoculated, setInoculated] = useState(false);
+  const [banding, setBanding] = useState(false);
 
   const view = useMemo(() => {
     if (fert.status !== 'ready') return null;
     const f = fert.data;
     const merged = mergeSoil(soilFromResults(results, f), answers.hasSoilTest ? answers.soilTest : undefined);
     try {
-      const plan = recommend(f, { crop, water, soil: merged.soil });
+      const plan = recommend(f, { crop, water, soil: merged.soil, inoculated, banding });
       return { f, merged, plan, groups: groupByTiming(f, plan) };
     } catch { return null; }
-  }, [fert, results, answers.hasSoilTest, answers.soilTest, crop, water]);
+  }, [fert, results, answers.hasSoilTest, answers.soilTest, crop, water, inoculated, banding]);
 
   if (fert.status === 'error') return null;   // the rest of the page works without this card
   if (!view) return <p className="text-muted" role="status">{t('loading')}</p>;
@@ -47,6 +50,14 @@ export function Fertilizer({ results, rotationId }: { results: ResultsFile; rota
   const product = (id: string) => tx(f.products[id]?.label) || id;
   const needsTest = plan.nutrients.some((n) => n.nutrient !== 'n' && n.basis === 'needs_soil_test');
   const advice = plan.advice.filter((a) => !ADVICE_SHOWN_ELSEWHERE.has(a.id));
+  const isLegume = !!f.crops[crop].fixed_n_kg_per_da;
+  // Without a P test the plan has nitrogen only; the guide's doses (wheat: Toros) are shown as the no-test reference.
+  const guideFallback = needsTest && plan.guide && plan.target_yield_kg_per_da !== null ? plan.guide : null;
+  const splitLabel = (timing: string) => f.crops[crop].n_split[water]?.find((p) => p.timing === timing)?.label;
+  const timingName = (timing: string) => {
+    const l = timing === 'base' ? null : splitLabel(timing);
+    return l ? `${t('fert_t_top')} · ${tx(l)}` : t(`fert_t_${timing}` as Key);
+  };
   const toSoilQuestion = () => { setQuestion(QUESTION_IDS.indexOf('soil')); go('questions'); };
   // A product dose is worked out from the nutrient amounts, so it is only as firm as the
   // least firm of them: official when every amount comes from an official table.
@@ -69,6 +80,20 @@ export function Fertilizer({ results, rotationId }: { results: ResultsFile; rota
         </div>
       )}
 
+      <div className="flex flex-wrap gap-x-5 gap-y-1 text-base">
+        {isLegume && (
+          <label className="inline-flex min-h-11 items-center gap-2">
+            <input type="checkbox" checked={inoculated} onChange={(e) => setInoculated(e.target.checked)} className="h-5 w-5 accent-[var(--color-primary)]" />
+            {t('fertInoculated')}
+          </label>
+        )}
+        <label className="inline-flex min-h-11 items-center gap-2">
+          <input type="checkbox" checked={banding} onChange={(e) => setBanding(e.target.checked)} className="h-5 w-5 accent-[var(--color-primary)]" />
+          {t('fertBanding')}
+        </label>
+      </div>
+
+      {needsTest && groups.length > 0 && <p className="text-[15px] font-bold text-warn">{t('fertOnlyN')}</p>}
       {groups.length === 0 ? <Note tone="warn">{t('fertNoDoses')}</Note> : (
         <ol className="grid gap-2.5">
           {groups.map((g) => (
@@ -97,6 +122,25 @@ export function Fertilizer({ results, rotationId }: { results: ResultsFile; rota
             </li>
           ))}
         </ol>
+      )}
+
+      {guideFallback && (
+        <Card className="grid gap-2 border-2 border-gold/60">
+          <p className="flex flex-wrap items-center gap-2 font-extrabold">
+            {t('fertGuideTitle', { y: num(plan.target_yield_kg_per_da!) })}
+            {f.crops[crop].guide_table && <DataBadge type={f.crops[crop].guide_table!.type} verified={f.crops[crop].guide_table!.verified} />}
+          </p>
+          <ul className="grid gap-1.5">
+            {guideFallback.doses.map((g, i) => (
+              <li key={i} className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <span><span className="text-sm text-muted">{timingName(g.timing)}:</span> <b>{product(g.product)}</b></span>
+                <span className="text-lg font-black tabular-nums">{num(g.min_kg_per_da)}{g.max_kg_per_da !== g.min_kg_per_da ? `–${num(g.max_kg_per_da)}` : ''} kg <span className="text-sm font-normal text-muted">{t('fertPerDa')}</span></span>
+              </li>
+            ))}
+          </ul>
+          {guideFallback.note && <p className="text-sm text-muted">{tx(guideFallback.note)}</p>}
+          <p className="text-sm text-muted">{t('fertGuideSub')}</p>
+        </Card>
       )}
 
       {needsTest && (
