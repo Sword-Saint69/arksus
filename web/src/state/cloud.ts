@@ -21,8 +21,14 @@ interface CloudState {
   error: string | null;
   /** null on success; otherwise why it failed. */
   signIn(email: string, password: string): Promise<AuthFail | null>;
-  /** 'check_mail' when Supabase still asks for an email confirmation. */
-  signUp(email: string, password: string): Promise<AuthFail | 'check_mail' | null>;
+  /**
+   * Creates the account and records the two decisions taken on the form: the notice was read
+   * (required) and the optional district consent. 'check_mail' when Supabase still asks for an
+   * email confirmation (then the decisions are asked again after the first sign-in).
+   */
+  signUp(email: string, password: string, districtConsent: boolean): Promise<AuthFail | 'check_mail' | null>;
+  /** True while sign-up is recording its consents: the consent dialog must not flash meanwhile. */
+  signingUp: boolean;
   signOut(): Promise<void>;
   /** Appends decisions to the log and reloads the latest state. */
   decide(items: { kind: ConsentKind; granted: boolean }[]): Promise<void>;
@@ -36,14 +42,22 @@ export const useCloud = create<CloudState>((set, get) => ({
   user: null,
   consents: NO_CONSENTS,
   consentsLoaded: false,
+  signingUp: false,
   error: null,
   signIn: async (email, password) => {
     set({ error: null });
     try { await signInEmail(email.trim(), password); return null; } catch (e) { return authFail(e as { code?: string }); }
   },
-  signUp: async (email, password) => {
-    set({ error: null });
-    try { return (await signUpEmail(email.trim(), password)).confirmed ? null : 'check_mail'; } catch (e) { return authFail(e as { code?: string }); }
+  signUp: async (email, password, districtConsent) => {
+    set({ error: null, signingUp: true });
+    try {
+      if (!(await signUpEmail(email.trim(), password)).confirmed) return 'check_mail';
+      await recordConsents([{ kind: 'notice_read', granted: true }, { kind: 'district_stats', granted: districtConsent }]);
+      set({ consents: latestConsents(await loadConsents()), consentsLoaded: true });
+      void syncProfile(true);
+      return null;
+    } catch (e) { return authFail(e as { code?: string }); }
+    finally { set({ signingUp: false }); }
   },
   signOut: async () => { try { await signOutCloud(); } finally { set({ user: null, consents: NO_CONSENTS, consentsLoaded: false }); } },
   decide: async (items) => {
@@ -89,6 +103,7 @@ if (cloud) {
       useCloud.setState({ consentsLoaded: false });
       // Supabase asks not to await other Supabase calls inside this callback.
       setTimeout(() => {
+        if (useCloud.getState().signingUp) return;          // sign-up records and loads them itself
         loadConsents()
           .then((rows) => { useCloud.setState({ consents: latestConsents(rows), consentsLoaded: true }); return syncProfile(true); })
           .catch((e) => useCloud.setState({ error: (e as Error).message }));

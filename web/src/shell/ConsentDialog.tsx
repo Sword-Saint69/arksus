@@ -21,7 +21,7 @@ export function useLegalText(file: 'aydinlatma-metni.md' | 'acik-riza-metni.md')
 export const noticeBody = (md: string) => withoutTickLines(md.replace(/\n\*Bu kutu bir onay[^\n]*\n?/, '\n'));
 
 /**
- * After the first sign-in (and whenever the notice changes): the notice, acknowledged with
+ * For an account whose notice is missing or out of date (the sign-up form asks both already): the notice, acknowledged with
  * "okudum ve anladım", and the one optional consent, each on its own (KVKK principle decision 2026/347).
  * Nothing about the farmer is saved before this is done.
  */
@@ -39,9 +39,10 @@ export function ConsentDialog() {
   const [failed, setFailed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const loaded = useCloud((s) => s.consentsLoaded);
+  const signingUp = useCloud((s) => s.signingUp);
 
   // Shown once the consent log is loaded and the current notice has not been acknowledged.
-  const open = !!user && loaded && needsNotice(consents);
+  const open = !!user && loaded && !signingUp && needsNotice(consents);
   useEffect(() => { if (open) box.current?.focus(); }, [open]);
   if (!open) return null;
 
