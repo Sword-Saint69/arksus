@@ -96,11 +96,12 @@ function Smap({ smap, lang }: { smap: SmapFile | null; lang: Lang }) {
             date: smap.latest.date,
             w: fmtNum(smap.latest.rootzone_wetness * 100, lang),
             pct: fmtNum(smap.latest.percentile_for_month, lang),
-          })} <Badge type="measured" lang={lang} />
+          })} <Badge type="model" lang={lang} />
         </p>
       ) : (
         <p className="mt-1 text-sm text-muted">{t(lang, 'smapComing')}</p>
       )}
+      <p className="mt-1 text-xs text-faint">{t(lang, 'smapNote')}</p>
     </div>
   );
 }

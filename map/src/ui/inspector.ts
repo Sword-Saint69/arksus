@@ -217,7 +217,8 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     ${flipHtml(d)}
     ${soilHtml}
     <h3 class="sec-title">${t('smap')}</h3>
-    <p class="sec-sub">${d.smap && d.smap.available ? 'SMAP' : t('smapComing')}</p>
+    <p class="sec-sub">${d.smap && d.smap.available && d.smap.latest ? `${t('smapLatest', { date: esc(d.smap.latest.date.slice(0, 7)), w: fmtNum(d.smap.latest.rootzone_wetness * 100, 0), pct: fmtNum(d.smap.latest.percentile_for_month, 0) })} ${badge('model')}` : t('smapComing')}</p>
+    <p class="sec-sub">${t('smapNote')}</p>
     ${evidenceHtml(d)}
     <div class="actions" style="margin-top:14px">
       <button class="btn" data-act="focus">${icon('i-target')}${t('focus')}</button>

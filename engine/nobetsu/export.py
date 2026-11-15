@@ -183,7 +183,7 @@ def _fertilizer(mock: bool, ts: str) -> dict:
 
 def _smap(location_id: str, mock: bool, ts: str) -> dict:
     base = {**_header(mock, ts), "location_id": location_id, "available": False,
-            "product": "SMAP L4 SPL4SMGP v8", "cell_km": 9,
+            "product": "NASA MERRA-2 soil wetness (GWETROOT, GWETTOP) via NASA POWER monthly", "cell_km": 55,
             "latest": None, "monthly_climatology": [], "monthly_series": []}
     path = config.DATA_DIR / "smap" / f"{location_id}.json"
     if path.exists():

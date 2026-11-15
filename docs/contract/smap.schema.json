@@ -44,7 +44,7 @@
               "maximum": 1
             },
             "rootzone_m3m3": {
-              "type": "number"
+              "type": ["number", "null"]
             },
             "percentile_for_month": {
               "type": "number",

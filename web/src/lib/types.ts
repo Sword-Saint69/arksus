@@ -104,7 +104,8 @@ export interface SmapFile extends FileHeader {
   available: boolean;
   product: string;
   cell_km: number;
-  latest: { date: string; rootzone_wetness: number; rootzone_m3m3: number; percentile_for_month: number } | null;
+  // 15 Nov: SMAP dropped; the slot holds NASA MERRA-2 (degree of saturation only, so rootzone_m3m3 is null).
+  latest: { date: string; rootzone_wetness: number; rootzone_m3m3: number | null; percentile_for_month: number } | null;
   monthly_climatology: { month: number; p10: number; p50: number; p90: number }[];
   monthly_series: { month_start: string; rootzone_wetness: number; surface_wetness: number }[];
 }
