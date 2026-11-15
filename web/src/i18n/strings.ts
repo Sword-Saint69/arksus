@@ -6,7 +6,7 @@
 export type T = { tr: string; en: string };
 
 export const S = {
-  appName: { tr: 'NöbetSu', en: 'NöbetSu' },
+  appName: { tr: 'Arksus', en: 'Arksus' },
   kicker: { tr: 'NASA Space Apps 2026 · Field Shift', en: 'NASA Space Apps 2026 · Field Shift' },
   loading: { tr: 'Yükleniyor…', en: 'Loading…' },
   loadFailed: { tr: 'Veri yüklenemedi. İnternetini kontrol edip sayfayı yenile.', en: 'The data could not be loaded. Check your connection and reload the page.' },
@@ -667,7 +667,7 @@ export const S = {
   altLess: { tr: 'Daha az uygun', en: 'Less suitable' },
   altNone: { tr: 'Eşikleri geçen başka ürün yok. Neden elendiklerini aşağıda görebilirsin.', en: 'No other crop passes the thresholds. You can see below why they were left out.' },
   // The guide
-  farmerName: { tr: 'NöbetSu çiftçisi', en: 'The NöbetSu farmer' },
+  farmerName: { tr: 'Arksus çiftçisi', en: 'The Arksus farmer' },
   farmerHello: { tr: 'Merhaba! Tarlana ne ekeceğini birlikte bulalım.', en: 'Hello! Let’s find out together what to plant on your field.' },
   // Ask the farmer (domain/assistant.ts)
   askOpen: { tr: 'Çiftçiye sor', en: 'Ask the farmer' },

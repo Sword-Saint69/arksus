@@ -50,7 +50,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.title = `NöbetSu · ${t('heroTitle')}`;
+    document.title = `Arksus · ${t('heroTitle')}`;
   }, [lang, t]);
   // The opening view shows the whole country; a step that needs a field never runs without one.
   useEffect(() => {

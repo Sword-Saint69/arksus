@@ -1,4 +1,4 @@
-# NöbetSu — Açık Rıza Metni
+# Arksus — Açık Rıza Metni
 
 > **TASLAK — sürüm `acik-riza-v1`** · Hukukçu kontrolünden geçmedi. Köşeli parantezli `[…]` yerler doldurulmadan yayınlanmaz.
 > Bu metin aydınlatma metninden **ayrıdır** (KVKK İlke Kararı 2026/347). Aşağıdaki iki izin birbirinden bağımsızdır; birini, ikisini ya da hiçbirini verebilirsin.
@@ -29,14 +29,14 @@ Tarla sınırı, ada/parsel numarası ve konumun bu işleme **girmez**.
 
 ## İzin 2 — Dil modeli geliştirme
 
-**Neden istiyoruz?** NöbetSu'nun çiftçiye sade Türkçeyle cevap veren tarım asistanını geliştirmek ve eğitmek için gerçek kullanım örneklerine ihtiyaç var.
+**Neden istiyoruz?** Arksus'un çiftçiye sade Türkçeyle cevap veren tarım asistanını geliştirmek ve eğitmek için gerçek kullanım örneklerine ihtiyaç var.
 
 **Hangi veri?** Asistana yazdığın sorular; sorulara verdiğin cevaplar (sulama, toprak derinliği, öncelikler, girersen toprak analizi değerlerin); sitenin sana gösterdiği sonuçlar; tarlanın il ve ilçesi.
 **E-posta adresin ve hesap numaran bu veriden silinir.** Tarla sınırı ve konumun bu işleme girmez.
 
 **Nasıl kullanılır?**
 - Bu veriler dil modelinin eğitiminde ve test edilmesinde kullanılır.
-- Eğitim [NöbetSu ekibi tarafından / şu hizmet sağlayıcı aracılığıyla: …] yapılır. [Bir dil modeli sağlayıcısı kullanılacaksa adı ve sunucu ülkesi buraya yazılacak; yurt dışına aktarım varsa aydınlatma metnindeki 5. bölüme eklenecek.]
+- Eğitim [Arksus ekibi tarafından / şu hizmet sağlayıcı aracılığıyla: …] yapılır. [Bir dil modeli sağlayıcısı kullanılacaksa adı ve sunucu ülkesi buraya yazılacak; yurt dışına aktarım varsa aydınlatma metnindeki 5. bölüme eklenecek.]
 - Eğitilmiş modelin cevapları senin kimliğini içermez.
 
 **Geri alırsan:** Verilerin bundan sonraki eğitimlerde kullanılmaz ve eğitim veri setinden silinir. Daha önce eğitilmiş bir modelden tek bir kişinin katkısını ayırmak teknik olarak mümkün olmayabilir.

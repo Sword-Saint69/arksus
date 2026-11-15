@@ -1,4 +1,4 @@
--- NöbetSu: Google sign-in data (docs/legal/README.md). No parcel, no geometry, no GPS: only il + ilçe.
+-- Arksus: Google sign-in data (docs/legal/README.md). No parcel, no geometry, no GPS: only il + ilçe.
 -- Applied to Supabase project "nobetsu" (tbqxvodltsvvsvkoobdw) on 2026-11-15. Owner: Gümüş.
 
 -- 1. Consent log (append-only, for proof). kind: notice_read | district_stats | llm_training.

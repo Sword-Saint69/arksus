@@ -1,4 +1,4 @@
-# NöbetSu — Kişisel Verilerin İşlenmesine İlişkin Aydınlatma Metni
+# Arksus — Kişisel Verilerin İşlenmesine İlişkin Aydınlatma Metni
 
 > **TASLAK — sürüm `aydinlatma-v1`** · Hukukçu kontrolünden geçmedi. Köşeli parantezli `[…]` yerler doldurulmadan yayınlanmaz.
 > Hazırlanırken uyulan kurallar ve açık konular: `docs/legal/README.md`.
@@ -19,7 +19,7 @@ Aşağıda bunların ayrıntısı var.
 
 ## 1. Veri sorumlusu
 
-6698 sayılı Kişisel Verilerin Korunması Kanunu ("Kanun") kapsamında veri sorumlusu **NöbetSu ekibidir**. NöbetSu, NASA Space Apps 2026 kapsamında geliştirilen ve çiftçiye tarlası için ekim önerisi veren bir internet sitesidir (https://nobetsu.vercel.app). Ekip bir şirket değildir; aşağıdaki ekip üyeleri verilerin işlenmesinden birlikte sorumludur ve başvurunu hangisine yaparsan yap birlikte cevaplanır.
+6698 sayılı Kişisel Verilerin Korunması Kanunu ("Kanun") kapsamında veri sorumlusu **Arksus ekibidir**. Arksus, NASA Space Apps 2026 kapsamında geliştirilen ve çiftçiye tarlası için ekim önerisi veren bir internet sitesidir (https://arksus.vercel.app). Ekip bir şirket değildir; aşağıdaki ekip üyeleri verilerin işlenmesinden birlikte sorumludur ve başvurunu hangisine yaparsan yap birlikte cevaplanır.
 
 - **Ekip üyeleri:** [Ad Soyad], [Ad Soyad], [Ad Soyad], [Ad Soyad], [Ad Soyad]
 - **Ortak başvuru e-postası:** [kvkk@… — ekibin ortak adresi]

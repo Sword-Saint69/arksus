@@ -262,7 +262,7 @@ function Hero({ verdict }: { verdict: Verdict }) {
     setSpeaking(true);
   };
   const share = async () => {
-    const text = `NöbetSu · ${summary}`;
+    const text = `Arksus · ${summary}`;
     try {
       if (navigator.share) await navigator.share({ text });
       else { await navigator.clipboard.writeText(text); setCopied(true); window.setTimeout(() => setCopied(false), 2500); }
