@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Ban, CalendarDays, Info, MapPin, Pencil, Share2, Square, Volume2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Ban, BookOpen, CalendarDays, CalendarRange, ChartScatter, ChevronRight, CirclePlay, CloudSun, Columns3, Gauge, Info, Leaf, MapPin, Mountain, Pencil, Share2, Shovel, Sparkles, Sprout, Square, Star, Volume2 } from 'lucide-react';
 import { translate, useT, type Key } from '@/i18n';
 import { depthFor, useStore } from '@/state/store';
 import { useDistrict } from '@/data/hooks';
@@ -57,6 +57,13 @@ export function Result() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recId]);
+  // Folding the window shows the map: fly to the field so it is what the farmer sees.
+  const panelOpen = useStore((s) => s.sheetOpen);
+  const sim = useStore((s) => s.sim);
+  useEffect(() => {
+    if (!panelOpen && !sim) withMap((m) => m.fitField(fieldPolygons(parcels), { orbit: true }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panelOpen]);
 
   if (!location) return <Note tone="warn">{t('loadFailed')}</Note>;
   if (district.status === 'loading') return <p className="py-8 text-center text-lg text-muted" role="status">{t('loading')}</p>;
@@ -66,20 +73,11 @@ export function Result() {
   const depthLabel = tx(core.site.depth_classes.find((d) => d.id === depth)?.label);
   const isPilot = parcels[0]?.source === 'pilot';
 
-  return (
-    // One column the width of the panel: a long word or a row of buttons may not widen the page on a phone.
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
-      <header className="grid gap-1">
-        <p className="flex flex-wrap items-center gap-1.5 text-base font-bold text-muted">
-          <MapPin size={18} aria-hidden="true" /> {t('resFor', { name: `${location.name}, ${location.province}`, depth: depthLabel })}
-        </p>
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <button type="button" onClick={() => { setQuestion(0); go('questions'); }} className="flex min-h-11 items-center gap-1.5 text-base font-bold text-primary"><Pencil size={17} /> {t('editAnswers')}</button>
-          <button type="button" onClick={() => { reset(); go('find'); }} className="flex min-h-11 items-center gap-1.5 text-base font-bold text-primary"><MapPin size={17} /> {t('newField')}</button>
-        </div>
-      </header>
-
-      {irrigated ? (
+  const irrigatedOnly = (el: ReactNode) => (irrigated ? null : el);
+  const sections: Section[] = [
+    {
+      id: 'summary', key: 'secSummary', icon: Star,
+      body: irrigated ? (
         <Card className="grid gap-3 border-2 border-water/40 bg-water-soft">
           <h1 className="text-2xl font-black leading-tight">{t('irrTitle')}</h1>
           <p className="text-lg leading-snug">{t('irrBody')}</p>
@@ -96,23 +94,93 @@ export function Result() {
             {!isPilot && distanceKm !== null && <b>{t('covered', { name: location.name, km: num(distanceKm, distanceKm < 10 ? 1 : 0) })} </b>}
             {t('coveredNote')}
           </Note>
-          <Options verdict={verdict} />
-          <YearStrip results={results} depth={depth} />
-          <FieldSim results={results} depth={depth} />
-          <FieldCalendar results={results} depth={depth} />
-          <WhatIf verdict={verdict} locationId={location.id} />
         </>
-      )}
+      ),
+    },
+    { id: 'options', key: 'secOptions', icon: Columns3, body: irrigatedOnly(<Options verdict={verdict} />) },
+    { id: 'climates', key: 'secClimates', icon: ChartScatter, body: irrigatedOnly(<YearStrip results={results} depth={depth} />) },
+    { id: 'twoYears', key: 'secTwoYears', icon: CirclePlay, body: irrigatedOnly(<FieldSim results={results} depth={depth} />) },
+    { id: 'calendar', key: 'secCalendar', icon: CalendarRange, body: irrigatedOnly(<FieldCalendar results={results} depth={depth} />) },
+    { id: 'whatIf', key: 'secWhatIf', icon: CloudSun, body: irrigatedOnly(<WhatIf verdict={verdict} locationId={location.id} />) },
+    // Terrain and runoff matter for every field, irrigated or not.
+    { id: 'terrain', key: 'secTerrain', icon: Mountain, body: <FieldTerrain /> },
+    { id: 'now', key: 'secNow', icon: Gauge, body: <RightNow smap={smap} location={location} /> },
+    {
+      id: 'fertilizer', key: 'secFertilizer', icon: Sprout,
+      body: <>{irrigated && <Note tone="info">{t('fertIrrigatedNote')}</Note>}<Fertilizer results={results} rotationId={recId} /></>,
+    },
+    { id: 'sowing', key: 'secSowing', icon: Shovel, body: <Sowing rotationId={recId} /> },
+    { id: 'greenness', key: 'secGreenness', icon: Leaf, body: isPilot ? null : <Greenness /> },
+    { id: 'ai', key: 'secAi', icon: Sparkles, body: agent?.guards.passed && agent.report ? <AgentCard agent={agent} /> : null },
+    { id: 'details', key: 'secDetails', icon: BookOpen, body: <Details verdict={verdict} results={results} /> },
+  ].filter((x): x is Section => x.body !== null) as Section[];
 
-      {/* Terrain and runoff matter for every field, irrigated or not. */}
-      <FieldTerrain />
-      <RightNow smap={smap} location={location} />
-      {irrigated && <Note tone="info">{t('fertIrrigatedNote')}</Note>}
-      <Fertilizer results={results} rotationId={recId} />
-      <Sowing rotationId={recId} />
-      {!isPilot && <Greenness />}
-      <AgentCard agent={agent} />
-      <Details verdict={verdict} results={results} />
+  return (
+    // One column the width of the panel: a long word or a row of buttons may not widen the page on a phone.
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
+      <header className="grid">
+        <p className="flex items-start gap-1.5 text-[15px] font-bold leading-snug text-muted md:text-base">
+          <MapPin size={18} aria-hidden="true" className="mt-0.5 shrink-0" /> <span>{t('resFor', { name: `${location.name}, ${location.province}`, depth: depthLabel })}</span>
+        </p>
+        <div className="flex flex-wrap gap-x-4">
+          <button type="button" onClick={() => { setQuestion(0); go('questions'); }} className="flex min-h-11 items-center gap-1.5 text-[15px] font-bold text-primary md:text-base"><Pencil size={16} /> {t('editAnswers')}</button>
+          <button type="button" onClick={() => { reset(); go('find'); }} className="flex min-h-11 items-center gap-1.5 text-[15px] font-bold text-primary md:text-base"><MapPin size={16} /> {t('newField')}</button>
+        </div>
+      </header>
+      <Sections sections={sections} />
+    </div>
+  );
+}
+
+type SectionKey = 'secSummary' | 'secOptions' | 'secClimates' | 'secTwoYears' | 'secCalendar' | 'secWhatIf' | 'secTerrain'
+  | 'secNow' | 'secFertilizer' | 'secSowing' | 'secGreenness' | 'secAi' | 'secDetails';
+interface Section { id: string; key: SectionKey; icon: typeof Star; body: ReactNode }
+
+/**
+ * The result as a menu: one subject at a time instead of one long page. A list
+ * on the left of a wide window, a row of chips on a phone; each subject ends
+ * with a button to the next one, so it can still be read in order.
+ */
+function Sections({ sections }: { sections: Section[] }) {
+  const { t } = useT();
+  const [active, setActive] = useState(sections[0].id);
+  const nav = useRef<HTMLElement>(null);
+  const i = Math.max(0, sections.findIndex((s) => s.id === active));
+  const current = sections[i];
+  const next = sections[i + 1];
+
+  const open = (id: string) => {
+    setActive(id);
+    nav.current?.parentElement?.closest('.thin-scroll')?.scrollTo({ top: 0 });
+    // keep the chosen chip in view on a phone
+    nav.current?.querySelector(`[data-sec="${id}"]`)?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  };
+
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start md:gap-6">
+      <nav ref={nav} aria-label={t('secMenu')}
+        className="sticky top-0 z-10 -mx-4 flex gap-2 overflow-x-auto bg-paper px-4 py-2 [scrollbar-width:none] md:mx-0 md:grid md:max-h-[calc(100dvh-15rem)] md:gap-0.5 md:overflow-y-auto md:p-0">
+        {sections.map((s) => {
+          const Icon = s.icon;
+          const on = s.id === current.id;
+          return (
+            <button key={s.id} type="button" data-sec={s.id} onClick={() => open(s.id)} aria-current={on ? 'page' : undefined}
+              className={cn('flex min-h-11 shrink-0 items-center gap-2 rounded-2xl px-3.5 text-left text-[15px] font-bold transition md:min-h-10 md:w-full md:py-1.5',
+                on ? 'bg-primary text-white' : 'bg-canvas text-ink hover:bg-primary-soft md:bg-transparent')}>
+              <Icon size={18} aria-hidden="true" className={on ? 'text-gold' : 'text-primary'} />
+              <span className="whitespace-nowrap md:whitespace-normal">{t(s.key)}</span>
+            </button>
+          );
+        })}
+      </nav>
+      <div key={current.id} className="grid max-w-3xl animate-fade gap-5">
+        {current.body}
+        {next && (
+          <Button variant="primary" size="lg" onClick={() => open(next.id)} className="w-full md:w-auto md:justify-self-end" icon={<ChevronRight size={22} />}>
+            {t('secNext', { s: t(next.key) })}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
