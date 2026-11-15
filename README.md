@@ -29,24 +29,29 @@ It is **not** a yield forecast for one field, a price forecast or a fertiliser a
 |---|---|
 | Engine (FAO-56 ET₀, two-layer dual-Kc water balance, yield ratio, soil indicators) | done, 13 districts |
 | Real data in `web/public/data/` (`mock: false`) | done, tag `v0.1` (2 districts), extended to 13 |
-| Validation checks (6) | 2 pass, 3 info, 1 pending (SMAP comparison, waiting for SMAP data) |
+| Validation checks (6) | 2 pass, 4 info (soil-wetness check now uses NASA MERRA-2) |
 | Decision module (`web/src/lib/economics.ts`: score, guardrails, recommendation) | done, unit-tested |
 | Reference yields, prices, supports (internal parameters), validation references | sourced (`docs/SOURCES.md`) |
 | Production costs | not used (team decision 14 Nov: no money shown; costs not sourced) |
-| NASA SMAP soil wetness | requested from AppEEARS, not yet in the data (`available: false`) |
+| NASA soil wetness | **NASA MERRA-2** root-zone wetness (via POWER) in the soil-wetness panel and check; SMAP L4 was never delivered by AppEEARS and was dropped (15 Nov) |
+| NASA MODIS NDVI | done: crop-calendar check, and it found **9 of 13 points on irrigated fields**; they were moved to rainfed cropland (WorldCover + NDVI) |
+| POWER precipitation | **station-corrected** (linear scaling to the WMO 1991–2020 normal); raw POWER stays in the precipitation check |
+| AI district commentary | engine side done (local free model via Ollama, every number checked against the data); reports pending the model download |
+| CI | GitHub Actions: engine tests, web tests, web and map builds |
 | Climate sensitivity scenarios (drier / warmer, E2) | done: 5 scenarios × 13 districts in `results/{loc}__{scenario}.json` |
 | NASA GPM IMERG precipitation (second satellite estimate) | done, shown in the precipitation check |
-| Web site (React) | not started yet |
+| Web site (React) | in progress (`web/`); the 3D map (`map/`) has the decision panel, scenarios, evidence and soil wetness |
 
 ---
 
 ## How it works
 
 ```
-NASA POWER (daily weather, 2000→) ─┐
-SoilGrids 2.0 (soil, 250 m) ───────┼─► engine/ (Python, offline) ─► web/public/data/*.json ─► web/ (static React site)
-engine/config/*.yaml (crops, soil, ┘     FAO-56 water balance,          contract: docs/contract/     decision in the browser
- locations, prices, references)          yield ratio Ya/Ym                                         (priority sliders)
+NASA POWER (daily weather, 2000→, station-corrected rain) ─┐
+NASA GPM IMERG · NASA MERRA-2 · NASA MODIS NDVI (checks) ───┤
+SoilGrids 2.0 (soil, 250 m) · ESA WorldCover (points) ──────┼─► engine/ (Python, offline) ─► web/public/data/*.json ─► web/ + map/
+engine/config/*.yaml (crops, soil, locations, prices, refs) ┘     FAO-56 water balance,          contract: docs/contract/   decision in the browser
+                                                                  yield ratio Ya/Ym, checks      (+ agent/*.json AI notes)   (priority sliders)
 ```
 
 - The Python engine computes **physical results only** (water, ET, yield ratio 0–1). It runs once and writes JSON.
@@ -75,10 +80,12 @@ pip install -e "./engine[dev]"
 
 | Command | What it does |
 |---|---|
-| `make test` | pytest (engine) + vitest (web, once `web/package.json` exists) |
-| `make data` | builds the real JSON from the cached NASA POWER and SoilGrids data |
+| `make test` | pytest (engine) + vitest (web) + map build |
+| `make data` | builds the real JSON from the cached data, one process per district (~1.5 min) |
+| `make merra2` / `make ndvi` | refresh NASA MERRA-2 soil wetness / MODIS NDVI caches (no login; NDVI is slow) |
+| `make agent` | AI district commentary with a local free model (`ollama pull qwen2.5:14b` once) |
 | `make mock` | builds fake JSON in the same format (for UI work; do not commit) |
-| `make web` | builds the web site |
+| `make web` / `make map` | builds the web site / the 3D map |
 
 Without `make` (e.g. Windows without `winget install ezwinports.make`):
 
@@ -90,7 +97,9 @@ python -m nobetsu.build --mock --out ../web/public/data   # make mock
 python -m nobetsu.power                               # fetch NASA POWER for locations without a cache
 python -m nobetsu.imerg                               # fetch NASA GPM IMERG monthly precipitation (no login needed)
 python -m nobetsu.soilgrids                           # pull SoilGrids for all locations
-python -m nobetsu.smap ../data/smap/<appeears>.csv    # turn the AppEEARS SMAP CSV into data/smap/{loc}.json, then make data
+python -m nobetsu.merra2                              # NASA MERRA-2 soil wetness → data/merra2 + data/smap (soil-wetness slot)
+python -m nobetsu.modis                               # NASA MODIS NDVI (ORNL API, slow, resumable)
+python -m nobetsu.agent                               # AI district commentary (Ollama, local)
 ```
 
 Raw downloads are cached in `data/` and committed, so `make data` needs no network.
@@ -98,7 +107,7 @@ Raw downloads are cached in `data/` and committed, so `make data` needs no netwo
 ### Add a district
 
 1. Add a point to `engine/config/locations.yaml` (id, name, district, province, lat, lon, note).
-2. `python -m nobetsu.power` and `python -m nobetsu.soilgrids`.
+2. `python -m nobetsu.power`, `python -m nobetsu.soilgrids`, `python -m nobetsu.imerg`, `python -m nobetsu.merra2`, `python -m nobetsu.modis`; check with NDVI that the point is not irrigated (summer-green).
 3. Add its WMO 1991–2020 precipitation normal to `engine/config/references.yaml` and a block to `engine/config/defaults.yaml`.
 4. `make data && make test`.
 
@@ -109,12 +118,13 @@ Raw downloads are cached in `data/` and committed, so `make data` needs no netwo
 ```
 engine/
   config/        locations, crops, soil, rotations (texts), defaults (decision parameters), references (validation)
-  nobetsu/       power, soilgrids, imerg, smap, et0, waterbalance, rotations, yieldmodel, indicators, runner, validate, export, build, mock
+  nobetsu/       power, soilgrids, imerg, merra2, modis, et0, waterbalance, rotations, yieldmodel, indicators, runner, validate,
+                 export, build, mock, agent, agent_tools
   tests/         pytest
 web/
   public/data/   generated JSON (the contract)
   src/lib/       types.ts (contract types), economics.ts (+ tests)
-data/            cached NASA POWER, SoilGrids, IMERG, SMAP request files
+data/            cached NASA POWER, SoilGrids, IMERG, MERRA-2, MODIS NDVI (data/smap/ = soil-wetness slot, MERRA-2)
 map/             3D map of the districts (separate Vite app)
 docs/            PLAN_MVP.md, ARAYUZLER.md (interfaces), contract/*.schema.json, SOURCES.md, AI_USE.md
 ```
@@ -126,11 +136,12 @@ docs/            PLAN_MVP.md, ARAYUZLER.md (interfaces), contract/*.schema.json,
 | Data | Use | Access |
 |---|---|---|
 | **NASA POWER** daily (PRECTOTCORR, T2M_MAX/MIN, T2MDEW, RH2M, WS2M, WS2M_MAX, ALLSKY_SFC_SW_DWN), community AG | weather for the engine, 2000-01-01 → 2026-11-09 | [power.larc.nasa.gov](https://power.larc.nasa.gov/) API |
-| **NASA SMAP L4** `SPL4SMGP.008` (root-zone and surface wetness, 9 km) | regional soil wetness panel | AppEEARS point request (`data/smap/appeears_request.json`) |
+| **NASA MERRA-2** soil wetness (GWETROOT, GWETTOP), ~0.5° | regional soil-wetness panel; check of the model's soil water timing | NASA POWER monthly API (source MERRA-2), no login |
+| **NASA MODIS** Terra MOD13Q1 v061 NDVI, 250 m, 16-day | crop-calendar check; detecting irrigated points | [ORNL DAAC Land Product Subsets API](https://modis.ornl.gov/data/modis_webservice.html), no login |
 | **SoilGrids 2.0** (ISRIC), 250 m | soil card, texture class, coarse fragments | WCS |
 | **NASA GPM IMERG** Final monthly V07 (0.1°) | second satellite precipitation estimate in the precipitation check | NSF NCAR GDEX mirror (d736000) |
 | **WMO Climate Normals 1991–2020** (Turkish State Meteorological Service stations) | check of POWER precipitation | [NOAA NCEI archive](https://www.nodc.noaa.gov/archive/arc0216/0253808/2.2/data/0-data/Region-6-WMO-Normals-9120/Turkiye/CSV/) |
-| **ESA WorldCover 2021** (10 m) | check that each point lies on cropland | AWS open data |
+| **ESA WorldCover 2021** (10 m) | point selection: ≥ 60 % cropland within 300 m (with NDVI: not irrigated) | AWS open data (COG) |
 | FAO-56 (Allen et al. 1998), FAO-33 | method and crop/soil parameters | [fao.org/4/x0490e](https://www.fao.org/4/x0490e/x0490e00.htm) |
 | Gültekin et al. 2017, KSÜ Doğa Bil. Derg. 20: 283–287 | Konya dryland trial (wheat after fallow / lentil / chickpea) | [doi:10.18016/ksudobil.349258](https://doi.org/10.18016/ksudobil.349258) |
 | TEPGE/TÜİK national yields, TMO 2026 prices, 2026 supports | internal decision parameters (never displayed) | see `docs/SOURCES.md` |
@@ -145,23 +156,26 @@ Every value, its link and access date are listed in `docs/SOURCES.md`; the YAML 
 |---|---|
 | Mass balance, all sequences | pass (< 0.01 mm) |
 | ET₀ vs FAO-56 Example 18 | pass (±0.1 mm/day) |
-| Fallow storage efficiency vs Central Anatolian literature (11–29 %) | info: model 8–23 % |
-| Wheat yield after chickpea / lentil relative to after fallow vs the Konya trial (0.80 / 0.87) | info: model 0.89 / 0.90 at Karapınar |
+| Fallow storage efficiency vs Central Anatolian literature (11–29 %) | info: model 8–17 % in 12 districts; Karaman 30 % (station correction halves its rain while the soil store stays near full) |
+| Wheat yield after chickpea / lentil relative to after fallow vs the Konya trial (0.80 / 0.87) | info: model 0.85 / 0.86 at Karapınar (0.89 / 0.90 before the precipitation correction) |
 | NASA POWER and NASA GPM IMERG annual precipitation vs WMO station normal | info: see below |
-| NASA SMAP root-zone wetness vs model soil-water fullness (monthly anomalies) | pending until SMAP data arrives |
+| NASA MERRA-2 root-zone wetness vs model soil-water fullness | info: seasonal ρ 0.87–0.96, monthly anomaly ρ 0.30–0.60 (not independent: POWER weather is also MERRA-2) |
+| NASA MODIS NDVI vs model crop calendar | engine function ready (`validate.check_ndvi_calendar`), not yet a contract check |
 
 ---
 
 ## Assumptions and limitations
 
 - **Results describe a typical field in the district** under 24 past climates, not a measured field.
-- **NASA POWER is ~50 km, model/satellite-based.** Its precipitation differs from the nearest station by −14 % to +13 % in 10 districts, but by **+36 % (Karapınar), +39 % (Eskişehir) and +83 % (Karaman)**. Water results in those three districts are likely optimistic. A station correction is planned.
-- **One crop calendar** (Konya) is used for all districts so far; colder districts (Sivas, Yozgat, Çankırı, Kayseri) may sow and harvest at other dates.
+- **NASA POWER is ~50 km, model/satellite-based.** Its precipitation differs from the nearest station by −14 % to +13 % in 10 districts, but by +36 % (Karapınar), +39 % (Eskişehir) and +83 % (Karaman). The engine therefore **scales daily POWER rain to the station normal** (factor 0.55–1.16); the normal covers 1991–2020, POWER 2000 onward. NASA GPM IMERG was tested as an alternative and was further from the stations on average (~29 % vs ~18 %).
+- **One crop calendar** (Konya) is used for all districts: no sourced calendar was found for Sivas, Yozgat or Çankırı dryland wheat, and MODIS NDVI shows no clear elevation trend in green-up or dry-down.
+- **Points:** each district is one point (rainfed cropland, checked with WorldCover and NDVI), not a field. The weather cell (~50 km) is shared by the district.
+- **AI commentary** is generated from the site's own data by a local model; every number in it must match the data or the report is not shown. It does not replace the farmer or local experts.
 - No runoff, snow, capillary rise, stubble mulch or irrigation in the water balance.
 - The wind-exposure index is a **count of windy, dry, bare days**, not a measured soil loss.
 - **Nitrogen fixation** is shown as a trait only; no kg N/da is estimated (needs a soil test).
 - Phosphorus, potassium, micronutrients and compaction cannot be estimated from satellites; the site says so.
-- ESA WorldCover does not separate irrigated from rainfed cropland.
+- ESA WorldCover does not separate irrigated from rainfed cropland; NDVI (never green in summer) is used for that.
 - **Earnings are an internal estimate** from national reference yields, 2026 prices and supports; production costs are not included. The chickpea price (one exchange, Feb 2026) is the least certain parameter and pushes several districts towards chickpea.
 - Supports are national 2026 amounts (basic + planned production); conditional extras are not included.
 
