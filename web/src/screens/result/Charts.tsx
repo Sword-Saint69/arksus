@@ -37,7 +37,7 @@ export function FieldCalendar({ results, depth }: { results: ResultsFile; depth:
     <Card className="grid gap-2">
       <SectionTitle sub={t('calSub', { n: nYears })} badge={<DataBadge type="model" />}>{t('calTitle')}</SectionTitle>
       <figure className="m-0">
-        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={t('calTitle')}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full max-w-[34rem]" role="img" aria-label={t('calTitle')}>
           <text x={(x(0) + x(12)) / 2} y={11} textAnchor="middle" fontSize="11.5" fontWeight="700" fill="#16241c">{t('year1')}</text>
           <text x={(x(12) + x(24)) / 2} y={11} textAnchor="middle" fontSize="11.5" fontWeight="700" fill="#16241c">{t('year2')}</text>
           <line x1={x(12) - 0.5} x2={x(12) - 0.5} y1={2} y2={H} stroke="#16241c" strokeOpacity="0.25" strokeDasharray="2 3" />
@@ -114,7 +114,7 @@ export function YearStrip({ results, depth }: { results: ResultsFile; depth: Dep
     <Card className="grid gap-2">
       <SectionTitle sub={t('yrSub', { n: nYears })} badge={<DataBadge type="model" />}>{t('yrTitle')}</SectionTitle>
       <figure className="m-0">
-        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={t('yrTitle')}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full max-w-[34rem]" role="img" aria-label={t('yrTitle')}>
           {ticks.map((v) => (
             <g key={v}>
               <line x1={x(v)} x2={x(v)} y1={top} y2={H - 20} stroke="#dcd7c6" strokeWidth="1" />
