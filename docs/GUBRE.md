@@ -122,3 +122,23 @@ const plan: FertPlan = recommend(fert, {
 - Sayı ya da kural değişikliği: `engine/config/fertilizer.yaml` (Gümüş). Ardından `cd engine && python -m nobetsu.build --out ../web/public/data` ya da sadece export.
 - Testler: `engine/tests/test_fertilizer.py` (YAML bütünlüğü, TAGEM spot değerleri, para ve yasak kelime yok) ve `web/src/lib/fertilizer.test.ts` (elle hesaplanmış planlar).
 - Yeni ürün eklemek için kod yazılmaz; YAML'a yeni bir `crops.<id>` girilir. Yalnız ürün `FertCropId` tipine ve şemanın `crops` listesine de eklenmeli (sözleşme değişikliği, Gümüş).
+
+## 9. Nasıl ekilir (15 Kas)
+
+Gübre kartının altında ikinci bir kart: **ne zaman, dekara ne kadar tohum, ne derine, hangi sıra aralığıyla**. Kurallar `engine/config/sowing.yaml` → `web/public/data/sowing.json`, hesap `web/src/lib/sowing.ts` (`sowingPlan`, `seedKgPerDa`, `windowStatus`), kart `web/src/screens/result/Sowing.tsx`. Araştırma: `reports/İç Anadolu gübre ekim toprak sağlığı.md`.
+
+| Ne | Kural | Kaynak (rozet) |
+|---|---|---|
+| Ekim penceresi | Buğday kuru 15 Eylül–10 Ekim, sulu 1–10 Ekim; arpa 21 Eylül–19 Ekim; kışlık mercimek Ekim; yazlık mercimek "Şubat sonu–Mart başı"; nohut "ilkbaharda tarlaya girilebilen ilk günler, son dondan 7–10 gün önce" (kaynağın tarih vermediği yerde tarih uydurulmaz, kaynağın sözü yazılır) | TİGEM Bölüm 4 (literature ✓), GKGM Yemeklik Baklagil (official ✓) |
+| İl penceresi yok | Konya dışındaki ilçelerde "Orta Anadolu/Konya penceresi en yakın kaynaklı değer" notu; Gemerek, Boğazlıyan ve Develi'de "soğuk ilçe: pencerenin başına kayar" (sayı yok) | assumption |
+| Tohum/m² | Ekmeklik çok kardeşlenen 500–550, az kardeşlenen 550–600, makarnalık 550–600, kışlık arpa 450–550, kışlık mercimek 300–350, nohut 100 bitki/m² | TİGEM, Adak 1999, GKGM |
+| Aralıkta hangi nokta | İyi tohum yatağı ve zamanında ekim → alt sınır; geç ekim ya da kötü yatak → üst sınır; aksi halde orta (TİGEM'in kuralı) | TİGEM |
+| kg/da | **Formül:** tohum/m² × bin tane ağırlığı (g) × 10 ÷ (saflık % × çimlenme %), çiftçinin etiket değerleriyle (rozet `user`). Kaynağın kg/da aralığı da yanında: ekmeklik 18–19, makarnalık 20–21, arpa 20–22; serpme ekimde ya da kötü yatakta +3–5; kışlık mercimekte kış zararı payı +1–2 | TİGEM, GKGM |
+| Derinlik | Tahıl 4–6 cm (kuru toprakta en az 5–6, 8 cm'den derin ekim riskli), yazlık arpa 3–4, mercimek 4–5, nohut 5–6 | TİGEM, GKGM |
+| Sıra arası | Tahıl 15–20 cm (**doğrulanmadı**); mercimek 15–20, yıllık yağış normali 350 mm'nin altındaysa 30 cm (ilçenin MGM/WMO normali, `sowing.json → annual_precip_mm`); nohut 45 (makineli çapa) ya da 30–35 (el çapası) | GKGM; tahıl yalnız arama özeti |
+| Uyarılar | Kuru toprakta derin örtme (ala tav), geç ekimde derinliği artırmama, gübre tohumla aynı bantta ise ayrı bant ya da ekimden önce serpip karıştırma (Konya'da +%14–23), çiftçinin 30 kg/da'ya çıkmasının nedeni, kışa 1–3 kardeşle girme, ilaçlı ve sertifikalı tohum, yazlık arpada %83'e kadar kayıp, nohutta ot ve aşılama | TİGEM, GKGM |
+
+Kaynaklardaki iki hata koda yansıtılmadı:
+- TİGEM'in Gerek-79 örneği "20 kg/da" yazıyor, formül **21,4** veriyor (kalite düzeltmesi atlanmış). Site kendisi hesaplıyor; `sowing.test.ts` 21,4'ü kontrol ediyor.
+- GKGM nohut kitapçığındaki 8–10 kg/da ile 100 bitki/m² hedefi iri taneli nohutta birlikte tutmuyor. Kart ikisini de gösteriyor ve "kaynak içi tutarsızlık" uyarısı veriyor; bin tane ağırlığı girilirse hedefe göre hesaplıyor.
+
