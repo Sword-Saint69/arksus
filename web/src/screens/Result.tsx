@@ -18,6 +18,7 @@ import { WhatIf } from './result/WhatIf';
 import { FieldSim } from './result/FieldSim';
 import { RightNow } from './result/RightNow';
 import { Fertilizer } from './result/Fertilizer';
+import { Sowing } from './result/Sowing';
 import { AgentCard, Details } from './result/Details';
 import { Greenness } from './result/Greenness';
 
@@ -101,6 +102,7 @@ export function Result() {
       <RightNow smap={smap} location={location} />
       {irrigated && <Note tone="info">{t('fertIrrigatedNote')}</Note>}
       <Fertilizer results={results} rotationId={recId} />
+      <Sowing rotationId={recId} />
       {!isPilot && <Greenness />}
       <AgentCard agent={agent} />
       <Details verdict={verdict} results={results} />

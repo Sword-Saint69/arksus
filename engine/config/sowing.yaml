@@ -1,0 +1,304 @@
+# Owner: Gümüş (Rol B). "Nasıl ekilir" rules for the browser (web/src/lib/sowing.ts). docs/GUBRE.md §9.
+# Exported as web/public/data/sowing.json (keys starting with "_" are dropped; annual precipitation per
+# district is copied from references.yaml → mgm_annual_precip_mm).
+# Source research: reports/İç Anadolu gübre ekim toprak sağlığı.md (15 Nov 2026), notes sowing_practices.md.
+# Every number is a range object R (min, max, unit, source, source_url, type, verified); verified: true only
+# where the number was read on the source page. No money. No crop-specific code: a crop differs only by its entry.
+#
+# Seed rate (TİGEM): kg/da = seeds per m² × thousand-kernel weight (g) × 10 ÷ (purity % × germination %).
+# TİGEM's own worked example (Gerek-79: 525 seeds/m², 38 g, 98 %, 95 %) prints "20 kg/da"; the formula gives
+# 21.4 — the printed value skips the quality correction (525 × 38 / 1000 = 19.95). The site computes, it does
+# not copy (web/src/lib/sowing.test.ts checks 21.4).
+
+_sources:
+  tigem: &tigem
+    source: "TİGEM, Buğday ve Arpa Tarımı, Bölüm 4 'Buğday ve Arpa Ekimi' (Orta Anadolu araştırmalarının özeti: Keklikçi vd. 1991, Topal 1997, Yılmaz vd. 1993, Sade vd. 1995, Marakoğlu 2000)"
+    source_url: "https://todab.org.tr/files/BUGDAY%20VE%20ARPA%20TARIMI/B%C3%B6l%C3%BCm-4.pdf"
+    type: literature
+    verified: true
+  gkgm: &gkgm
+    source: "T.C. Tarım Bakanlığı GKGM, 'Yemeklik Baklagil' üretici kitapçığı (mercimek ve nohut: ekim, tohum, sıra arası, derinlik)"
+    source_url: "https://www.tarimorman.gov.tr/GKGM/Belgeler/Uretici_Bilgi_Kosesi/Dokumanlar/yemeklik_baklagil.pdf"
+    type: official
+    verified: true
+  adak: &adak
+    source: "Adak M.S. 1999, Tarla Bitkileri Merkez Araştırma Enstitüsü Dergisi 8(1-2), Haymana denemesi: kışlık mercimek 300–350 tohum/m² ile ekildi"
+    source_url: "https://dergipark.org.tr/tr/download/article-file/118589"
+    type: literature
+    verified: true
+  gultekin: &gultekin
+    source: "Gültekin vd. 2017, KSÜ Doğa Bil. Derg. 20 (Özel Sayı): 283–287 — Konya kuru koşul: Ekim'den sonraki ekim verimi düşürür (Topal 1993 atfı)"
+    source_url: "https://dergipark.org.tr/en/download/article-file/390551"
+    type: literature
+    verified: true
+  unverified_rows: &rows_unverified
+    source: "Bölge denemeleri 20 cm sıra arası kullanıyor (Taner 2022); mibzerler genelde 15–20 cm'ye ayarlı (Ankara Üniv. ders notu) — yalnızca arama özetinde görüldü"
+    source_url: "https://dergipark.org.tr/tr/download/article-file/2555787"
+    type: literature
+    verified: false
+
+seed_formula:
+  <<: *tigem
+  source: "TİGEM Bölüm 4: tohum (kg/da) = tohum/m² × bin tane ağırlığı (g) × 10 ÷ (saflık % × biyolojik değer %); bin tane ağırlığı 4 × 100 tane tartılıp ortalaması × 10"
+
+# Districts with no sourced province sowing window: the Central Anatolia / Konya window is shown as the
+# nearest sourced value. Cold, high districts: the shift to earlier sowing is said in words only (no number).
+nearest_window_note:
+  text:
+    tr: "İl düzeyinde resmi ekim penceresi bulunamadı; Orta Anadolu/Konya penceresi en yakın kaynaklı değer olarak gösteriliyor."
+    en: "No official province sowing window was found; the Central Anatolia/Konya window is shown as the nearest sourced value."
+  districts: [develi, polatli, eskisehir, gemerek, bogazliyan, kaman, kirikkale, cankiri, nevsehir, nigde]
+  type: assumption
+  verified: false
+  source: "Araştırma: Sivas-Gemerek, Yozgat-Boğazlıyan, Kayseri, Eskişehir ve Ankara için il penceresi bulunamadı (reports/İç Anadolu gübre ekim toprak sağlığı.md)"
+cold_districts:
+  ids: [gemerek, bogazliyan, develi]
+  text:
+    tr: "Yüksek ve soğuk ilçelerde kış erken bastırır; ekim pencerenin başına doğru kayar. Bunun için kaynaklı bir tarih yok, yerel ziraat mühendisine danışın."
+    en: "High, cold districts get winter earlier, so sowing moves towards the start of the window. There is no sourced date for this; ask a local agronomist."
+  type: assumption
+  verified: false
+  source: "Proje kabulü: ilçe rakımı (POWER) 1150 m üzeri ve iklim; sayı verilmez"
+
+crops:
+  wheat:
+    label: { tr: "Buğday", en: "Wheat" }
+    types:
+      - id: bread_high_tiller
+        label: { tr: "Ekmeklik, çok kardeşlenen (ör. Gerek-79)", en: "Bread wheat, high-tillering (e.g. Gerek-79)" }
+        season: autumn
+        window:
+          rainfed:   { from: "09-15", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: Orta Anadolu ve Konya kuru ekim 15 Eylül–10 Ekim (Keklikçi vd. 1991, Topal 1997)" }
+          limited:   { from: "09-15", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: kuru ekim penceresi (kısıtlı sulu için ayrı pencere yok)" }
+          irrigated: { from: "10-01", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: Konya sulu buğday 1–10 Ekim (Yılmaz vd. 1993)" }
+        seeds_per_m2: { min: 500, max: 550, unit: "çimlenebilir tohum/m²", <<: *tigem }
+        guide_kg_per_da: { min: 18, max: 19, unit: kg/da, <<: *tigem, source: "TİGEM Bölüm 4: yarı kurak (300–400 mm), iyi tohum yatağı, ekmeklik buğday 18–19 kg/da" }
+        depth_cm: { min: 4, max: 6, unit: cm, <<: *tigem }
+      - id: bread_normal
+        label: { tr: "Ekmeklik, normal ya da az kardeşlenen (ör. Bezostaja)", en: "Bread wheat, normal or low-tillering (e.g. Bezostaja)" }
+        season: autumn
+        window:
+          rainfed:   { from: "09-15", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: Orta Anadolu ve Konya kuru ekim 15 Eylül–10 Ekim" }
+          limited:   { from: "09-15", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: kuru ekim penceresi (kısıtlı sulu için ayrı pencere yok)" }
+          irrigated: { from: "10-01", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: Konya sulu buğday 1–10 Ekim" }
+        seeds_per_m2: { min: 550, max: 600, unit: "çimlenebilir tohum/m²", <<: *tigem }
+        guide_kg_per_da: { min: 18, max: 19, unit: kg/da, <<: *tigem, source: "TİGEM Bölüm 4: yarı kurak, iyi tohum yatağı, ekmeklik 18–19 kg/da" }
+        depth_cm: { min: 4, max: 6, unit: cm, <<: *tigem }
+      - id: durum
+        label: { tr: "Makarnalık", en: "Durum wheat" }
+        season: autumn
+        window:
+          rainfed:   { from: "09-15", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: Orta Anadolu ve Konya kuru ekim 15 Eylül–10 Ekim" }
+          limited:   { from: "09-15", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: kuru ekim penceresi" }
+          irrigated: { from: "10-01", to: "10-10", <<: *tigem, source: "TİGEM Bölüm 4: Konya sulu buğday 1–10 Ekim" }
+        seeds_per_m2: { min: 550, max: 600, unit: "çimlenebilir tohum/m²", <<: *tigem }
+        guide_kg_per_da: { min: 20, max: 21, unit: kg/da, <<: *tigem, source: "TİGEM Bölüm 4: yarı kurak, iyi tohum yatağı, makarnalık 20–21 kg/da" }
+        depth_cm: { min: 4, max: 6, unit: cm, <<: *tigem }
+    rows:
+      - { min: 15, max: 20, unit: cm, label: { tr: "Mibzer sıra arası", en: "Drill row spacing" }, <<: *rows_unverified }
+    extra_kg_per_da:
+      - when: { drill: { eq: broadcast } }
+        min: 3
+        max: 5
+        unit: kg/da
+        label: { tr: "serpme ekim", en: "broadcast sowing" }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: kötü tohum yatağı, serpme ekim ya da düşük tohum kalitesinde +3–5 kg/da"
+      - when: { seedbed: { eq: poor } }
+        min: 3
+        max: 5
+        unit: kg/da
+        label: { tr: "kötü tohum yatağı", en: "poor seedbed" }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: kötü tohum yatağında +3–5 kg/da"
+    advice:
+      - id: cereal_dry_depth
+        when: { soil: { eq: dry } }
+        text: { tr: "Toprak kuruysa tohumu en az 5–6 cm toprakla örtün. Sığ ekilirse yalnız yüzeyi ıslatan hafif bir yağış çimlenmeyi başlatır, ardından gelen kuraklık fideyi öldürür (ala tav).", en: "If the soil is dry, cover the seed with at least 5–6 cm of soil. Sown shallow, a light rain that wets only the surface starts germination and the dry spell after it kills the seedlings." }
+        <<: *tigem
+      - id: cereal_late
+        when: { late: { eq: true } }
+        text: { tr: "Geç ekimde tohumu aralığın üst ucundan atın, derinliği ise artırmayın (normal derinlik). Konya'da Ekim'den sonraki ekim verimi düşürüyor.", en: "When sowing late, use the top of the seed range but do not sow deeper (normal depth). In Konya, sowing after October lowers yield." }
+        <<: *tigem
+      - id: cereal_too_deep
+        text: { tr: "8 cm'den derin ekimde fide çıkamayabilir; yarı bodur çeşitlerde derinliğe ayrıca dikkat edin.", en: "Sown deeper than 8 cm, seedlings may not emerge; take extra care with semi-dwarf varieties." }
+        <<: *tigem
+      - id: cereal_fert_band
+        when: { drill: { eq: same_band } }
+        text: { tr: "Gübre tohumla aynı banda düşüyor: kuru toprakta gübre tohumdan su çeker ve fideyi öldürebilir. Konya'da gübreyi ayrı banda bırakan mibzer, karışık atıma göre verimi kurak yıllarda %14–23 artırdı. Ayrı bantlı mibzer yoksa ve toprak kuruysa gübreyi ekimden önce serpip toprağa karıştırın.", en: "The fertilizer falls in the same band as the seed: in dry soil it draws water from the seed and can kill seedlings. In Konya a drill that keeps fertilizer in a separate band raised yield 14–23 % over mixed placement in dry years. Without such a drill and with dry soil, spread the fertilizer before sowing and work it in." }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: Sade vd. 1995 (Konya kuru koşul, Gerek-79: ayrı bant 303, serpip karıştırma 291, karışık 289 kg/da; üstünlük %14–23) ve Sade 2001 (kuru yatakta önceden serpip karıştırma)"
+      - id: cereal_farmer_practice
+        text: { tr: "Bölgede çiftçi dekara 30 kg'a kadar tohum atıyor; araştırma 18–22 kg/da diyor. Fark büyük ölçüde gübrenin tohumla aynı banda düşüp fide öldürmesinden: gübre ayrı banda giderse tohum azalabilir.", en: "Farmers in the region sow up to 30 kg/da; research says 18–22 kg/da. The gap comes largely from fertilizer in the seed band killing seedlings: with fertilizer in a separate band, less seed is needed." }
+        <<: *tigem
+      - id: cereal_winter_stage
+        text: { tr: "Hedef: buğday kışa 1–3 kardeşle (3–4 yaprak) girsin. Çok erken ekim nadasta suyu erken tüketir, hastalık ve zararlıyı artırır; geç ekim kök çürüklüğü ve sürmeyi artırır.", en: "Aim for wheat to enter winter with 1–3 tillers (3–4 leaves). Sowing too early uses the fallow water early and raises pests and diseases; sowing late raises root rot and bunt." }
+        <<: *tigem
+      - id: cereal_seed
+        text: { tr: "Sertifikalı ya da selektörden (2–2,2 mm elek) geçmiş, sürme, rastık ve buğday kara böceğine (Zabrus) karşı ilaçlanmış tohum kullanın.", en: "Use certified seed or seed cleaned over a 2–2.2 mm sieve and treated against bunt, smut and the Zabrus ground beetle." }
+        <<: *tigem
+      - id: cereal_rows_ew
+        text: { tr: "Uygulanabilen yerde sıraları doğu–batı yönünde açın; denemelerde başak ve tane sayısını artırdı.", en: "Where possible run the rows east–west; in trials it raised ear and grain numbers." }
+        <<: *tigem
+      - id: cereal_soil_temp
+        text: { tr: "Tohum yatağı sıcaklığı için TİGEM 5–8 °C diyor; Bolu İl Tarım broşürü 8–10 °C diyor (bu ikincisi doğrulanmadı).", en: "For seedbed temperature TİGEM says 5–8 °C; a Bolu provincial leaflet says 8–10 °C (the second is not verified)." }
+        <<: *tigem
+
+  barley:
+    label: { tr: "Arpa", en: "Barley" }
+    types:
+      - id: winter
+        label: { tr: "Kışlık arpa", en: "Winter barley" }
+        season: autumn
+        window:
+          rainfed:   { from: "09-21", to: "10-19", <<: *tigem, source: "TİGEM Bölüm 4: Orta Anadolu ve Konya kuru arpa ekimi 21 Eylül–19 Ekim" }
+          limited:   { from: "09-21", to: "10-19", <<: *tigem, source: "TİGEM Bölüm 4: kuru ekim penceresi" }
+          irrigated: { from: "09-21", to: "10-19", <<: *tigem, source: "TİGEM Bölüm 4: kuru ekim penceresi (sulu arpa için ayrı pencere yok)" }
+        seeds_per_m2: { min: 450, max: 550, unit: "çimlenebilir tohum/m²", <<: *tigem }
+        guide_kg_per_da: { min: 20, max: 22, unit: kg/da, <<: *tigem, source: "TİGEM Bölüm 4: yarı kurak, iyi tohum yatağı, arpa 20–22 kg/da" }
+        depth_cm: { min: 4, max: 6, unit: cm, <<: *tigem }
+      - id: spring_late
+        label: { tr: "Yazlık arpa (geç, zorunlu kalınırsa)", en: "Spring barley (late, only if forced)" }
+        season: spring
+        window_text: { tr: "İlkbahar; Orta Anadolu'da zorunlu kalınmadıkça önerilmez", en: "Spring; in Central Anatolia not suggested unless forced" }
+        seeds_per_m2: { min: 500, max: 600, unit: "çimlenebilir tohum/m²", <<: *tigem }
+        depth_cm: { min: 3, max: 4, unit: cm, <<: *tigem }
+    rows:
+      - { min: 15, max: 20, unit: cm, label: { tr: "Mibzer sıra arası", en: "Drill row spacing" }, <<: *rows_unverified }
+    extra_kg_per_da:
+      - when: { drill: { eq: broadcast } }
+        min: 3
+        max: 5
+        unit: kg/da
+        label: { tr: "serpme ekim", en: "broadcast sowing" }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: serpme ekimde +3–5 kg/da"
+      - when: { seedbed: { eq: poor } }
+        min: 3
+        max: 5
+        unit: kg/da
+        label: { tr: "kötü tohum yatağı", en: "poor seedbed" }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: kötü tohum yatağında +3–5 kg/da"
+    advice:
+      - id: barley_spring_loss
+        when: { type: { eq: spring_late } }
+        text: { tr: "Orta Anadolu'da yazlık arpa, kışlık ekime göre %83'e kadar verim kaybettirdi; mümkünse sonbaharda ekin.", en: "In Central Anatolia spring barley lost up to 83 % of yield against winter sowing; sow in autumn where you can." }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: Gemalmaz 1997, Orta Anadolu arpa"
+      - id: cereal_dry_depth
+        when: { soil: { eq: dry } }
+        text: { tr: "Toprak kuruysa tohumu en az 5–6 cm toprakla örtün; sığ ekimde hafif yağış çimlendirir, ardından gelen kuraklık fideyi öldürür.", en: "If the soil is dry, cover the seed with at least 5–6 cm of soil; sown shallow, a light rain starts germination and the following dry spell kills the seedlings." }
+        <<: *tigem
+      - id: cereal_late
+        when: { late: { eq: true } }
+        text: { tr: "Geç ekimde tohumu aralığın üst ucundan atın, derinliği artırmayın.", en: "When sowing late, use the top of the seed range and do not sow deeper." }
+        <<: *tigem
+      - id: cereal_fert_band
+        when: { drill: { eq: same_band } }
+        text: { tr: "Gübre tohumla aynı banda düşüyor: kuru toprakta fideyi öldürebilir. Ayrı bantlı mibzer Konya'da verimi kurak yıllarda %14–23 artırdı; yoksa ve toprak kuruysa gübreyi ekimden önce serpip karıştırın.", en: "The fertilizer falls in the seed band and can kill seedlings in dry soil. A separate-band drill raised yield 14–23 % in dry years in Konya; without one and with dry soil, spread and work in the fertilizer before sowing." }
+        <<: *tigem
+        source: "TİGEM Bölüm 4: Sade vd. 1995, Sade 2001"
+      - id: cereal_seed
+        text: { tr: "Sertifikalı ya da selektörden geçmiş, ilaçlı tohum kullanın.", en: "Use certified or cleaned, treated seed." }
+        <<: *tigem
+
+  lentil:
+    label: { tr: "Mercimek", en: "Lentil" }
+    types:
+      - id: winter_large
+        label: { tr: "Kışlık, iri taneli yeşil", en: "Winter, large green" }
+        season: autumn
+        window:
+          rainfed:   { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM Yemeklik Baklagil: kışlık mercimek Orta Anadolu ve Geçit bölgelerinde Ekim ayında ekilir" }
+          limited:   { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM: Ekim ayı" }
+          irrigated: { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM: Ekim ayı" }
+        seeds_per_m2: { min: 300, max: 350, unit: "tohum/m²", <<: *adak }
+        guide_kg_per_da: { min: 14, max: 15, unit: kg/da, <<: *gkgm, source: "GKGM: iri yeşil mercimek kışlık ekimde 14–15 kg/da (mibzerle)" }
+        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
+      - id: winter_small
+        label: { tr: "Kışlık, küçük taneli (kırmızı)", en: "Winter, small-seeded (red)" }
+        season: autumn
+        window:
+          rainfed:   { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM: kışlık mercimek Orta Anadolu'da Ekim ayında" }
+          limited:   { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM: Ekim ayı" }
+          irrigated: { from: "10-01", to: "10-31", <<: *gkgm, source: "GKGM: Ekim ayı" }
+        seeds_per_m2: { min: 300, max: 350, unit: "tohum/m²", <<: *adak }
+        guide_kg_per_da: { min: 8, max: 10, unit: kg/da, <<: *gkgm, source: "GKGM: küçük taneli mercimek kışlık ekimde 8–10 kg/da" }
+        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
+      - id: spring_large
+        label: { tr: "Yazlık, iri taneli yeşil", en: "Spring, large green" }
+        season: spring
+        window_text: { tr: "Şubat sonu–Mart başı", en: "Late February–early March" }
+        guide_kg_per_da: { min: 10, max: 12, unit: kg/da, <<: *gkgm, source: "GKGM: iri yeşil mercimek yazlık ekimde 10–12 kg/da" }
+        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
+      - id: spring_small
+        label: { tr: "Yazlık, küçük taneli (kırmızı)", en: "Spring, small-seeded (red)" }
+        season: spring
+        window_text: { tr: "Şubat sonu–Mart başı", en: "Late February–early March" }
+        guide_kg_per_da: { min: 7, max: 8, unit: kg/da, <<: *gkgm, source: "GKGM: küçük taneli mercimek yazlık ekimde 7–8 kg/da" }
+        depth_cm: { min: 4, max: 5, unit: cm, <<: *gkgm }
+    rows:
+      - { when: { annual_precip_mm: { lt: 350 } }, min: 30, max: 30, unit: cm, label: { tr: "Yıllık yağış 350 mm'nin altında", en: "Annual rain below 350 mm" }, <<: *gkgm, source: "GKGM: yıllık yağışı 350 mm'nin altındaki yerlerde 30 cm sıra arası daha dar sıralardan fazla verim verdi" }
+      - { when: { annual_precip_mm: { gte: 350 } }, min: 15, max: 20, unit: cm, label: { tr: "Mibzer sıra arası", en: "Drill row spacing" }, <<: *gkgm, source: "GKGM: mercimekte sıra arası 15–20 cm" }
+      - { when: { annual_precip_mm: { missing: true } }, min: 15, max: 20, unit: cm, label: { tr: "Mibzer sıra arası (yağış bilinmiyor; 350 mm altında 30 cm)", en: "Drill row spacing (rain unknown; 30 cm below 350 mm)" }, <<: *gkgm, source: "GKGM: 15–20 cm; 350 mm altında 30 cm" }
+    extra_kg_per_da:
+      - when: { season: { eq: autumn } }
+        min: 1
+        max: 2
+        unit: kg/da
+        label: { tr: "Orta Anadolu'da kış zararı payı", en: "winter-kill margin in Central Anatolia" }
+        <<: *gkgm
+        source: "GKGM: Orta Anadolu'da kış zararına karşı tohuma 1–2 kg/da eklenir"
+      - when: { drill: { eq: broadcast } }
+        min: 2
+        max: 2
+        unit: kg/da
+        label: { tr: "serpme ekim (en az)", en: "broadcast sowing (at least)" }
+        <<: *gkgm
+        source: "GKGM: serpme ekimde en az 2 kg/da fazla tohum"
+    advice:
+      - id: lentil_fert
+        text: { tr: "Ekimle dekara 12–14 kg DAP önerilir; ayrıntı gübre planında.", en: "About 12–14 kg/da DAP at sowing is suggested; see the fertilizer plan." }
+        <<: *gkgm
+      - id: legume_inoculate_first
+        text: { tr: "Tarlada daha önce aynı baklagil ekilmediyse tohumu Rhizobium ile aşılayın.", en: "If the same legume was not grown on the field before, inoculate the seed with Rhizobium." }
+        <<: *gkgm
+
+  chickpea:
+    label: { tr: "Nohut", en: "Chickpea" }
+    types:
+      - id: spring
+        label: { tr: "İlkbahar ekimi (antraknoza dayanıklı çeşit)", en: "Spring sowing (Ascochyta-resistant variety)" }
+        season: spring
+        window_text: { tr: "İlkbaharda tarlaya girilebilen ilk günler; son ilkbahar donundan 7–10 gün önce", en: "The first days the field can be entered in spring; 7–10 days before the last spring frost" }
+        plants_per_m2: { min: 100, max: 100, unit: "bitki/m²", <<: *gkgm, source: "GKGM: Orta Anadolu'da optimum 100 bitki/m²" }
+        guide_kg_per_da: { min: 8, max: 10, unit: kg/da, <<: *gkgm, source: "GKGM: mibzerle 8–10 kg/da (iri taneli tiplerde 100 bitki/m² ile tutarsız, bkz. not)" }
+        depth_cm: { min: 5, max: 6, unit: cm, <<: *gkgm }
+    rows:
+      - { min: 45, max: 45, unit: cm, label: { tr: "Makineli çapa", en: "Machine hoeing" }, <<: *gkgm }
+      - { min: 30, max: 35, unit: cm, label: { tr: "El çapası", en: "Hand hoeing" }, <<: *gkgm }
+    extra_kg_per_da:
+      - when: { drill: { eq: broadcast } }
+        min: 2
+        max: 2
+        unit: kg/da
+        label: { tr: "serpme ekim (10–12 kg/da)", en: "broadcast sowing (10–12 kg/da)" }
+        <<: *gkgm
+        source: "GKGM: serpme ekimde 10–12 kg/da (mibzerle 8–10)"
+    advice:
+      - id: chickpea_seed_conflict
+        text: { tr: "Kitapçıktaki 8–10 kg/da ile 100 bitki/m² hedefi iri taneli nohutta birlikte tutmuyor (bin tane ağırlığı 80–100 g olmalıydı). Bin tane ağırlığını girerseniz hedefe göre hesaplanır; yerel uzmana danışın.", en: "The booklet's 8–10 kg/da and its 100 plants/m² target do not fit together for large-seeded chickpea (the thousand-seed weight would have to be 80–100 g). Enter the thousand-seed weight to compute from the target; ask a local expert." }
+        source: "Türetilmiş: 100 bitki/m² × bin tane ağırlığı ile GKGM 8–10 kg/da karşılaştırması"
+        source_url: ""
+        type: model
+        verified: false
+      - id: chickpea_weeds
+        text: { tr: "Erken ekim verimi artırır ama yabancı otu da artırır; ot mücadelesini planlayın.", en: "Early sowing raises yield but also weeds; plan weed control." }
+        <<: *gkgm
+      - id: chickpea_germination
+        text: { tr: "Tohumun çimlenmesi %85–95 olmalı ve hastalıksız tarladan alınmalı; 10 cm derin ekim çiçeklenmeyi geciktirir.", en: "Seed germination should be 85–95 % from a disease-free field; sowing 10 cm deep delays flowering." }
+        <<: *gkgm
+      - id: legume_inoculate_first
+        text: { tr: "İlk kez nohut ekilecek tarlada tohum Rhizobium ile aşılanmalı.", en: "On a field where chickpea is grown for the first time, the seed should be inoculated with Rhizobium." }
+        <<: *gkgm

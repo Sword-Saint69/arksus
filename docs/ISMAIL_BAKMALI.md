@@ -150,3 +150,9 @@ Ekip kararı: çiftçiye "şu kadar kâr ettin" denmeyecek. Site, arazi için **
 - `.claude/launch.json`: `web` dev sunucusu (port 5174).
 - [ ] Pancar/patates/soğanda kuru tarım hâlâ seçilebiliyor (plan "kaynak bekleniyor" der); istersen gri yap.
 
+## 16. "Nasıl ekilir" kartı (15 Kas, Gümüş — yeni sitede, Gümüş'ün isteğiyle)
+
+- [ ] `web/src/screens/result/Sowing.tsx` (yeni): sonuç ekranında gübre kartının altında. Önce rotasyonun ürünleri, sonra diğerleri (kesik çizgili düğme); tip seçimi; tarla durumu (tohum yatağı, toprak nemi, ekim makinesi, geç ekim); ne zaman / tohum / derinlik / sıra arası; "Kendi tohumunla hesapla" (bin tane ağırlığı, saflık, çimlenme → kg/da ve tüm tarla).
+- `Result.tsx`'e tek satır; `data/api.ts` ve `data/hooks.ts`'e `loadSowing` / `useSowing`; `i18n/strings.ts`'e `sow*`, `seedbed_*`, `soil_*`, `drill_*` anahtarları.
+- Hesap `lib/sowing.ts`'te (Gümüş); ayrıntı `docs/GUBRE.md` §9.
+
