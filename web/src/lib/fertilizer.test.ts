@@ -125,6 +125,17 @@ describe('legumes', () => {
     expect(dose(p, 'dap')).toBe(13);
     expect(dose(p, 'can')).toBeUndefined();                   // DAP already gives 2.35 N ≥ 2.3
   });
+  it('irrigated or limited chickpea / lentil: the Kuru table, badged as an assumption (was: no dose at all)', () => {
+    for (const crop of ['chickpea', 'lentil'] as const) {
+      for (const water of ['limited', 'irrigated'] as const) {
+        const p = recommend(F, { crop, water, soil: { om_pct: 1.5 } });
+        expect(nut(p, 'n')).toMatchObject({ fertilizer_kg_per_da: 4, basis: 'soil_table' });   // OM 1.5 → 4
+        expect(nut(p, 'n').source).toMatchObject({ type: 'assumption', verified: false });
+        expect(nut(p, 'p2o5').basis).toBe('needs_soil_test');
+        expect(dose(p, 'can', 'base')).toBe(15.4);            // 4 / 0.26
+      }
+    }
+  });
 });
 
 describe('irrigated crops and fallbacks', () => {

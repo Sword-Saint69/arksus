@@ -143,6 +143,23 @@ def test_rotation_crops_have_rainfed_tables(fert):
             assert "rainfed" in fert["crops"][cid]["soil_tables"][nu], f"{cid}/{nu}"
 
 
+def test_rotation_crops_have_n_and_p_for_every_water_regime(fert):
+    """The water question can be "limited" or "irrigated" for any rotation crop; without a table the card had no dose.
+    TAGEM has only Kuru rows for chickpea and lentil, so their irrigated rows reuse the Kuru numbers as an assumption."""
+    for cid in ("wheat", "chickpea", "lentil"):
+        tables = fert["crops"][cid]["soil_tables"]
+        for nu in ("n", "p2o5"):
+            for r in REGIMES:
+                assert r in tables[nu], f"{cid}/{nu}/{r}: no table"
+    for cid in ("chickpea", "lentil"):
+        for nu in ("n", "p2o5"):
+            kuru = fert["crops"][cid]["soil_tables"][nu]["rainfed"]
+            for r in ("limited", "irrigated"):
+                t = fert["crops"][cid]["soil_tables"][nu][r]
+                assert t["rows"] == kuru["rows"], f"{cid}/{nu}/{r}"
+                assert t["type"] == "assumption" and t["verified"] is False, f"{cid}/{nu}/{r}: must be flagged"
+
+
 def test_rotation_crops_match_engine_crops(fert):
     in_rot = {c for c in CROPS if fert["crops"][c]["in_rotations"]}
     engine_crops = {k for k in config.load("crops") if k != "fallow"}

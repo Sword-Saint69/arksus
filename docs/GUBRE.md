@@ -32,8 +32,8 @@ Kullanıcı ürünü, sulama durumunu ve toprak analizini (ya da SoilGrids'ten g
 |---|---|---|---|
 | `wheat` | Buğday | evet | N, P, K: Kuru + Sulu |
 | `barley` | Arpa | hayır | N, P: Kuru + Sulu (K satırı yok → denge, ABD alım değeri) |
-| `chickpea` | Nohut | evet | N, P: Kuru (K yok → `pending`) |
-| `lentil` | Mercimek | evet | N, P: Kuru (K yok → denge, zayıf kaynak) |
+| `chickpea` | Nohut | evet | N, P: Kuru; kısıtlı/sulu su seçilirse aynı Kuru satırı `assumption` rozetiyle (TAGEM'de sulu satır yok) (K yok → `pending`) |
+| `lentil` | Mercimek | evet | N, P: Kuru; kısıtlı/sulu için aynı Kuru satırı `assumption` rozetiyle (K yok → denge, zayıf kaynak) |
 | `sugar_beet` | Şeker pancarı | hayır | N, P, K: Sulu (N tavanı 15) |
 | `potato` | Patates | hayır | N, P, K: Sulu |
 | `onion` | Kuru soğan | hayır | N, P: Sulu; K: "Sebze" satırı (**kabul**) |
