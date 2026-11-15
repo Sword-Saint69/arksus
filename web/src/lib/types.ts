@@ -195,6 +195,8 @@ export interface FertCrop {
   top_products: ProductChoice[];               // first match supplies the remaining N
   k_product: string;
   guide_table?: GuideTable;                    // a Turkish guide's product doses by target yield (shown for comparison)
+  /** What farmers actually apply (survey); shown next to the plan, never used in the calculation. */
+  farmer_practice?: Sourced & { text: Text; note?: Text; doses: { product: string; timing: Timing; kg_per_da: number; farms?: number }[] };
   advice: Advice[];
 }
 export interface FertilizerFile extends FileHeader {

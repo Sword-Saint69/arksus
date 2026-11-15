@@ -3,6 +3,9 @@
 # 3–10 km from the WMO 1991–2020 normals station used for precip_vs_mgm. Elevation comes from the NASA POWER header.
 # 15 Nov (Ömer, with Gümüş's OK): 9 points (Develi added later the same day) that MODIS NDVI showed as irrigated were moved to pixels that are both
 # ≥ 60 % WorldCover cropland within 300 m AND never summer-green in MODIS NDVI 2020–2023 (rainfed). See coord_check.
+# Note directions (15 Nov, Gümüş): recomputed for the moved points from OpenStreetMap Nominatim town/city centres
+# (Karapınar 8 km SW, Develi 6 km NW, Eskişehir 10 km NE, Aksaray 6 km NW, Karaman 10 km W, Niğde 10 km S,
+# Nevşehir 11 km SW — unchanged, Gemerek 6 km SE, Boğazlıyan 3 km N — texts say "near").
 locations:
 - id: karapinar
   name: Karapınar
@@ -13,8 +16,8 @@ locations:
   coord_verified: true
   coord_check: '15 Kas, Ömer: eski nokta 37.72, 33.48 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (5.58 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %80 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 4 (0.321), Temmuz 0.221. Yakın WMO istasyonu: Karapınar 17902 (~6.4 km)'
   note:
-    en: Rainfed cropland west of Karapınar town (Konya closed basin), the 1960s wind-erosion area. Representative of the district, not a specific field.
-    tr: Karapınar ilçe merkezinin batısında kuru tarım alanı (Konya kapalı havzası), 1960'ların rüzgâr erozyonu bölgesi. İlçeyi temsil eder, belirli bir tarla değildir.
+    en: Rainfed cropland south-west of Karapınar town (Konya closed basin), the 1960s wind-erosion area. Representative of the district, not a specific field.
+    tr: Karapınar ilçe merkezinin güneybatısında kuru tarım alanı (Konya kapalı havzası), 1960'ların rüzgâr erozyonu bölgesi. İlçeyi temsil eder, belirli bir tarla değildir.
 - id: develi
   name: Develi
   district: Develi
@@ -24,8 +27,8 @@ locations:
   coord_verified: true
   coord_check: '15 Kas, Ömer: eski nokta 38.43, 35.47 MODIS NDVI''de 12 yılın 7''sinde yazın yeşildi (sulu görünüyordu), taşındı (2.26 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %90 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.337), Temmuz 0.228. Yakın WMO istasyonu: Kayseri Bölge 17196 (~29 km)'
   note:
-    en: Cropland north of Develi town (Develi plain). Representative of the district, not a specific field.
-    tr: Develi ilçe merkezinin kuzeyinde tarım alanı (Develi ovası). İlçeyi temsil eder, belirli bir tarla değildir.
+    en: Cropland north-west of Develi town (Develi plain). Representative of the district, not a specific field.
+    tr: Develi ilçe merkezinin kuzeybatısında tarım alanı (Develi ovası). İlçeyi temsil eder, belirli bir tarla değildir.
 - id: polatli
   name: Polatlı
   district: Polatlı
@@ -46,8 +49,8 @@ locations:
   coord_verified: true
   coord_check: '15 Kas, Ömer: eski nokta 39.806, 30.568 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (4.67 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %91 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 4 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.476), Temmuz 0.218. Yakın WMO istasyonu: Eskişehir Bölge 17126 (~9.4 km)'
   note:
-    en: Cropland north of Eskişehir city. Representative of the district, not a specific field.
-    tr: Eskişehir şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+    en: Cropland north-east of Eskişehir city. Representative of the district, not a specific field.
+    tr: Eskişehir şehir merkezinin kuzeydoğusunda tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
 - id: aksaray
   name: Aksaray
   district: Merkez
@@ -57,8 +60,8 @@ locations:
   coord_verified: true
   coord_check: '15 Kas, Ömer: eski nokta 38.371, 33.964 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (3.74 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %88 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 4 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.58), Temmuz 0.27. Yakın WMO istasyonu: Aksaray 17192 (~4.1 km)'
   note:
-    en: Cropland west of Aksaray city (Tuz Gölü basin). Representative of the district, not a specific field.
-    tr: Aksaray şehir merkezinin batısında tarım alanı (Tuz Gölü havzası). İlçeyi temsil eder, belirli bir tarla değildir.
+    en: Cropland north-west of Aksaray city (Tuz Gölü basin). Representative of the district, not a specific field.
+    tr: Aksaray şehir merkezinin kuzeybatısında tarım alanı (Tuz Gölü havzası). İlçeyi temsil eder, belirli bir tarla değildir.
 - id: karaman
   name: Karaman
   district: Merkez
@@ -68,8 +71,8 @@ locations:
   coord_verified: true
   coord_check: '15 Kas, Ömer: eski nokta 37.234, 33.22 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (12.01 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %100 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.379), Temmuz 0.203. Yakın WMO istasyonu: Karaman 17246 (~10.0 km)'
   note:
-    en: Cropland north of Karaman city. Representative of the district, not a specific field.
-    tr: Karaman şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+    en: Cropland west of Karaman city. Representative of the district, not a specific field.
+    tr: Karaman şehir merkezinin batısında tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
 - id: nigde
   name: Niğde
   district: Merkez–Bor
@@ -79,8 +82,8 @@ locations:
   coord_verified: true
   coord_check: '15 Kas, Ömer: eski nokta 37.918, 34.628 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (6.5 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %89 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 4 (0.327), Temmuz 0.174. Yakın WMO istasyonu: Niğde 17250 (~9.2 km)'
   note:
-    en: Cropland south-west of Niğde city, towards Bor. Representative of the district, not a specific field.
-    tr: Niğde şehir merkezinin güneybatısında, Bor yönünde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
+    en: Cropland south of Niğde city. Representative of the district, not a specific field.
+    tr: Niğde şehir merkezinin güneyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
 - id: nevsehir
   name: Nevşehir
   district: Merkez

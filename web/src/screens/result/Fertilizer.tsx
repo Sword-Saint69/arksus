@@ -5,7 +5,7 @@ import { QUESTION_IDS, useStore } from '@/state/store';
 import { useFertilizer } from '@/data/hooks';
 import { fieldAreaM2, hasRealArea, toDonum } from '@/domain/field';
 import { cropsForRotation, fieldTotal, groupByTiming, mergeSoil } from '@/domain/fertilizerView';
-import { recommend, soilFromResults, type SoilKey } from '@/lib/fertilizer';
+import { practiceNutrients, recommend, soilFromResults, type SoilKey } from '@/lib/fertilizer';
 import type { FertCropId, ResultsFile, WaterRegime } from '@/lib/types';
 import { Button, Card, DataBadge, Fold, Note, SectionTitle, cn } from '@/ui/kit';
 
@@ -51,6 +51,9 @@ export function Fertilizer({ results, rotationId }: { results: ResultsFile; rota
   const needsTest = plan.nutrients.some((n) => n.nutrient !== 'n' && n.basis === 'needs_soil_test');
   const advice = plan.advice.filter((a) => !ADVICE_SHOWN_ELSEWHERE.has(a.id));
   const isLegume = !!f.crops[crop].fixed_n_kg_per_da;
+  const practice = f.crops[crop].farmer_practice;
+  const practiceN = practiceNutrients(f, crop);
+  const planAmount = (nu: 'n' | 'p2o5') => plan.nutrients.find((x) => x.nutrient === nu)?.fertilizer_kg_per_da ?? null;
   // Without a P test the plan has nitrogen only; the guide's doses (wheat: Toros) are shown as the no-test reference.
   const guideFallback = needsTest && plan.guide && plan.target_yield_kg_per_da !== null ? plan.guide : null;
   const splitLabel = (timing: string) => f.crops[crop].n_split[water]?.find((p) => p.timing === timing)?.label;
@@ -140,6 +143,29 @@ export function Fertilizer({ results, rotationId }: { results: ResultsFile; rota
           </ul>
           {guideFallback.note && <p className="text-sm text-muted">{tx(guideFallback.note)}</p>}
           <p className="text-sm text-muted">{t('fertGuideSub')}</p>
+        </Card>
+      )}
+
+      {practice && practiceN && (
+        <Card className="grid gap-2 bg-canvas">
+          <p className="flex flex-wrap items-center gap-2 font-extrabold">{t('fertPracticeTitle')} <DataBadge type={practice.type} verified={practice.verified} /></p>
+          <p className="text-sm text-muted">{tx(practice.text)}</p>
+          <ul className="grid gap-1">
+            {practice.doses.map((d, i) => (
+              <li key={i} className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <span><span className="text-sm text-muted">{timingName(d.timing)}:</span> <b>{product(d.product)}</b></span>
+                <span className="font-black tabular-nums">{num(d.kg_per_da, 1)} kg <span className="text-sm font-normal text-muted">{t('fertPerDa')}</span></span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[15px]">
+            {t('fertPracticeTotals', { n: num(practiceN.n, 1), p: num(practiceN.p2o5, 1) })}{' '}
+            <b>{t('fertPracticePlan', {
+              n: planAmount('n') === null ? '—' : num(planAmount('n')!, 1),
+              p: planAmount('p2o5') === null ? t('fertPracticeNeedsTest') : `${num(planAmount('p2o5')!, 1)} kg`,
+            })}</b>
+          </p>
+          {practice.note && <p className="text-sm text-muted">{tx(practice.note)}</p>}
         </Card>
       )}
 

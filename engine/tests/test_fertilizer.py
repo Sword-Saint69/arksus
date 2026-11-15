@@ -70,6 +70,7 @@ def test_all_referenced_products_exist(fert):
         c = fert["crops"][cid]
         refs = [x["product"] for x in c["base_products"] + c["top_products"]] + [c["k_product"]]
         refs += [d["product"] for row in c.get("guide_table", {}).get("rows", []) for d in row["doses"]]
+        refs += [d["product"] for d in c.get("farmer_practice", {}).get("doses", [])]
         assert set(refs) <= products, f"{cid}: unknown {set(refs) - products}"
         assert c["base_products"] and c["top_products"]
         assert "when" not in c["base_products"][-1] and "when" not in c["top_products"][-1], \

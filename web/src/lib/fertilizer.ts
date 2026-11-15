@@ -298,3 +298,17 @@ export function recommend(f: FertilizerFile, req: FertRequest): FertPlan {
     soil: s, derived, flags, nutrients, doses, guide, advice, missing, better_for_salinity: better,
   };
 }
+
+/** Pure nutrient in the farmers' usual doses (product kg × grade), for the comparison line. null without survey data. */
+export function practiceNutrients(f: FertilizerFile, crop: FertCropId): Record<Nutrient, number> | null {
+  const fp = f.crops[crop]?.farmer_practice;
+  if (!fp) return null;
+  const out: Record<Nutrient, number> = { n: 0, p2o5: 0, k2o: 0 };
+  for (const d of fp.doses) {
+    const p = f.products[d.product];
+    if (!p) throw new Error(`unknown product ${d.product}`);
+    for (const nu of NUTRIENTS) out[nu] += (d.kg_per_da * p[nu]) / 100;
+  }
+  return { n: r1(out.n), p2o5: r1(out.p2o5), k2o: r1(out.k2o) };
+}
+

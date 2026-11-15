@@ -910,6 +910,71 @@
           "items": {
             "$ref": "#/$defs/advice"
           }
+        },
+        "farmer_practice": {
+          "type": "object",
+          "required": [
+            "text",
+            "doses",
+            "source",
+            "type",
+            "verified"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "text": {
+              "$ref": "#/$defs/text"
+            },
+            "note": {
+              "$ref": "#/$defs/text"
+            },
+            "doses": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "product",
+                  "timing",
+                  "kg_per_da"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "product": {
+                    "type": "string"
+                  },
+                  "timing": {
+                    "enum": [
+                      "pre_plant",
+                      "base",
+                      "top_1",
+                      "top_2",
+                      "foliar"
+                    ]
+                  },
+                  "kg_per_da": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "farms": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "source": {
+              "type": "string"
+            },
+            "source_url": {
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/badge"
+            },
+            "verified": {
+              "type": "boolean"
+            }
+          }
         }
       },
       "additionalProperties": false

@@ -18,8 +18,9 @@ For **13 districts** (one per Central Anatolian province), **3 soil depth classe
 - **Soil:** bare days per month and windy, dry, bare days (wind-exposure count); nitrogen-fixing crops; a regional soil card from SoilGrids.
 - **Yield:** the range of wheat and legume yields that water allows (P10 / P50 / P90).
 - **Recommendation:** the rotation most suitable for this land under the farmer's priorities (earnings, wheat yield, soil, water). Prices and supports are used **internally** to judge what earns more; the site shows **no money**. Rotations that cut the next wheat below 85 % of after-fallow wheat, or whose year-1 crop fails in the median year, are **blocked** whatever they would earn.
+- **Fertiliser, sowing and soil health (beyond "what to plant"):** a fertiliser plan from the official TAGEM Central Anatolia soil-test tables (when, which product, kg per dekar; phosphorus and potassium need the farmer's lab values), how to sow (window, seeds per m² and kg/da from the farmer's own seed label, depth, row spacing) and soil-protection practices with regional evidence and the field's own model numbers. Details: `docs/GUBRE.md`.
 
-It is **not** a yield forecast for one field, a price forecast or a fertiliser advisor. Every recommendation shows its main reason, the blocked options and whether the result is a close call; the final decision stays with the farmer and local experts.
+It is **not** a yield forecast for one field or a price forecast, and its fertiliser plan does not replace a soil test. Every recommendation shows its main reason, the blocked options and whether the result is a close call; the final decision stays with the farmer and local experts.
 
 ---
 
@@ -40,7 +41,8 @@ It is **not** a yield forecast for one field, a price forecast or a fertiliser a
 | CI | GitHub Actions: engine tests, web tests, web and map builds |
 | Climate sensitivity scenarios (drier / warmer, E2) | done: 5 scenarios × 13 districts in `results/{loc}__{scenario}.json` |
 | NASA GPM IMERG precipitation (second satellite estimate) | done, shown in the precipitation check |
-| Web site (React) | in progress (`web/`); the 3D map (`map/`) has the decision panel, scenarios, evidence and soil wetness |
+| Fertiliser plan, how to sow, soil health (`web/src/lib/{fertilizer,sowing,soilhealth}.ts`, `docs/GUBRE.md`) | done, unit-tested; sourced from TAGEM, TİGEM, GKGM and regional trials (research: `reports/`) |
+| Web site (React) | working (`web/`): guided flow around the 3D map (`map/`), result with options, scenarios, field calendar, terrain and runoff, fertiliser, sowing and soil-health cards; deployment pending |
 
 ---
 
@@ -55,7 +57,7 @@ engine/config/*.yaml (crops, soil, locations, prices, refs) ┘     FAO-56 water
 ```
 
 - The Python engine computes **physical results only** (water, ET, yield ratio 0–1). It runs once and writes JSON.
-- The browser scores each rotation (earnings estimate from yield ratio × reference yield × price + support, wheat yield, soil, water), applies the guardrails and names the most suitable rotation. No TL is displayed. No server, no database, no live API calls.
+- The browser scores each rotation (earnings estimate from yield ratio × reference yield × price + support, wheat yield, soil, water), applies the guardrails and names the most suitable rotation. No TL is displayed. No server and no database: the decision uses only the precomputed JSON. For context the browser also fetches live, without keys: map tiles and imagery (Esri, OpenFreeMap, EOX, NASA GIBS, AWS terrain tiles), place search (OpenStreetMap Nominatim), parcel lookup (TKGM), Sentinel-2 scenes (Element 84 Earth Search) and the last 30 days of NASA POWER rain at the field. None of these change the recommendation.
 - Every number carries a source and a type badge: `measured`, `model`, `official`, `statistic`, `literature`, `assumption`, `user`. Values not yet sourced are `null` and shown as pending, never as a number.
 
 ### Engine in short

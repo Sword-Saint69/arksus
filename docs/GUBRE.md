@@ -165,3 +165,7 @@ Kartın üç parçası:
 
 Not: motorun nohut ve mercimek sonrası buğday oranı bazı ilçelerde Konya denemesinden yüksek çıkıyor (ör. Develi orta derinlikte %94–95; deneme %80–87). Kart ikisini ayrı gösteriyor: tablo modelin sonucu, "Kanıt" denemenin sonucu.
 
+## 11. Çiftçi pratiğiyle karşılaştırma (15 Kas)
+
+Buğdayda gübre kartı, planın yanında bölgedeki tipik uygulamayı gösterir: Konya-Cihanbeyli 2023 anketi, 70 buğday işletmesi (36 sulu, 34 kuru; Tapkı ve Göz 2025). Ekimle 21 kg/da DAP, ilkbaharda 11,1 kg/da üre; yani dekara yaklaşık 8,9 kg azot ve 9,7 kg P₂O₅ (`practiceNutrients`). Bu değerler hesaba girmez, sadece karşılaştırma içindir (`fertilizer.yaml → crops.wheat.farmer_practice`, rozet `statistic`). Diğer ürünler için bölgesel anket bulunamadı.
+

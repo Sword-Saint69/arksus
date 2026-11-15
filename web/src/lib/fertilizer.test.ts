@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { FertilizerFile, ResultsFile } from './types';
-import { completeSoil, lookup, matches, recommend, soilFlags, soilFromResults, type FertPlan } from './fertilizer';
+import { completeSoil, lookup, matches, practiceNutrients, recommend, soilFlags, soilFromResults, type FertPlan } from './fertilizer';
 
 const F = JSON.parse(readFileSync(resolve(__dirname, '../../public/data/fertilizer.json'), 'utf-8')) as FertilizerFile;
 const dose = (p: FertPlan, product: string, timing?: string) =>
@@ -184,3 +184,13 @@ describe('SoilGrids prefill only (no lab)', () => {
     expect(nut(p, 'n')).toMatchObject({ soil_supply_kg_per_da: 5.2, balance_kg_per_da: 3.2 });
   });
 });
+
+describe('farmer practice (Cihanbeyli 2023 survey)', () => {
+  it('21 kg DAP + 11.12 kg urea = 3.78 + 5.12 = 8.9 kg N and 9.7 kg P2O5 per dekar', () => {
+    expect(practiceNutrients(F, 'wheat')).toEqual({ n: 8.9, p2o5: 9.7, k2o: 0 });
+  });
+  it('no survey for other crops', () => {
+    expect(practiceNutrients(F, 'chickpea')).toBeNull();
+  });
+});
+
