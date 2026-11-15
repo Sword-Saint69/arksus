@@ -676,7 +676,7 @@ export const S = {
   askPlaceholder: { tr: 'Sorunu yaz…', en: 'Type your question…' },
   askSend: { tr: 'Gönder', en: 'Send' },
   askHello: { tr: 'Merhaba! Bir şey takılırsa bana sor.', en: 'Hello! If anything is unclear, ask me.' },
-  askNote: { tr: 'Cevaplar bu sayfadaki bilgilerden gelir; sorular hiçbir yere gönderilmez.', en: 'Answers come from what this page knows; questions are not sent anywhere.' },
+  askNote: { tr: 'Cevaplar bu sayfadaki bilgilere dayanır; sorular hiçbir yere gönderilmez.', en: 'Answers come from what this page knows; questions are not sent anywhere.' },
   askOpenSection: { tr: 'Bölümü aç', en: 'Open the section' },
   askOpenSettings: { tr: 'Ayarları aç', en: 'Open settings' },
   askOpenFind: { tr: 'Tarla seç', en: 'Pick a field' },

@@ -40,7 +40,7 @@ type Topic =
 const TOPICS: Record<Topic, string[]> = {
   plant: ['ne ek', 'ne dik', 'hangi urun', 'oner', 'tavsiye', 'ekeyim', 'ekmeli', 'ekecegim', 'what should', 'what to plant', 'which crop', 'recommend', 'suggest'],
   why: ['neden', 'nicin', 'niye', 'sebep', 'why', 'reason', 'because'],
-  alternatives: ['baska', 'alternatif', 'diger', 'secenek', 'else', 'other', 'alternative', 'option'],
+  alternatives: ['baska ne', 'baska', 'alternatif', 'diger', 'secenek', 'else', 'other', 'alternative', 'option'],
   data: ['veri', 'kaynak', 'nereden', 'nasil hesap', 'nasil calis', 'model', 'nasa', 'uydu', 'data', 'source', 'how does', 'how do you', 'satellite'],
   trust: ['dogru mu', 'guven', 'emin', 'yanlis', 'hata', 'accurate', 'trust', 'sure', 'reliable', 'wrong'],
   settings: ['basit', 'gelismis', 'ayar', 'mod', 'bolum', 'simple', 'advanced', 'setting', 'section'],
