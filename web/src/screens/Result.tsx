@@ -15,6 +15,7 @@ import type { CropId, RotationId } from '@/lib/types';
 import { Button, Card, DataBadge, Note, cn } from '@/ui/kit';
 import { CropIcon } from '@/ui/crops';
 import { Farmer } from '@/ui/farmer/Farmer';
+import { PlantingIntent } from './result/PlantingIntent';
 import { Options } from './result/Options';
 import { WhatIf } from './result/WhatIf';
 import { FieldSim } from './result/FieldSim';
@@ -94,6 +95,7 @@ export function Result() {
           {answers.water === 'limited' && <Note tone="info" icon={<Info size={20} />}>{t('qWaterSub')}</Note>}
           <Hero verdict={verdict} />
           <OtherChoices verdict={verdict} />
+          <PlantingIntent verdict={verdict} />
           <Blocked verdict={verdict} />
           <Note tone="info" icon={<Info size={20} />}>
             {!isPilot && distanceKm !== null && <b>{t('covered', { name: location.name, km: num(distanceKm, distanceKm < 10 ? 1 : 0) })} </b>}

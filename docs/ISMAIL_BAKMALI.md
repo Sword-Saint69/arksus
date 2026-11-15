@@ -173,3 +173,11 @@ Site canlıda: https://nobetsu.vercel.app (Vercel projesi `nobetsu`, kök `web/`
 - [ ] `screens/find/ParcelNumber.tsx`: il/ilçe/mahalle listeleri sınırda `tkgmFail` yerine `tkgmLimit` yazar, il kutusu "Yükleniyor…"da takılı kalmaz, hata notunda "Haritada elle çiz" düğmesi (`onDraw`).
 - Ayrıca canlıda: `web/.env.local` ve Vercel'de `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` var (Supabase projesi `nobetsu`, Frankfurt); kodda henüz kullanılmıyor. Giriş ekranı için `package.json`'a `@supabase/supabase-js` gerekecek.
 - [ ] (15 Kas, Gümüş — `biar` ve `omer` muhammet'e alınırken) `Result.tsx` çakışması: Biar'ın `SectionId` tipi + Toprak sağlığı bölümü birlikte. `domain/sections.ts` `SECTION_IDS`'e `soilHealth` eklendi (sade modda da görünür), `shell/Profile.tsx` ayar listesine `secSoilHealth`. Biar'ın branch'inde zaten kırık olan iki test düzeltildi: `askNote` metninde "gelir" (para kelimesi testi) → "dayanır"; `domain/assistant.ts` alternatiflere `'baska ne'` (yoksa "başka ne ekebilirim" ekim önerisine gidiyordu).
+
+## 19. Google girişi ve KVKK onayı (15 Kas, Gümüş — Gümüş'ün isteğiyle; sözleşme: ARAYUZLER §16)
+
+- [ ] `package.json`: `@supabase/supabase-js@^2` eklendi.
+- [ ] Yeni: `services/cloud.ts`, `state/cloud.ts`, `domain/consent.ts` (+test), `ui/Markdown.tsx` (+test, hukuk metinleri için küçük okuyucu), `shell/CloudAccount.tsx`, `shell/ConsentDialog.tsx`, `screens/result/PlantingIntent.tsx`, `public/legal/*.md` (docs/legal kopyası; test eşitliği kontrol eder), `vite-env.d.ts`'e iki env tipi.
+- [ ] Biar'ın dosyalarına küçük dokunuş: `shell/Profile.tsx` Supabase varsa deneme girişi yerine `CloudAccount`; `shell/TopBar.tsx` Google kullanıcısını gösterir; `App.tsx` `ConsentDialog`'u bağlar; `Result.tsx` öneri bölümünde `OtherChoices`'tan sonra `PlantingIntent`. Deneme girişi (`domain/auth.ts`) silinmedi; env yoksa hâlâ o çalışır.
+- [ ] `i18n/strings.ts`: `g*`, `cd*`, `pi*` anahtarları.
+- Not: Google girişi Supabase panelinde Google sağlayıcısı açılınca çalışır (Gümüş). Yerelde 5175 portu kullanılırsa Supabase'in yönlendirme listesine o port da eklenmeli.

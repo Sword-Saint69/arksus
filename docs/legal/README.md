@@ -25,7 +25,8 @@ Sürüm kimliği değişirse (metin değişirse) kullanıcıya yeni metin bir ke
 
 ## Açık konular (yayından önce kapanmalı)
 
-- [ ] **Veri sorumlusu kim?** Ekip tüzel kişi değil. Gerçek kişi (ör. bir ekip üyesi) ya da şirket; adı, adresi, başvuru e-postası.
+- [x] **Veri sorumlusu kim?** Ekip kararı (15 Kas, Gümüş): **NöbetSu ekibi**, tek bir kişiye indirgenmez; beş üye birlikte sorumlu, ortak başvuru e-postası. Doldurulacak: üyelerin adları, ortak e-posta, tebligat adresi.
+- [ ] Ekip tüzel kişi olmadığı için "birlikte veri sorumlusu" yazımının KVKK'da yeterli olup olmadığı hukukçuya sorulacak (Kanun'da müşterek veri sorumluluğu açıkça düzenlenmemiş).
 - [ ] **Yurt dışı aktarım (md. 9):** 2024 değişikliğinden (7499 sayılı Kanun, 1 Haziran 2024) beri düzenli aktarımda açık rıza tek başına yetmiyor. Supabase / Vercel / Google için Kurul'un standart sözleşmesi imzalanıp 5 iş günü içinde Kurum'a bildirilmeli. Hukukçuya sorulacak; hackathon süresinde yapılamazsa metindeki köşeli parantez açık kalır ve gerçek kullanıcı verisi toplanmaz (sadece demo).
 - [ ] **Vercel bölgesi:** fonksiyon/log bölgesi doğrulanacak (AB mi ABD mi).
 - [ ] **Saklama süreleri:** 30 gün (hesap silme), 1 yıl (güvenlik kaydı), onay kayıtları için süre — ekip kararı / hukukçu.

@@ -19,13 +19,11 @@ Aşağıda bunların ayrıntısı var.
 
 ## 1. Veri sorumlusu
 
-6698 sayılı Kişisel Verilerin Korunması Kanunu ("Kanun") kapsamında veri sorumlusu:
+6698 sayılı Kişisel Verilerin Korunması Kanunu ("Kanun") kapsamında veri sorumlusu **NöbetSu ekibidir**. NöbetSu, NASA Space Apps 2026 kapsamında geliştirilen ve çiftçiye tarlası için ekim önerisi veren bir internet sitesidir (https://nobetsu.vercel.app). Ekip bir şirket değildir; aşağıdaki ekip üyeleri verilerin işlenmesinden birlikte sorumludur ve başvurunu hangisine yaparsan yap birlikte cevaplanır.
 
-- **Ad / unvan:** [Veri sorumlusunun adı soyadı ya da şirket unvanı]
-- **Adres:** [Tebligat adresi]
-- **E-posta:** [kvkk@… başvuru adresi]
-
-NöbetSu, NASA Space Apps 2026 kapsamında geliştirilen ve çiftçiye tarlası için ekim önerisi veren bir internet sitesidir (https://nobetsu.vercel.app).
+- **Ekip üyeleri:** [Ad Soyad], [Ad Soyad], [Ad Soyad], [Ad Soyad], [Ad Soyad]
+- **Ortak başvuru e-postası:** [kvkk@… — ekibin ortak adresi]
+- **Tebligat adresi:** [Ekip adına yazılı başvuruların gönderileceği adres]
 
 ## 2. Hangi kişisel verilerini işliyoruz?
 

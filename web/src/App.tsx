@@ -9,6 +9,7 @@ import { MapControls } from '@/shell/MapControls';
 import { Panel } from '@/shell/Panel';
 import { TopBar } from '@/shell/TopBar';
 import { Profile } from '@/shell/Profile';
+import { ConsentDialog } from '@/shell/ConsentDialog';
 import { Welcome } from '@/screens/Welcome';
 import { FindField } from '@/screens/FindField';
 import { Questions } from '@/screens/Questions';
@@ -86,6 +87,7 @@ export default function App() {
       {sim && core && step === 'result' && <SimHud />}
       <MapControls />
       {profileOpen && <Profile />}
+      <ConsentDialog />
     </div>
   );
 }
