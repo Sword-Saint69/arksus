@@ -1,0 +1,197 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T07:24:15Z",
+ "location_id": "kaman",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Kaman İli Orta Derinliği Alanı İçin İki Yıllık Rotasyonlar Karşılaştırması",
+   "en": "Comparison of Two-Year Rotations for Medium Depth Fields in Kaman Province"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması, buğday ekimindeki su stresi azalmasına yardımcı olabilir.",
+      "en": "Reduced soil moisture during fallow period may help reduce water stress at wheat sowing."
+     },
+     {
+      "tr": "Daha az tillaj (toprak işlemi) gereksinimi, toprak zararını azaltabilir.",
+      "en": "Less tillage required, which may reduce soil damage."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Bare soil durumunda toprak erozyonu ve su kaybı riski.",
+      "en": "Risk of soil erosion and water loss with bare soil."
+     },
+     {
+      "tr": "Nütrasyonel yetersizlik riski, özellikle azot.",
+      "en": "Risk of nutrient deficiency, especially nitrogen."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nütrasyonel yetersizlik riskini azaltan azot üretimi.",
+      "en": "Nitrogen fixation reduces risk of nutrient deficiency."
+     },
+     {
+      "tr": "Toprak erozyonunu azaltan bitki kaplaması.",
+      "en": "Plant cover reduces soil erosion."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla tillaj gereksinimi, toprak zararını artırabilir.",
+      "en": "More tillage required, which may increase soil damage."
+     },
+     {
+      "tr": "Daha az toprak suyunun azalması, buğday ekimindeki su stresi artabilir.",
+      "en": "Less soil moisture reduction may increase water stress at wheat sowing."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Nütrasyonel yetersizlik riskini azaltan azot üretimi.",
+      "en": "Nitrogen fixation reduces risk of nutrient deficiency."
+     },
+     {
+      "tr": "Toprak erozyonunu azaltan bitki kaplaması.",
+      "en": "Plant cover reduces soil erosion."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az tillaj gereksinimi, toprak zararını azaltabilir.",
+      "en": "Less tillage required, which may reduce soil damage."
+     },
+     {
+      "tr": "Daha az toprak suyunun azalması, buğday ekimindeki su stresi artabilir.",
+      "en": "Less soil moisture reduction may increase water stress at wheat sowing."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak organik maddeleri ve pH değerleri varye edebilir, toprak testi gereklidir.",
+    "en": "Soil organic matter and pH values may vary, soil test is needed."
+   },
+   {
+    "tr": "Toprak testi, fosfor, potasyum, mikroelementler ve toprak sıkışmasını kontrol etmelidir.",
+    "en": "Soil test should check phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI verileri, toprak su dengesini ve bitki kaplamasını gösterir.",
+    "en": "NDVI data shows soil moisture balance and vegetation cover."
+   },
+   {
+    "tr": "MERRA-2 modeli, toprak su dengesini tahmin etmek için kullanılır.",
+    "en": "MERRA-2 model is used to predict soil moisture balance."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim koşullarında, nadas-çalı-çalı rotasyonu en yüksek buğday hasadı verir.",
+    "en": "In past climate conditions, fallow-wheat rotation yields the highest wheat yield."
+   },
+   {
+    "tr": "Düşük yağış koşullarında, nadas-çalı-çalı rotasyonu en düşük buğday hasadı verir.",
+    "en": "In low rainfall conditions, fallow-wheat rotation yields the lowest wheat yield."
+   },
+   {
+    "tr": "Sıcaklık koşullarında, nadas-çalı-çalı rotasyonu en düşük buğday hasadı verir.",
+    "en": "In warm conditions, fallow-wheat rotation yields the lowest wheat yield."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 modeli, uydu ölçümü değildir, model tahminidir.",
+    "en": "MERRA-2 is a model prediction, not a measurement."
+   },
+   {
+    "tr": "Satellite verileri, fosfor, potasyum, mikroelementler ve toprak sıkışmasını göstermez.",
+    "en": "Satellite data does not show phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın, toprak sıkışmasını ve diğer elementleri kontrol edin.",
+    "en": "Conduct a soil test to check soil compaction and other elements."
+   },
+   {
+    "tr": "Yerel uzmanlardan toprak durumunu ve bitki kaplamasını kontrol etmek için yardım alın.",
+    "en": "Seek help from local experts to check soil conditions and vegetation cover."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "kaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "kaman",
+    "depth_class": "medium",
+    "scenario_id": "baseline",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ]
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "kaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "kaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "kaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {},
+   "forced": true
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

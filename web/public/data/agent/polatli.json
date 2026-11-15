@@ -1,0 +1,195 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T06:21:55Z",
+ "location_id": "polatli",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Polatlı'da Üç İki-Yıl Döngüsünün Karşılaştırılması",
+   "en": "Comparison of Three Two-Year Rotations in Polatlı"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması, buğday ekiminde daha az su gereksinimi.",
+      "en": "Less soil moisture in fallow period, less water needed at wheat sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla açık toprak, toprak erozyonu ve kuru toprak problemleri.",
+      "en": "More bare soil, soil erosion and dry soil issues."
+     },
+     {
+      "tr": "Azot maddeleri toprakta azalır, buğday üretiminde azot uygulaması gerekebilir.",
+      "en": "Nitrogen levels decrease in soil, nitrogen application may be needed for wheat."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekiminde toprak suyu artar, buğday ekiminde daha fazla su var.",
+      "en": "More soil moisture at chickpea sowing, more water available at wheat sowing."
+     },
+     {
+      "tr": "Nohut azot üretir, buğday üretiminde azot uygulaması gereksiz olabilir.",
+      "en": "Chickpea fixes nitrogen, nitrogen application may not be needed for wheat."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az açık toprak, ancak daha fazla toprak işlenmesi gerekebilir.",
+      "en": "Less bare soil, but more tillage may be required."
+     },
+     {
+      "tr": "Nohut ekiminde daha az su, buğday ekiminde daha az su var.",
+      "en": "Less water available at chickpea sowing, less water available at wheat sowing."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekiminde toprak suyu artar, buğday ekiminde daha fazla su var.",
+      "en": "More soil moisture at lentil sowing, more water available at wheat sowing."
+     },
+     {
+      "tr": "Mercimek azot üretir, buğday üretiminde azot uygulaması gereksiz olabilir.",
+      "en": "Lentil fixes nitrogen, nitrogen application may not be needed for wheat."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az açık toprak, ancak daha az toprak işlenmesi gerekebilir.",
+      "en": "Less bare soil, but less tillage may be required."
+     },
+     {
+      "tr": "Mercimek ekiminde daha az su, buğday ekiminde daha az su var.",
+      "en": "Less water available at lentil sowing, less water available at wheat sowing."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak su kapasitesi 154.7 mm/m, toprak erozyonu ve kuru toprak problemleri var.",
+    "en": "Soil water capacity is 154.7 mm/m, soil erosion and dry soil problems exist."
+   },
+   {
+    "tr": "Toprak testi gereklidir: fosfor, potasyum, mikroelementler ve toprak sıkışması.",
+    "en": "Soil test is needed: phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI en yüksek seviyede Nisan ayı, en düşük seviyede Ekim, Ağustos ve Eylül.",
+    "en": "NDVI peaks in April, lowest in October, August, and September."
+   },
+   {
+    "tr": "NASA MERRA-2 modeli, toprak ıslaklığı %47, bu ay için %93 percentil.",
+    "en": "NASA MERRA-2 model, soil moisture 47%, 93rd percentile for this month."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Nadas → Buğday: 53% buğday verimlilik, 49 mm su.",
+    "en": "Baseline climate (2001-2026) - Fallow → Wheat: 53% wheat yield, 49 mm water."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Nohut → Buğday: 45% buğday verimlilik, 1 mm su.",
+    "en": "Baseline climate (2001-2026) - Chickpea → Wheat: 45% wheat yield, 1 mm water."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Mercimek → Buğday: 45% buğday verimlilik, 7 mm su.",
+    "en": "Baseline climate (2001-2026) - Lentil → Wheat: 45% wheat yield, 7 mm water."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 bir model, uydu ölçümü değildir; senaryolar hassasiyet adımları, öngörüler değildir.",
+    "en": "MERRA-2 is a model, not a measurement; scenarios are sensitivity steps, not forecasts."
+   },
+   {
+    "tr": "Satellite verileri fosfor, potasyum, mikroelementler ve toprak sıkışmasını göstermez.",
+    "en": "Satellite data does not show phosphorus, potassium, micronutrients, or soil compaction."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi için fosfor, potasyum, mikroelementler ve toprak sıkışmasını ölçün.",
+    "en": "Test soil for phosphorus, potassium, micronutrients, and soil compaction."
+   },
+   {
+    "tr": "Toprak erozyonunu ve kuru toprak problemlerini yönetmek için yöntemleri araştırın.",
+    "en": "Investigate methods to manage soil erosion and dry soil problems."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "polatli",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "polatli",
+    "depth_class": "medium",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ],
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "polatli",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "polatli",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "polatli"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "polatli",
+    "depth_class": "medium"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

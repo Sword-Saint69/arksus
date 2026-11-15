@@ -1,0 +1,187 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T06:59:24Z",
+ "location_id": "nigde",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Niğde'deki Orta Derinlikli Toprakta Üretim Rotasyonları Karşılaştırması",
+   "en": "Comparison of Production Rotations in Medium-Depth Soils of Niğde"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi, toprak suyunun ekimdeki buğday için kullanılabilirliğini artırır.",
+      "en": "Fallow period increases soil water availability for wheat at planting."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Bare soil increases wind erosion and water loss.",
+      "en": "Bare soil increases wind erosion and water loss."
+     },
+     {
+      "tr": "Nadas dönemi, toprak suyunun ekimdeki buğday için kullanılabilirliğini artırır.",
+      "en": "Fallow period increases soil water availability for wheat at planting."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekiminde toprak suyunun azlığı, ekim su gereksinimini azaltır.",
+      "en": "Chickpea planting soil moisture deficit reduces planting water requirement."
+     },
+     {
+      "tr": "Nohut, azot üretir ve toprak suyunun ekimdeki buğday için kullanılabilirliğini artırır.",
+      "en": "Chickpea produces nitrogen and increases soil water availability for wheat at planting."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Nohut ekiminde toprak suyunun azlığı, ekim su gereksinimini azaltır.",
+      "en": "Chickpea planting soil moisture deficit reduces planting water requirement."
+     },
+     {
+      "tr": "Nohut ekiminde toprak suyunun azlığı, ekim su gereksinimini azaltır.",
+      "en": "Chickpea planting soil moisture deficit reduces planting water requirement."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekiminde toprak suyunun azlığı, ekim su gereksinimini azaltır.",
+      "en": "Lentil planting soil moisture deficit reduces planting water requirement."
+     },
+     {
+      "tr": "Mercimek, azot üretir ve toprak suyunun ekimdeki buğday için kullanılabilirliğini artırır.",
+      "en": "Lentil produces nitrogen and increases soil water availability for wheat at planting."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Mercimek ekiminde toprak suyunun azlığı, ekim su gereksinimini azaltır.",
+      "en": "Lentil planting soil moisture deficit reduces planting water requirement."
+     },
+     {
+      "tr": "Mercimek ekiminde toprak suyunun azlığı, ekim su gereksinimini azaltır.",
+      "en": "Lentil planting soil moisture deficit reduces planting water requirement."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak testi, fosfor, potasyum, mikroelementler ve toprak sıkışmasını belirlemek için gereklidir.",
+    "en": "Soil test is needed to determine phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI, 4. ayın en yüksek değerini gösterir, 1, 9 ve 10. ayların en düşük değerlerini gösterir.",
+    "en": "NDVI shows peak in April, lowest in January, September, and October."
+   },
+   {
+    "tr": "NASA MERRA-2 modeli, toprak ıslaklığının %46 oranında olduğunu gösterir.",
+    "en": "NASA MERRA-2 model shows soil moisture at 46%."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2026) senaryosunda, nadas-buğday rotasyonunun ortalama buğday hasılat oranı %53'tür.",
+    "en": "In the past climate (2001-2026) scenario, the average wheat yield ratio for fallow-wheat rotation is 53%."
+   },
+   {
+    "tr": "Yüzde 10 daha az yağış ve 1°C daha sıcak senaryosunda, nadas-buğday rotasyonunun ortalama buğday hasılat oranı %46'dır.",
+    "en": "In the 10% less rainfall and 1°C warmer scenario, the average wheat yield ratio for fallow-wheat rotation is 46%."
+   },
+   {
+    "tr": "Yüzde 20 daha az yağış ve 2°C daha sıcak senaryosunda, nadas-buğday rotasyonunun ortalama buğday hasılat oranı %41'dir.",
+    "en": "In the 20% less rainfall and 2°C warmer scenario, the average wheat yield ratio for fallow-wheat rotation is 41%."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 modeli, uydu ölçümü değildir; model ve veri kaynakları arasındaki uyumu kontrol etmek için uydu verileri kullanılır.",
+    "en": "MERRA-2 is a model, not a measurement; satellite data is used to check the agreement between model and data sources."
+   },
+   {
+    "tr": "Senaryolar, geçmiş iklimlerdeki hassaslık adımlarıdır, gelecekteki iklim tahminleri değildir.",
+    "en": "Scenarios are sensitivity steps in past climates, not forecasts of future climates."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi, fosfor, potasyum, mikroelementler ve toprak sıkışmasını belirlemek için gereklidir.",
+    "en": "Soil test is needed to determine phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "nigde",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ],
+    "scenario_id": "baseline",
+    "district_name": "nigde",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "nigde"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "nigde",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "nigde"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "nigde"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

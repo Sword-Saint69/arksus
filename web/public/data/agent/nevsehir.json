@@ -1,0 +1,192 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T07:14:19Z",
+ "location_id": "nevsehir",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Nevşehir'de Üç İki-Yıl Döngüsü Karşılaştırması",
+   "en": "Three Two-Year Rotations Compared in Nevşehir"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun ekimde 62 mm olabilir.",
+      "en": "Fallow period soil water can be 62 mm at sowing."
+     },
+     {
+      "tr": "Daha az toprak erozyonu ve yabancı ot.",
+      "en": "Less soil erosion and foreign weeds."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "460 günün 461 gününde toprak açık.",
+      "en": "460 out of 461 days soil is bare."
+     },
+     {
+      "tr": "108 gün boyunca buğday su baskısı.",
+      "en": "108 days of wheat water stress."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekimden sonra 8 mm toprak suyu.",
+      "en": "8 mm of soil water after chickpea sowing."
+     },
+     {
+      "tr": "332 günün 332 gününde toprak açık.",
+      "en": "332 out of 332 days soil is bare."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "172 gün boyunca buğday su baskısı.",
+      "en": "172 days of wheat water stress."
+     },
+     {
+      "tr": "Nohut üretimi düşük olabilir.",
+      "en": "Chickpea yield may be low."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekimden sonra 8 mm toprak suyu.",
+      "en": "8 mm of soil water after lentil sowing."
+     },
+     {
+      "tr": "310 günün 311 gününde toprak açık.",
+      "en": "310 out of 311 days soil is bare."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "166 gün boyunca buğday su baskısı.",
+      "en": "166 days of wheat water stress."
+     },
+     {
+      "tr": "Mercimek üretimi düşük olabilir.",
+      "en": "Lentil yield may be low."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak organik karbonu medyan 11.3 g/kg.",
+    "en": "Soil organic carbon median 11.3 g/kg."
+   },
+   {
+    "tr": "Toprak ıslaklık kapasitesi 131 mm/m.",
+    "en": "Soil water holding capacity 131 mm/m."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI en yüksek mayıs ayında 0.34.",
+    "en": "NDVI peak in May at 0.34."
+   },
+   {
+    "tr": "Toprak ıslaklığı %38, bu ay için %93.",
+    "en": "Soil wetness 38%, this month 93rd percentile."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "10% daha az yağış ve 1 °C daha sıcak: Nadas → Buğday %47, Nohut → Buğday %42, Mercimek → Buğday %42.",
+    "en": "10% less rain and 1 °C warmer: Fallow → Wheat 47%, Chickpea → Wheat 42%, Lentil → Wheat 42%."
+   },
+   {
+    "tr": "20% daha az yağış ve 2 °C daha sıcak: Nadas → Buğday %42, Nohut → Buğday %39, Mercimek → Buğday %39.",
+    "en": "20% less rain and 2 °C warmer: Fallow → Wheat 42%, Chickpea → Wheat 39%, Lentil → Wheat 39%."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "Phosphorus, potassium, mikronutrients ve toprak sıkışması için toprak testi gereklidir.",
+    "en": "Soil test needed for phosphorus, potassium, micronutrients and compaction."
+   },
+   {
+    "tr": "MERRA-2 bir model, uydu ölçümü değildir.",
+    "en": "MERRA-2 is a model, not a measurement."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Nohut ve mercimek üretimleri için toprak testi.",
+    "en": "Soil test for chickpea and lentil yields."
+   },
+   {
+    "tr": "Nohut ve mercimek ekim ve tohum kalitesi.",
+    "en": "Chickpea and lentil sowing and seed quality."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "nevsehir"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "nevsehir",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ],
+    "scenario_id": "baseline",
+    "district_name": "nevsehir",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "nevsehir"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "nevsehir",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "nevsehir"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 1
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

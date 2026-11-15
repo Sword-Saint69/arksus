@@ -1,0 +1,187 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T06:39:59Z",
+ "location_id": "aksaray",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Aksaray'da İki Yıllık Rotasyonlar Karşılaştırılması",
+   "en": "Two-Year Rotations Comparison in Aksaray"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması, ekim zamanında daha az su gereksinimi.",
+      "en": "Fallow period reduces soil moisture, less water needed at sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla toprak suyunun kaybı, ekim zamanında daha az su.",
+      "en": "More soil moisture loss, less water at sowing."
+     },
+     {
+      "tr": "Daha fazla toprak suyunun kaybı, ekim zamanında daha az su.",
+      "en": "More soil moisture loss, less water at sowing."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nötrofilik bitki, azot üretir, ekim zamanında daha az su gereksinimi.",
+      "en": "Nitrogen-fixing crop, less water needed at sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az toprak suyunun kaybı, ekim zamanında daha fazla su.",
+      "en": "Less soil moisture loss, more water at sowing."
+     },
+     {
+      "tr": "Daha az toprak suyunun kaybı, ekim zamanında daha fazla su.",
+      "en": "Less soil moisture loss, more water at sowing."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Nötrofilik bitki, azot üretir, ekim zamanında daha az su gereksinimi.",
+      "en": "Nitrogen-fixing crop, less water needed at sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az toprak suyunun kaybı, ekim zamanında daha fazla su.",
+      "en": "Less soil moisture loss, more water at sowing."
+     },
+     {
+      "tr": "Daha az toprak suyunun kaybı, ekim zamanında daha fazla su.",
+      "en": "Less soil moisture loss, more water at sowing."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak organik maddeleri ve azot seviyeleri, toprak testi ile belirlenmelidir.",
+    "en": "Soil organic matter and nitrogen levels should be determined by soil test."
+   },
+   {
+    "tr": "Fosfor, potasyum, mikroelementler ve toprak sıkışması için toprak testi gerekli.",
+    "en": "Soil tests are needed for phosphorus, potassium, micronutrients, and compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI verileri, 2013-2024 yılları arasında toprak suyunun ve bitki kapasitesinin göstergesi.",
+    "en": "NDVI data, 2013-2024, indicate soil moisture and vegetation capacity."
+   },
+   {
+    "tr": "MERRA-2 modeli, toprak suyu dolulukunu tahmin eder (55 km hücresi).",
+    "en": "MERRA-2 model estimates soil moisture content (55 km cell)."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2024) ve %10 daha az yağışlı iklimlerde, nadas-çıkma rotasyonu daha az suya ihtiyaç duyar.",
+    "en": "In past climate (2001-2024) and 10% drier climates, fallow-wheat rotation needs less water."
+   },
+   {
+    "tr": "Nohut-çıkma ve mercimek-çıkma rotasyonları, ekim zamanında daha fazla suya ihtiyaç duyar.",
+    "en": "Chickpea-wheat and lentil-wheat rotations need more water at sowing."
+   },
+   {
+    "tr": "1 °C daha sıcak iklimlerde, nadas-çıkma rotasyonu daha az suya ihtiyaç duyar.",
+    "en": "In 1 °C warmer climates, fallow-wheat rotation needs less water."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "Model, toprak su kapasitesine çok bağlıdır, bu nedenle sonuçlar değişkenlik gösterir.",
+    "en": "Model results are highly dependent on soil water capacity, showing variability."
+   },
+   {
+    "tr": "MERRA-2 modeli, uydu ölçümü değildir, bu nedenle iklim tahminleri biraz belirsizdir.",
+    "en": "MERRA-2 is a model, not a measurement, so climate predictions are somewhat uncertain."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın, toprak sıkışması ve mikroelementler için.",
+    "en": "Conduct a soil test for compaction and micronutrients."
+   },
+   {
+    "tr": "Yerel uzmanlardan toprak su kapasitesi ve bitki ihtiyaçları hakkında bilgi edinin.",
+    "en": "Consult local experts for soil water capacity and crop needs."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "aksaray",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "aksaray",
+    "depth_class": "medium",
+    "scenario_id": "baseline",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ]
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "aksaray",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "aksaray",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "aksaray",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "aksaray"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

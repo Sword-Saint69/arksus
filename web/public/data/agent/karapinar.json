@@ -1,0 +1,187 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T06:11:13Z",
+ "location_id": "karapinar",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Karapınar'da Üç İki-Yıl Döngüsü Karşılaştırması",
+   "en": "Three Two-Year Rotations Compared in Karapınar"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması, buğday ekiminde daha az su gereksinimi.",
+      "en": "Less soil moisture in fallow period, less water needed at wheat sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla rüzgâr erozyonu, toprak kaybı.",
+      "en": "More wind erosion, soil loss."
+     },
+     {
+      "tr": "Daha az bitki kaplaması, toprak suyunun azalması.",
+      "en": "Less plant cover, less soil moisture."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nötrofil bitki, azot üretimi.",
+      "en": "Nitrogen-fixing legume."
+     },
+     {
+      "tr": "Daha az rüzgâr erozyonu, toprak koruması.",
+      "en": "Less wind erosion, soil protection."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla toprak işlenmesi, toprak kaybı riski.",
+      "en": "More tillage, soil loss risk."
+     },
+     {
+      "tr": "Nötrofil bitkilerin ekim su gereksinimi.",
+      "en": "Legume sowing water requirement."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Nötrofil bitki, azot üretimi.",
+      "en": "Nitrogen-fixing legume."
+     },
+     {
+      "tr": "Daha az rüzgâr erozyonu, toprak koruması.",
+      "en": "Less wind erosion, soil protection."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha az toprak işlenmesi, toprak koruması.",
+      "en": "Less tillage, soil protection."
+     },
+     {
+      "tr": "Nötrofil bitkilerin ekim su gereksinimi.",
+      "en": "Legume sowing water requirement."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak testi gereklidir: fosfor, potasyum, mikroelementler ve kompaktlik.",
+    "en": "Soil test needed: phosphorus, potassium, micronutrients, and compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI verileri, 2013-2024: en yüksek mayıs ayında, en düşük Ocak, Ekim ve Kasım aylarında.",
+    "en": "NDVI data, 2013-2024: peak in May, lowest in January, October, and November."
+   },
+   {
+    "tr": "MERRA-2 toprak ıslaklık modeli, son ay: Eylül 2026, %46 doluluk, %67 percentil.",
+    "en": "MERRA-2 soil moisture model, latest month: September 2026, 46% full, 67th percentile."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2026): Nadas-Buğday, Buğday verimlilik oranı %50: 42, ekim su gereksinimi %50: 45 mm.",
+    "en": "Baseline climate (2001-2026): Fallow-Wheat, Wheat yield ratio p50: 42%, water at sowing p50: 45 mm."
+   },
+   {
+    "tr": "10% daha az yağış: Nadas-Buğday, Buğday verimlilik oranı %50: 36, ekim su gereksinimi %50: 32 mm.",
+    "en": "10% less rainfall: Fallow-Wheat, Wheat yield ratio p50: 36%, water at sowing p50: 32 mm."
+   },
+   {
+    "tr": "10% daha az yağış ve 1°C daha sıcak: Nadas-Buğday, Buğday verimlilik oranı %50: 35, ekim su gereksinimi %50: 30 mm.",
+    "en": "10% less rainfall and 1°C warmer: Fallow-Wheat, Wheat yield ratio p50: 35%, water at sowing p50: 30 mm."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 bir NASA yeniden analiz modelidir, uydu ölçümü değildir.",
+    "en": "MERRA-2 is a NASA reanalysis model, not a satellite measurement."
+   },
+   {
+    "tr": "İstasyon verisi, yerde tek bir noktayı ölçer, model geniş bir bölgeyi kapsar.",
+    "en": "Station data measures a single point on the ground, model covers a wider area."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın: fosfor, potasyum, mikroelementler ve kompaktlik.",
+    "en": "Conduct a soil test: phosphorus, potassium, micronutrients, and compaction."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "karapinar",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "karapinar",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ],
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "karapinar",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "karapinar",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "karapinar",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "karapinar",
+    "depth_class": "medium"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

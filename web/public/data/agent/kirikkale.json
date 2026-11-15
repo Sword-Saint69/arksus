@@ -1,0 +1,191 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T07:34:03Z",
+ "location_id": "kirikkale",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Kırıkkale'de İki Yıllık Rotasyonlar Karşılaştırılması",
+   "en": "Two-Year Rotations Comparison in Kırıkkale"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması, buğday ekiminde daha az su gereksinimi.",
+      "en": "Less soil moisture in fallow period, less water needed for wheat sowing."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Bare soil durumunda toprak erozyonu ve su kaybı.",
+      "en": "Soil erosion and water loss due to bare soil."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekiminde toprak suyunun azalması, buğday ekiminde daha az su gereksinimi.",
+      "en": "Less soil moisture in chickpea period, less water needed for wheat sowing."
+     },
+     {
+      "tr": "Nohut, toprak suyunun korunmasına yardımcı olur.",
+      "en": "Chickpea helps in soil moisture conservation."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Nohut ekiminde daha az toprak suyu, buğday ekiminde daha düşük verim.",
+      "en": "Less soil moisture in chickpea period, lower wheat yield."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekiminde toprak suyunun azalması, buğday ekiminde daha az su gereksinimi.",
+      "en": "Less soil moisture in lentil period, less water needed for wheat sowing."
+     },
+     {
+      "tr": "Mercimek, toprak suyunun korunmasına yardımcı olur.",
+      "en": "Lentil helps in soil moisture conservation."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Mercimek ekiminde daha az toprak suyu, buğday ekiminde daha düşük verim.",
+      "en": "Less soil moisture in lentil period, lower wheat yield."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak erozyonu riski, nadas dönemi ve az toprak suyu durumunda artar.",
+    "en": "Soil erosion risk increases with fallow period and low soil moisture."
+   },
+   {
+    "tr": "Nohut ve mercimek ekimleri toprak erozyonunu azaltabilir, ancak buğday ekiminde daha az toprak suyu olabilir.",
+    "en": "Chickpea and lentil planting can reduce soil erosion, but may result in less soil moisture for wheat planting."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI verileri, 2013-2024 yılları arasında en verimli ayların Mayıs, en az verimli ayların Ekim, Ocak ve Ağustos olduğunu gösteriyor.",
+    "en": "NDVI data shows the most productive months are May, least productive months are October, January, and August."
+   },
+   {
+    "tr": "MERRA-2 modeli, 2026-09 aylarında kök bölgesi toprak ıslaklığının %47 olduğunu gösteriyor.",
+    "en": "MERRA-2 model shows root zone soil moisture at 47% in September 2026."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Düşük yağışlı ve sıcak hava koşullarında, nadas dönemi ve nohut-merimek ekimleri daha düşük buğday verimlerine yol açabilir.",
+    "en": "In low rainfall and warm conditions, fallow period and chickpea-lentil planting can lead to lower wheat yields."
+   },
+   {
+    "tr": "Geçmiş iklim koşullarında, nadas dönemi ve nohut-merimek ekimleri arasında toprak suyunun ve buğday veriminin farklılıklar var.",
+    "en": "In past climate conditions, there are differences in soil moisture and wheat yield between fallow period and chickpea-lentil planting."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "Toprak testi gereklidir, fosfor, potasyum, mikroelementler ve toprak sıkışması bilinmiyor.",
+    "en": "Soil test is needed, phosphorus, potassium, micronutrients, and compaction are unknown."
+   },
+   {
+    "tr": "MERRA-2 modeli bir reanaliz modelidir, uydu ölçümü değildir.",
+    "en": "MERRA-2 is a reanalysis model, not a satellite measurement."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın, fosfor, potasyum, mikroelementler ve toprak sıkışmasını belirleyin.",
+    "en": "Conduct a soil test to determine phosphorus, potassium, micronutrients, and compaction."
+   },
+   {
+    "tr": "Yerel uzmanlardan toprak erozyonu ve su kaybı risklerini öğrenin.",
+    "en": "Consult local experts to learn about soil erosion and water loss risks."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "kirikkale",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "depth_class": "medium",
+    "scenario_id": "baseline",
+    "district_name": "kirikkale",
+    "rotation": "fallow-wheat"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "kirikkale",
+    "rotation": "chickpea-wheat",
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "scenario_id": "baseline",
+    "district_name": "kirikkale",
+    "rotation": "lentil-wheat",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "kirikkale",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "kirikkale"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "kirikkale"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "kirikkale"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

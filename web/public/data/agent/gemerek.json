@@ -1,0 +1,191 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T07:52:21Z",
+ "location_id": "gemerek",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Gemerek'de Nadas → Buğday, Nohut → Buğday ve Mercimek → Buğday Rotasyonları",
+   "en": "Fallow → Wheat, Chickpea → Wheat, and Lentil → Wheat Rotations in Gemerek"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Bare soil provides heat for early wheat growth",
+      "en": "Bare soil provides heat for early wheat growth"
+     },
+     {
+      "tr": "Less tillage passes than legume rotations",
+      "en": "Less tillage passes than legume rotations"
+     }
+    ],
+    "risks": [
+     {
+      "tr": "High risk of soil erosion",
+      "en": "High risk of soil erosion"
+     },
+     {
+      "tr": "Less water available at wheat sowing",
+      "en": "Less water available at wheat sowing"
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Fixes nitrogen, reducing fertilizer needs",
+      "en": "Fixes nitrogen, reducing fertilizer needs"
+     },
+     {
+      "tr": "More water available at wheat sowing",
+      "en": "More water available at wheat sowing"
+     }
+    ],
+    "risks": [
+     {
+      "tr": "More tillage passes than fallow",
+      "en": "More tillage passes than fallow"
+     },
+     {
+      "tr": "Lower wheat yield ratio",
+      "en": "Lower wheat yield ratio"
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Fixes nitrogen, reducing fertilizer needs",
+      "en": "Fixes nitrogen, reducing fertilizer needs"
+     },
+     {
+      "tr": "More water available at wheat sowing",
+      "en": "More water available at wheat sowing"
+     }
+    ],
+    "risks": [
+     {
+      "tr": "More tillage passes than fallow",
+      "en": "More tillage passes than fallow"
+     },
+     {
+      "tr": "Lower wheat yield ratio",
+      "en": "Lower wheat yield ratio"
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Soil tests needed for phosphorus, potassium, micronutrients, and compaction",
+    "en": "Soil tests needed for phosphorus, potassium, micronutrients, and compaction"
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI shows bare or dry soil in winter and spring, higher values in summer",
+    "en": "NDVI shows bare or dry soil in winter and spring, higher values in summer"
+   },
+   {
+    "tr": "MERRA-2 model shows 47% soil moisture, 93rd percentile for September 2026",
+    "en": "MERRA-2 model shows 47% soil moisture, 93rd percentile for September 2026"
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Baseline: 2001-2026 climate, fallow-wheat yields 61% of potential, 60 mm water at sowing",
+    "en": "Baseline: 2001-2026 climate, fallow-wheat yields 61% of potential, 60 mm water at sowing"
+   },
+   {
+    "tr": "Dry10: 10% less rainfall, fallow-wheat yields 58% of potential, 44 mm water at sowing",
+    "en": "Dry10: 10% less rainfall, fallow-wheat yields 58% of potential, 44 mm water at sowing"
+   },
+   {
+    "tr": "Dry20: 20% less rainfall, fallow-wheat yields 51% of potential, 28 mm water at sowing",
+    "en": "Dry20: 20% less rainfall, fallow-wheat yields 51% of potential, 28 mm water at sowing"
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "Model uses NASA MERRA-2 reanalysis, not direct measurements",
+    "en": "Model uses NASA MERRA-2 reanalysis, not direct measurements"
+   },
+   {
+    "tr": "Scenarios are sensitivity steps, not forecasts",
+    "en": "Scenarios are sensitivity steps, not forecasts"
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Local expert advice on fertilizer needs and disease management",
+    "en": "Local expert advice on fertilizer needs and disease management"
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "gemerek",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "scenario_id": "baseline",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ],
+    "district_name": "gemerek",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "gemerek",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "gemerek",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "gemerek",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "gemerek",
+    "depth_class": "medium"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

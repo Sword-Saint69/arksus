@@ -1,0 +1,223 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T04:50:58Z",
+ "location_id": "develi",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Develi İliçindeki Üç İki-Yılık Rotasyonun Karşılaştırılması",
+   "en": "Comparison of Three Two-Year Rotations in Develi District"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun azalması ve buğday ekimindeki su stokları düşük olabilir.",
+      "en": "Fallow period leads to soil moisture depletion, and wheat sowing may have low water stocks."
+     },
+     {
+      "tr": "Daha az taraflı tohum ekimi (3 taraflı tohum ekimi yerine 2 taraflı).",
+      "en": "Less tillage passes (3 tillage passes per year instead of 2)."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Daha fazla toprak suyunun kaybı ve toprak erozyonu riski.",
+      "en": "More soil moisture loss and soil erosion risk."
+     },
+     {
+      "tr": "Nitrigen ve diğer besinlerin toprakta azalması.",
+      "en": "Nitrogen and other nutrients may decrease in the soil."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut, toprak suyunun korunmasına yardımcı olabilir.",
+      "en": "Chickpea helps conserve soil moisture."
+     },
+     {
+      "tr": "Nohut, toprakda azot üretir.",
+      "en": "Chickpea fixes nitrogen in the soil."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Nohut ekiminde daha fazla taraflı tohum ekimi.",
+      "en": "More tillage passes during chickpea planting."
+     },
+     {
+      "tr": "Nohut ekimindeki su stokları düşük olabilir.",
+      "en": "Chickpea planting may have low water stocks."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek, toprak suyunun korunmasına yardımcı olabilir.",
+      "en": "Lentil helps conserve soil moisture."
+     },
+     {
+      "tr": "Mercimek, toprakda azot üretir.",
+      "en": "Lentil fixes nitrogen in the soil."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Mercimek ekiminde daha az taraflı tohum ekimi.",
+      "en": "Less tillage passes during lentil planting."
+     },
+     {
+      "tr": "Mercimek ekimindeki su stokları düşük olabilir.",
+      "en": "Lentil planting may have low water stocks."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak su kapasitesi: 123.5 mm/m (orijinal tahmin).",
+    "en": "Soil water capacity: 123.5 mm/m (original estimate)."
+   },
+   {
+    "tr": "Toprak testi gereklidir: fosfor, potasyum, mikroelementler ve toprak sıkışması.",
+    "en": "Soil test needed: phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI: Mayıs ayı zirvesi, Ocak ve Şubat düşük.",
+    "en": "NDVI: May peak, January and February low."
+   },
+   {
+    "tr": "MERRA-2 toprak ıslaklığı: Eylül ayı %48, bu ay için %96 percentil.",
+    "en": "MERRA-2 soil wetness: September at 48%, 96th percentile for this month."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2026): Nadas → Buğday, 72 mm su, 57% buğday verim.",
+    "en": "Baseline climate (2001-2026): Fallow → Wheat, 72 mm water, 57% wheat yield."
+   },
+   {
+    "tr": "10% daha az yağış: Nadas → Buğday, 51 mm su, 54% buğday verim.",
+    "en": "10% less rainfall: Fallow → Wheat, 51 mm water, 54% wheat yield."
+   },
+   {
+    "tr": "20% daha az yağış: Nadas → Buğday, 33 mm su, 49% buğday verim.",
+    "en": "20% less rainfall: Fallow → Wheat, 33 mm water, 49% wheat yield."
+   },
+   {
+    "tr": "1 °C daha sıcak: Nadas → Buğday, 68 mm su, 56% buğday verim.",
+    "en": "1 °C warmer: Fallow → Wheat, 68 mm water, 56% wheat yield."
+   },
+   {
+    "tr": "2 °C daha sıcak: Nadas → Buğday, 63 mm su, 55% buğday verim.",
+    "en": "2 °C warmer: Fallow → Wheat, 63 mm water, 55% wheat yield."
+   },
+   {
+    "tr": "10% daha az yağış ve 1 °C daha sıcak: Nadas → Buğday, 48 mm su, 53% buğday verim.",
+    "en": "10% less rainfall and 1 °C warmer: Fallow → Wheat, 48 mm water, 53% wheat yield."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "MERRA-2 bir model, uydu ölçümü değildir.",
+    "en": "MERRA-2 is a model, not a satellite measurement."
+   },
+   {
+    "tr": "Senaryolar hassasiyet adımları, geleceğin tahminleri değildir.",
+    "en": "Scenarios are sensitivity steps, not forecasts of the future."
+   },
+   {
+    "tr": "Sonuçlar 24 geçmiş iklim yılına dayanır, çiftçinin tarlası değil.",
+    "en": "Results are for 24 past climate years, not the farmer's field."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Toprak testi yapın: fosfor, potasyum, mikroelementler ve toprak sıkışması.",
+    "en": "Conduct a soil test: phosphorus, potassium, micronutrients, and soil compaction."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "develi",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "rotation": "fallow-wheat",
+    "depth_class": "medium",
+    "scenario_id": "baseline",
+    "district_name": "develi"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "develi",
+    "rotation": "chickpea-wheat",
+    "depth_class": "medium",
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "scenario_id": "baseline",
+    "district_name": "develi",
+    "rotation": "lentil-wheat",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "develi",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "develi"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "depth_class": "medium",
+    "district_name": "develi"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "develi"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}

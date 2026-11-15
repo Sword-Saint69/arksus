@@ -1,0 +1,195 @@
+{
+ "schema_version": "1.0",
+ "mock": false,
+ "generated_at": "2026-11-15T06:49:41Z",
+ "location_id": "karaman",
+ "depth_id": "medium",
+ "model": "qwen2.5:14b (Ollama, local)",
+ "type": "model",
+ "report": {
+  "headline": {
+   "tr": "Karaman'da Üç İki-Yıl Döngüsü Karşılaştırması",
+   "en": "Three Two-Year Rotations Compared in Karaman"
+  },
+  "rotations": [
+   {
+    "rotation_id": "fallow_wheat",
+    "strengths": [
+     {
+      "tr": "Nadas dönemi toprak suyunun ekimde 112 mm olabilir.",
+      "en": "Fallow period soil water can be 112 mm at sowing."
+     },
+     {
+      "tr": "Bare soil 460 gün ve rüzgarla maruz kalan 83 gün.",
+      "en": "Bare soil 460 days and 83 days exposed to wind."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Buğday stressi 86 gün.",
+      "en": "Wheat stress 86 days."
+     },
+     {
+      "tr": "Buğday hasadı 49% olabilir.",
+      "en": "Wheat yield ratio 49%."
+     }
+    ]
+   },
+   {
+    "rotation_id": "chickpea_wheat",
+    "strengths": [
+     {
+      "tr": "Nohut ekimde toprak suyunun 0 mm olabilir.",
+      "en": "Chickpea sowing soil water can be 0 mm."
+     },
+     {
+      "tr": "Bare soil 332 gün ve rüzgarla maruz kalan 54 gün.",
+      "en": "Bare soil 332 days and 54 days exposed to wind."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Buğday hasadı 44% olabilir.",
+      "en": "Wheat yield ratio 44%."
+     },
+     {
+      "tr": "Nohut hasadı 30% olabilir.",
+      "en": "Chickpea yield ratio 30%."
+     }
+    ]
+   },
+   {
+    "rotation_id": "lentil_wheat",
+    "strengths": [
+     {
+      "tr": "Mercimek ekimde toprak suyunun 14 mm olabilir.",
+      "en": "Lentil sowing soil water can be 14 mm."
+     },
+     {
+      "tr": "Bare soil 310 gün ve rüzgarla maruz kalan 47 gün.",
+      "en": "Bare soil 310 days and 47 days exposed to wind."
+     }
+    ],
+    "risks": [
+     {
+      "tr": "Buğday hasadı 45% olabilir.",
+      "en": "Wheat yield ratio 45%."
+     },
+     {
+      "tr": "Mercimek hasadı 28% olabilir.",
+      "en": "Lentil yield ratio 28%."
+     }
+    ]
+   }
+  ],
+  "soil_health": [
+   {
+    "tr": "Toprak organik karbonu 8.6 g/kg.",
+    "en": "Soil organic carbon 8.6 g/kg."
+   },
+   {
+    "tr": "Toprak su kapasitesi 153.4 mm/m.",
+    "en": "Available water capacity 153.4 mm/m."
+   }
+  ],
+  "satellites": [
+   {
+    "tr": "NDVI en yüksek 4. ayda, en düşük 9, 10 ve 8. ayda.",
+    "en": "NDVI peak in April, lowest in September, October, and August."
+   },
+   {
+    "tr": "Toprak ıslaklığı %47, bu ay için %96 percentil.",
+    "en": "Soil moisture 47%, this month's 96th percentile."
+   }
+  ],
+  "climate_scenarios": [
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Nadas → Buğday: Buğday hasadı 49%, ekimde toprak suyu 112 mm.",
+    "en": "Baseline climate (2001-2026) - Fallow → Wheat: Wheat yield ratio 49%, soil water at sowing 112 mm."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Nohut → Buğday: Buğday hasadı 44%, ekimde toprak suyu 0 mm.",
+    "en": "Baseline climate (2001-2026) - Chickpea → Wheat: Wheat yield ratio 44%, soil water at sowing 0 mm."
+   },
+   {
+    "tr": "Geçmiş iklim (2001-2026) - Mercimek → Buğday: Buğday hasadı 45%, ekimde toprak suyu 14 mm.",
+    "en": "Baseline climate (2001-2026) - Lentil → Wheat: Wheat yield ratio 45%, soil water at sowing 14 mm."
+   }
+  ],
+  "uncertainties": [
+   {
+    "tr": "Phosphorus, potassium, mikronutrients ve toprak sıkışması için toprak testi gereklidir.",
+    "en": "Soil test needed for phosphorus, potassium, micronutrients, and compaction."
+   },
+   {
+    "tr": "MERRA-2 bir NASA yeniden analiz modelidir, uydu ölçümü değildir.",
+    "en": "MERRA-2 is a NASA reanalysis model, not a measurement."
+   }
+  ],
+  "ask_local_expert": [
+   {
+    "tr": "Azot, hastalıklar ve yabancı otların etkileri için yerel uzmana danışın.",
+    "en": "Consult local expert for nitrogen, disease, and weed impacts."
+   }
+  ]
+ },
+ "tools_used": [
+  {
+   "tool": "district",
+   "args": {
+    "district_name": "karaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "rotations",
+   "args": {
+    "district_name": "karaman",
+    "depth_class": "medium",
+    "rotation_names": [
+     "fallow-wheat",
+     "chickpea-wheat",
+     "lentil-wheat"
+    ],
+    "scenario_id": "baseline"
+   }
+  },
+  {
+   "tool": "soil",
+   "args": {
+    "district_name": "karaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "satellites",
+   "args": {
+    "district_name": "karaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "scenarios",
+   "args": {
+    "district_name": "karaman",
+    "depth_class": "medium"
+   }
+  },
+  {
+   "tool": "checks",
+   "args": {
+    "district_name": "karaman",
+    "depth_class": "medium"
+   }
+  }
+ ],
+ "guards": {
+  "passed": true,
+  "problems": [],
+  "rewrites": 0
+ },
+ "disclaimer": {
+  "tr": "Yapay zekâ yorumu: yalnızca bu sitedeki verilerden üretildi; çiftçinin ve yerel uzmanın kararının yerine geçmez.",
+  "en": "AI commentary generated only from this site's data; it does not replace the farmer's and local experts' judgment."
+ }
+}
