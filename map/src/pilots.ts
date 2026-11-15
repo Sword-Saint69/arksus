@@ -5,7 +5,7 @@
 // 15 Nov: climate scenarios (E2), the decision module (priorities → ranking, guardrails,
 // close call, price robustness, flip table) and the evidence panel (validation.json).
 
-import type { DefaultsFile, DepthId, LedgerFile, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
+import type { AgentFile, DefaultsFile, DepthId, LedgerFile, LocationId, ResultsFile, SiteIndex, SmapFile, ValidationFile } from '../../web/src/lib/types';
 import {
   decide, flipTable, inputsFromDefaults, priceRobustness, summarize,
   type Decision, type DecisionInputs, type FlipCell, type PriceRobustness, type Weights,
@@ -35,6 +35,7 @@ export class Pilots {
   private inputs: DecisionInputs | null = null;
   private results = new Map<string, ResultsFile>();   // key: `${id}__${scenario}`
   private smap = new Map<string, SmapFile>();
+  private agent = new Map<string, AgentFile | null>();
   private ledgers = new Map<string, Promise<LedgerFile>>();
   private loading = new Map<string, Promise<void>>();
   onLoaded: () => void = () => {};
@@ -67,8 +68,9 @@ export class Pilots {
     const p = Promise.all([
       getJSON<ResultsFile>(resultsPath(id, this.scenario)),
       this.smap.has(id) ? Promise.resolve(this.smap.get(id)!) : getJSON<SmapFile>(`smap/${id}.json`).catch(() => null),
+      this.agent.has(id) ? Promise.resolve(this.agent.get(id)!) : getJSON<AgentFile>(`agent/${id}.json`).catch(() => null),
     ])
-      .then(([r, s]) => { this.results.set(key, r); if (s) this.smap.set(id, s); this.onLoaded(); })
+      .then(([r, s, a]) => { this.results.set(key, r); if (s) this.smap.set(id, s); this.agent.set(id, a); this.onLoaded(); })
       .catch((e) => console.warn('NöbetSu results', key, e))
       .finally(() => this.loading.delete(key));
     this.loading.set(key, p);
@@ -92,6 +94,7 @@ export class Pilots {
       site: this.site, location, results, smap: this.smap.get(id) ?? null, summaries, depth: this.depth,
       moneyPending: false, scenario: this.scenario, weights: this.weights, decision, robustness, flip,
       validation: this.validation,
+      agent: this.agent.get(id) ?? null,
     };
   }
 

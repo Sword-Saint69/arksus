@@ -2,7 +2,7 @@ import { formatLat, formatLon, mercToLonLat, polygonCentroid, polygonPerimeterM 
 import type { Feature } from '../vector/features';
 import { esc, fmtArea, fmtDonum, fmtLen, fmtNum } from './format';
 import { t, tx, getLang, type Key } from '../strings';
-import type { Badge, DepthId, Location, ResultsFile, SiteIndex, SmapFile, V, ValidationFile } from '../../../web/src/lib/types';
+import type { AgentFile, Badge, DepthId, Location, ResultsFile, SiteIndex, SmapFile, V, ValidationFile } from '../../../web/src/lib/types';
 import type { Decision, FlipCell, PriceRobustness, RotationSummary, Weights } from '../../../web/src/lib/economics';
 
 export type PilotData = {
@@ -20,6 +20,7 @@ export type PilotData = {
   robustness: PriceRobustness | null;
   flip: FlipCell[] | null;
   validation: ValidationFile | null;
+  agent: AgentFile | null;
 };
 
 export type InspectorContext = {
@@ -212,6 +213,7 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     ${scenarioHtml(d)}
     ${prioritiesHtml(d)}
     ${rankingHtml(d)}
+    ${agentHtml(d)}
     ${d.moneyPending ? `<div class="note warn">${icon('i-info')}<span>${t('moneyPending')}</span></div>` : ''}
     ${rotHtml || `<p class="sec-sub">…</p>`}
     ${flipHtml(d)}
@@ -287,6 +289,30 @@ function rankingHtml(d: PilotData) {
     <ol class="ranking">${rows}</ol>
     ${dec.close_call ? `<div class="note warn">${icon('i-info')}<span>${t('closeCall')}</span></div>` : ''}
     ${priceNote ? `<p class="sec-sub">${priceNote}</p>` : ''}`;
+}
+
+function agentHtml(d: PilotData) {
+  const a = d.agent;
+  // Only reports that passed the guards (every number from the data, honest wording) are shown.
+  if (!a || !a.guards.passed || !a.report) return '';
+  const r = a.report;
+  const ul = (xs: { en: string; tr: string }[]) => (xs.length ? `<ul>${xs.map((x) => `<li>${esc(tx(x))}</li>`).join('')}</ul>` : '');
+  const rots = r.rotations.map((x) => `
+      <h5>${rotLabel(d.site, x.rotation_id)}</h5>
+      ${x.strengths.length ? `<p class="sec-sub">${t('aiStrengths')}</p>${ul(x.strengths)}` : ''}
+      ${x.risks.length ? `<p class="sec-sub">${t('aiRisks')}</p>${ul(x.risks)}` : ''}`).join('');
+  return `
+    <details class="evidence ai">
+      <summary>${t('aiTitle')} ${badge('model')}</summary>
+      <p><b>${esc(tx(r.headline))}</b></p>
+      ${rots}
+      ${r.soil_health.length ? `<h5>${t('aiSoil')}</h5>${ul(r.soil_health)}` : ''}
+      ${r.satellites.length ? `<h5>${t('aiSat')}</h5>${ul(r.satellites)}` : ''}
+      ${r.climate_scenarios.length ? `<h5>${t('aiScen')}</h5>${ul(r.climate_scenarios)}` : ''}
+      ${r.uncertainties.length ? `<h5>${t('gaps')}</h5>${ul(r.uncertainties)}` : ''}
+      ${r.ask_local_expert.length ? `<h5>${t('localReview')}</h5>${ul(r.ask_local_expert)}` : ''}
+      <p class="sec-sub">${esc(tx(a.disclaimer))} · ${esc(a.model)} · ${t('aiGuards')}</p>
+    </details>`;
 }
 
 function flipHtml(d: PilotData) {

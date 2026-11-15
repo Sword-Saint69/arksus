@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nobetsu/agent.schema.json",
+  "title": "agent",
+  "description": "15 Nov: AI district commentary from a local model (nobetsu.agent). web/public/data/agent/{location_id}.json. Show the report only when guards.passed is true.",
+  "type": "object",
+  "$defs": {
+    "text": {
+      "type": "object",
+      "properties": {"tr": {"type": "string"}, "en": {"type": "string"}},
+      "required": ["tr", "en"]
+    },
+    "texts": {"type": "array", "items": {"$ref": "#/$defs/text"}}
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "mock": {"type": "boolean"},
+    "generated_at": {"type": "string"},
+    "location_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "depth_id": {"type": "string"},
+    "model": {"type": "string"},
+    "type": {"const": "model"},
+    "report": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "properties": {
+            "headline": {"$ref": "#/$defs/text"},
+            "rotations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rotation_id": {"type": "string"},
+                  "strengths": {"$ref": "#/$defs/texts"},
+                  "risks": {"$ref": "#/$defs/texts"}
+                },
+                "required": ["rotation_id", "strengths", "risks"]
+              }
+            },
+            "soil_health": {"$ref": "#/$defs/texts"},
+            "satellites": {"$ref": "#/$defs/texts"},
+            "climate_scenarios": {"$ref": "#/$defs/texts"},
+            "uncertainties": {"$ref": "#/$defs/texts"},
+            "ask_local_expert": {"$ref": "#/$defs/texts"}
+          },
+          "required": ["headline", "rotations", "soil_health", "satellites", "climate_scenarios", "uncertainties", "ask_local_expert"]
+        }
+      ]
+    },
+    "tools_used": {"type": "array"},
+    "guards": {
+      "type": "object",
+      "properties": {
+        "passed": {"type": "boolean"},
+        "problems": {"type": "array", "items": {"type": "string"}},
+        "rewrites": {"type": "integer"}
+      },
+      "required": ["passed", "problems", "rewrites"]
+    },
+    "disclaimer": {"$ref": "#/$defs/text"}
+  },
+  "required": ["schema_version", "mock", "generated_at", "location_id", "model", "type", "report", "guards", "disclaimer"]
+}

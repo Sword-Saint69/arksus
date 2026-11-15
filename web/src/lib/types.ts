@@ -128,6 +128,27 @@ export type CheckId = 'mass_balance' | 'et0_fao56_ex18' | 'pse_literature' | 'tr
 export interface Check { id: CheckId; status: 'pass' | 'fail' | 'info' | 'pending'; value: string; reference: string; note: Text }
 export interface ValidationFile extends FileHeader { checks: Check[] }
 
+// agent/{location_id}.json — AI district commentary from a local model (15 Nov). Show `report` only when guards.passed.
+export interface AgentReport {
+  headline: Text;
+  rotations: { rotation_id: string; strengths: Text[]; risks: Text[] }[];
+  soil_health: Text[];
+  satellites: Text[];
+  climate_scenarios: Text[];
+  uncertainties: Text[];
+  ask_local_expert: Text[];
+}
+export interface AgentFile extends FileHeader {
+  location_id: LocationId;
+  depth_id: DepthId;
+  model: string;
+  type: 'model';
+  report: AgentReport | null;
+  tools_used: { tool: string; args: Record<string, unknown>; forced?: boolean }[];
+  guards: { passed: boolean; problems: string[]; rewrites: number };
+  disclaimer: Text;
+}
+
 // §4.6 fertilizer.json — fertilizer rules (15 Nov, docs/GUBRE.md). National (Central Anatolia tables), same for every location.
 // The browser computes the plan with fertilizer.ts; amounts are kg/da of pure nutrient or of product. No money.
 export type FertCropId = 'wheat' | 'barley' | 'chickpea' | 'lentil' | 'sugar_beet' | 'potato' | 'onion';

@@ -223,6 +223,13 @@ const S = {
   textureClass: { tr: 'Doku sınıfı (0–100 cm)', en: 'Texture class (0–100 cm)' },
   awcAlt: { tr: 'Diğer su kapasitesi tahminleri (kullanılmıyor)', en: 'Other water-capacity estimates (not used)' },
   reset: { tr: 'Varsayılana dön', en: 'Reset to defaults' },
+  aiTitle: { tr: 'Yapay zekâ yorumu (ilçe)', en: 'AI commentary (district)' },
+  aiStrengths: { tr: 'Güçlü yanları', en: 'Strengths' },
+  aiRisks: { tr: 'Riskleri', en: 'Risks' },
+  aiSoil: { tr: 'Toprak sağlığı', en: 'Soil health' },
+  aiSat: { tr: 'Uydular ne gösteriyor', en: 'What satellites show' },
+  aiScen: { tr: 'Daha kurak ya da sıcak olursa', en: 'If it gets drier or warmer' },
+  aiGuards: { tr: 'Metindeki her sayı bu sitenin verisinden; denetimden geçti.', en: 'Every number in the text comes from this site\'s data; checked.' },
   // Process simulation (three.js)
   simOpen: { tr: 'Süreci 3B izle', en: 'Watch the process in 3D' },
   simCtaSub: { tr: 'Üç tarlada iki yılın suyu, haftalık', en: 'Two years of water in three fields, week by week' },
