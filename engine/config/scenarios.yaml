@@ -33,3 +33,20 @@ scenarios:
     label: { en: "10 % less rain and 1 °C warmer", tr: "%10 daha az yağış ve 1 °C daha sıcak" }
     precip_factor: { value: 0.9, unit: "-", source: "PLAN_EXPANSION E2 combined case: precipitation × 0.9", type: assumption, verified: false }
     temp_shift_c: { value: 1.0, unit: "°C", source: "PLAN_EXPANSION E2 combined case: +1 °C", type: assumption, verified: false }
+
+# Station correction of NASA POWER precipitation (15 Nov, OMER_BAKMALI §6 option b).
+# Linear scaling: every daily POWER precipitation value is multiplied by
+#   MGM/WMO 1991–2020 annual normal (references.yaml mgm_annual_precip_mm) / POWER mean annual
+#   precipitation over the complete calendar years of the record.
+# Wet days and their timing stay as in POWER; only amounts change. Applied in runner.run_location,
+# run_scenarios (before the scenario factor) and run_landscape. The raw POWER-vs-MGM numbers stay in
+# the precip_vs_mgm check. Known limits: the normal covers 1991–2020 while POWER covers 2000 onward;
+# Develi uses Kayseri Bölge (~29 km away); one annual factor, not month by month.
+precip_correction:
+  enabled:
+    value: true
+    unit: "-"
+    source: "Project choice (Ömer, 15 Nov): POWER precipitation differs from the nearest WMO station by −14 … +85 % (precip_vs_mgm). Method: linear scaling, the simplest bias correction compared in Teutschbein & Seibert 2012, J. Hydrol. 456–457: 12–29"
+    source_url: "https://doi.org/10.1016/j.jhydrol.2012.05.052"
+    type: assumption
+    verified: false

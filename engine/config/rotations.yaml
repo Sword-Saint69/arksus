@@ -78,13 +78,13 @@ rotations:
     soil_traits:
       n_fixing: true
       tillage_passes:
-        value: null
+        value: 3
         unit: "passes/year"
-        source: "bulunamadı — denenen: Çelebi ve Bal, Adak 1999, Gültekin vd. 2017 (baklagil yılındaki işleme sayısı verilmiyor)"
-        source_url: ""
-        type: assumption
-        verified: false
-        as_of: "2026-11-14"
+        source: "Babaoğlu M., 'Nohut ve Tarımı', T.C. Tarım ve Orman Bakanlığı Trakya Tarımsal Araştırma Enstitüsü: sonbaharda 15–20 cm pullukla sürüm, ekimden önce 2–3 kez kazayağı veya diskaro (10–15 cm), sonra isteğe bağlı tırmık → en az 3, en çok 5 geçiş; alt sınır alındı. Genel rehber, Orta Anadolu'ya özel değil"
+        source_url: "https://arastirma.tarimorman.gov.tr/ttae/Sayfalar/Detay.aspx?SayfaId=61"
+        type: literature
+        verified: true
+        as_of: "2026-11-15"
       note:
         en: "Chickpea forms root nodules with Rhizobium bacteria and fixes nitrogen from the air. The amount depends on the season; check it with a soil test."
         tr: "Nohut, Rhizobium bakterileriyle kök nodülü oluşturur ve havadaki azotu bağlar. Miktar sezona bağlıdır; toprak analiziyle kontrol edin."
@@ -121,13 +121,13 @@ rotations:
     soil_traits:
       n_fixing: true
       tillage_passes:
-        value: null
+        value: 2
         unit: "passes/year"
-        source: "bulunamadı — denenen: Çelebi ve Bal, Adak 1999, Gültekin vd. 2017 (baklagil yılındaki işleme sayısı verilmiyor)"
-        source_url: ""
-        type: assumption
-        verified: false
-        as_of: "2026-11-14"
+        source: "Süzer S., 'Mercimek Tarımı', T.C. Tarım ve Orman Bakanlığı Trakya Tarımsal Araştırma Enstitüsü: hububat hasadından sonra sonbaharda soklu pullukla 15–20 cm ilk sürüm; yazlık ekimde ilkbahara kadar işlem yok, ekimden önce kazayağı tırmık takımıyla ikinci sürüm → 2 geçiş. Genel rehber, Orta Anadolu'ya özel değil"
+        source_url: "https://arastirma.tarimorman.gov.tr/ttae/Sayfalar/Detay.aspx?SayfaId=81"
+        type: literature
+        verified: true
+        as_of: "2026-11-15"
       note:
         en: "Lentil is a legume and fixes nitrogen from the air with Rhizobium bacteria. The amount depends on the season; check it with a soil test."
         tr: "Mercimek bir baklagildir ve Rhizobium bakterileriyle havadaki azotu bağlar. Miktar sezona bağlıdır; toprak analiziyle kontrol edin."

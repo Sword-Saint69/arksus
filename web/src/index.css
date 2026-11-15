@@ -1,33 +1,87 @@
 @import "tailwindcss";
 
-/* "Agronomy field report": paper, ink, wheat and soil accents. Light first
-   (PLAN_MVP §6). Colour is never the only signal: badges carry their word. */
+/* NöbetSu farmer site. Big, calm and legible: the readers are often older and
+   read on a phone in daylight. Colour is never the only signal: every state
+   also has a word or an icon. */
 @theme {
-  --font-sans: "Fira Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Fira Code", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: "Atkinson Hyperlegible Next Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --color-paper: #fbfaf6;
-  --color-canvas: #f1eee5;
-  --color-raise: #ebe7db;
-  --color-line: #d9d4c4;
-  --color-ink: #1f2a24;
-  --color-muted: #56645b;
-  --color-faint: #7b867e;
-  --color-primary: #2f5d46;
-  --color-primary-ink: #ffffff;
+  --color-paper: #fbfaf5;
+  --color-canvas: #f1eee4;
+  --color-raise: #ebe7da;
+  --color-line: #dcd7c6;
+  --color-ink: #16241c;
+  --color-muted: #4f5e54;
+  --color-faint: #76837a;
+  --color-primary: #1f5b3f;
+  --color-primary-strong: #14402c;
+  --color-primary-soft: #e3efe6;
+  --color-gold: #f2c14e;
   --color-wheat: #b5741a;
-  --color-water: #3d7ea6;
+  --color-water: #2f7fb0;
+  --color-water-soft: #e2eff6;
   --color-soil: #8a5a2b;
   --color-good: #2f7a4f;
   --color-warn: #8a5a12;
+  --color-warn-soft: #fbf3e2;
   --color-bad: #b4432c;
+  --color-bad-soft: #f8e6e0;
+
+  /* One fixed colour per rotation, the same on the map and on every chart. */
+  --color-fallow: #94541f;
+  --color-chickpea: #b8860b;
+  --color-lentil: #127fa8;
+
+  --shadow-panel: 0 18px 50px -12px rgb(10 30 20 / 0.45), 0 2px 6px rgb(10 30 20 / 0.12);
+  --shadow-float: 0 6px 20px -4px rgb(10 30 20 / 0.4);
+
+  --animate-rise: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade: fade 0.4s ease both;
+  --animate-pulse-ring: pulse-ring 2.2s ease-out infinite;
+
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse-ring { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(2.4); opacity: 0; } }
 }
 
 @layer base {
-  html { background: var(--color-canvas); color: var(--color-ink); -webkit-font-smoothing: antialiased; }
-  body { font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
-  :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  html, body, #root { height: 100%; }
+  html { background: #0d1f17; color: var(--color-ink); -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font-sans); font-size: 17px; line-height: 1.5; overflow: hidden; overscroll-behavior: none; }
+  button, [role="button"], summary { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  :focus-visible { outline: 3px solid var(--color-gold); outline-offset: 2px; border-radius: 6px; }
+  input, select, textarea { font: inherit; }
+  summary { list-style: none; }
+  summary::-webkit-details-marker { display: none; }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   }
 }
+
+/* Scrollbars inside the panel stay out of the way. */
+.thin-scroll { scrollbar-width: thin; scrollbar-color: var(--color-line) transparent; }
+
+/* MapLibre: keep its attribution legible but quiet, clear of our own controls. */
+.maplibregl-map { font-family: var(--font-sans); }
+.maplibregl-ctrl-attrib { font-size: 10.5px; background: rgb(255 255 255 / 0.72) !important; border-radius: 8px 0 0 0; }
+.maplibregl-ctrl-attrib a { color: #24382d; }
+.maplibregl-canvas:focus-visible { outline: none; }
+
+/* Markers drawn in HTML over the map. */
+.pilot-pin { display: grid; justify-items: center; gap: 2px; pointer-events: auto; background: none; border: 0; padding: 0; }
+.pilot-pin .dot { position: relative; width: 14px; height: 14px; border-radius: 999px; background: var(--color-gold); border: 2.5px solid #fff; box-shadow: 0 1px 6px rgb(0 0 0 / 0.5); }
+.pilot-pin .dot::after { content: ""; position: absolute; inset: -3px; border-radius: 999px; border: 2px solid var(--color-gold); animation: var(--animate-pulse-ring); }
+.pilot-pin .name { font-size: 13px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgb(0 0 0 / 0.9), 0 0 8px rgb(0 0 0 / 0.6); white-space: nowrap; }
+.pilot-pin.far .name { display: none; }
+.pilot-pin[data-rot="fallow_wheat"] .dot { background: #d08a4a; }
+.pilot-pin[data-rot="chickpea_wheat"] .dot { background: #f2c14e; }
+.pilot-pin[data-rot="lentil_wheat"] .dot { background: #4fb6dd; }
+
+.here-pin { width: 20px; height: 20px; border-radius: 999px; background: #2f8fe0; border: 3px solid #fff; box-shadow: 0 0 0 6px rgb(47 143 224 / 0.3), 0 2px 6px rgb(0 0 0 / 0.5); }
+
+.strip-tag { display: grid; gap: 2px; min-width: 92px; padding: 5px 8px 6px; border-radius: 11px; background: rgb(15 30 22 / 0.84); color: #fff; font-size: 11.5px; line-height: 1.2; box-shadow: 0 4px 14px rgb(0 0 0 / 0.45); border-top: 4px solid var(--c, #fff); pointer-events: none; }
+.strip-tag b { font-size: 12.5px; }
+.strip-tag .gauge { height: 6px; border-radius: 99px; background: rgb(255 255 255 / 0.22); overflow: hidden; }
+.strip-tag .gauge i { display: block; height: 100%; background: #6cc4f0; border-radius: 99px; transition: width 0.2s linear; }
+.strip-tag small { opacity: 0.85; }

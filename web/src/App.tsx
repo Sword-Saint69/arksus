@@ -1,70 +1,72 @@
-import { useEffect, useState } from 'react';
-import { useSiteData } from '@/data/useSiteData';
-import { AuthProvider, useAuth } from '@/auth/AuthContext';
-import { AppShell } from '@/components/AppShell';
-import { MockBanner } from '@/components/MockBanner';
-import { navigate, useRoute, type Route } from '@/router';
-import { initialLang, saveLang, t, type Lang } from '@/strings';
-import { Home } from '@/pages/Home';
-import { Login } from '@/pages/Login';
-import { Panel } from '@/pages/Panel';
-import { FieldForm } from '@/pages/FieldForm';
-import { FieldDetail } from '@/pages/FieldDetail';
-import { Profile } from '@/pages/Profile';
-import { Analysis } from '@/pages/Analysis';
-import { MapView } from '@/pages/MapView';
+import { lazy, Suspense, useEffect } from 'react';
+import { loadCore } from '@/data/api';
+import { useT } from '@/i18n';
+import { useStore } from '@/state/store';
+import { withMap } from '@/map/api';
+import { MapControls } from '@/shell/MapControls';
+import { Panel } from '@/shell/Panel';
+import { TopBar } from '@/shell/TopBar';
+import { Welcome } from '@/screens/Welcome';
+import { FindField } from '@/screens/FindField';
+import { Questions } from '@/screens/Questions';
+import { Analyzing } from '@/screens/Analyzing';
+import { Result } from '@/screens/Result';
+import { SimHud } from '@/screens/result/SimHud';
+import { Button, Note } from '@/ui/kit';
+
+// MapLibre is most of the download; loading it apart lets the first words appear at once.
+const MapCanvas = lazy(() => import('@/map/MapCanvas').then((m) => ({ default: m.MapCanvas })));
 
 export default function App() {
-  return (
-    <AuthProvider>
-      <Site />
-    </AuthProvider>
-  );
-}
+  const { t, lang } = useT();
+  const step = useStore((s) => s.step);
+  const core = useStore((s) => s.core);
+  const coreError = useStore((s) => s.coreError);
+  const sim = useStore((s) => s.sim);
+  const hasField = useStore((s) => s.parcels.length > 0 && !!s.locationId);
+  const go = useStore((s) => s.go);
 
-const NEEDS_LOGIN: Route['name'][] = ['panel', 'field', 'field-new', 'field-edit', 'profile'];
-
-function Site() {
-  const [lang, setLang] = useState<Lang>(initialLang);
-  const route = useRoute();
-  const site = useSiteData();
-  const { farmer } = useAuth();
-
+  useEffect(() => {
+    loadCore().then(useStore.getState().setCore, useStore.getState().setCoreError);
+  }, []);
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.title = `NöbetSu · ${t(lang, 'question')}`;
-    saveLang(lang);
-  }, [lang]);
-  // Signed-out visitors on a private page go to sign-in; signed-in ones skip the sign-in page.
+    document.title = `NöbetSu · ${t('heroTitle')}`;
+  }, [lang, t]);
+  // The opening view shows the whole country; a step that needs a field never runs without one.
   useEffect(() => {
-    if (!farmer && NEEDS_LOGIN.includes(route.name)) navigate('/giris');
-    if (farmer && route.name === 'login') navigate('/panel');
-  }, [farmer, route.name]);
+    if (step === 'welcome') withMap((m) => { m.setField([]); m.setHere(null); m.home(); });
+    else if (step !== 'find' && !hasField) go('find');
+  }, [step, hasField, go]);
 
-  let body: React.ReactNode;
-  if (site.status === 'loading') body = <p className="p-8 text-muted">{t(lang, 'loading')}</p>;
-  else if (site.status === 'error') body = <p role="alert" className="p-8 text-bad">{t(lang, 'loadFailed')}</p>;
-  else {
-    const data = site.data;
-    switch (route.name) {
-      case 'login': body = <Login data={data} lang={lang} mode={route.mode} />; break;
-      case 'panel': body = <Panel data={data} lang={lang} />; break;
-      case 'field-new': body = <FieldForm data={data} lang={lang} />; break;
-      case 'field-edit': body = <FieldForm key={route.id} data={data} lang={lang} id={route.id} />; break;
-      case 'field': body = <FieldDetail data={data} lang={lang} id={route.id} />; break;
-      case 'profile': body = <Profile data={data} lang={lang} />; break;
-      // Keyed by the query so opening it from a different field starts from that field's settings.
-      case 'analysis': body = <Analysis key={route.query.toString()} data={data} lang={lang} query={route.query} />; break;
-      case 'map': body = <MapView data={data} lang={lang} query={route.query} />; break;
-      default: body = <Home data={data} lang={lang} />;
-    }
-  }
-  const anyMock = site.status === 'ready' && (site.data.site.mock || site.data.defaults.mock || site.data.validation.mock);
+  const mock = !!core && (core.site.mock || core.defaults.mock || core.validation.mock);
 
   return (
-    <AppShell lang={lang} onLang={setLang} route={route} bare={route.name === 'map'}>
-      <MockBanner show={anyMock} lang={lang} />
-      {body}
-    </AppShell>
+    <div className="relative h-dvh w-full overflow-hidden bg-[#0d1f17]">
+      <Suspense fallback={null}><MapCanvas /></Suspense>
+      {step === 'welcome' && <Welcome />}
+      <TopBar />
+      {mock && (
+        <p role="status" className="absolute inset-x-0 top-0 z-40 bg-[#7a2e1d] px-3 py-1 text-center text-sm font-bold text-white">{t('mockBanner')}</p>
+      )}
+      {step !== 'welcome' && (
+        <Panel>
+          {coreError ? (
+            <Note tone="bad">{t('loadFailed')}<Button className="mt-2" onClick={() => location.reload()}>{t('retry')}</Button></Note>
+          ) : !core ? (
+            <p className="py-10 text-center text-lg text-muted" role="status">{t('loading')}</p>
+          ) : (
+            <>
+              {step === 'find' && <FindField />}
+              {step === 'questions' && hasField && <Questions />}
+              {step === 'analyzing' && hasField && <Analyzing />}
+              {step === 'result' && hasField && <Result />}
+            </>
+          )}
+        </Panel>
+      )}
+      {sim && core && step === 'result' && <SimHud />}
+      <MapControls />
+    </div>
   );
 }

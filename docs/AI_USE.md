@@ -23,6 +23,10 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 
 - Claude Code (Opus 5.5) — harita arayüzünü yeni backend'e bağlama: iklim senaryosu seçimi (E2), öncelik kaydırıcıları + karar modülü sıralaması (decide, priceRobustness), nerede değişir tablosu (flipTable), kanıt paneli (validation.json), toprak kartı ek alanları — `map/src/{pilots,main,strings}.ts`, `map/src/ui/inspector.ts`, `map/src/style.css`
 
+- Claude Code (Opus 5.5) — SMAP yerine NASA MERRA-2 toprak ıslaklığı (POWER GWETROOT): çekim, E1 kontrolünde SMAP→MERRA-2 düşüşü, testleri, harita metinleri — `engine/nobetsu/{merra2,validate}.py`, `engine/tests/{test_merra2,conftest}.py`, `data/merra2/*.json`, `map/src/strings.ts`
+- Claude Code (Opus 5.5) — POWER yağışına istasyon düzeltmesi (doğrusal ölçekleme), testleri — `engine/nobetsu/{runner,validate}.py`, `engine/config/scenarios.yaml`, `engine/tests/test_precipcorr.py`
+- Claude Code (Opus 5.5) + tarayıcı/WebSearch — 8 sulu noktanın taşınması (MODIS NDVI komşuluk taraması + ESA WorldCover), veri yenileme ve make data; SMAP'in kaldırılıp MERRA-2 ile değiştirilmesi (sözleşme, export, iki arayüz); baklagil toprak işleme kaynakları — `engine/config/{locations,references,rotations}.yaml`, `docs/contract/smap.schema.json`, `web/src/{lib/types,strings}.ts`, `web/src/sections/SoilHealth.tsx`, `map/src/*`, `data/**`, `web/public/data/**`
+
 ## Gümüş
 - Claude Code (Opus 5.5) — M0 sözleşme iskeleti: paket, config, mock runner, export/build, JSON şemaları, testler, types.ts, economics.ts — `engine/`, `docs/contract/`, `web/src/lib/`, `Makefile`
 - Claude Code (Opus 5.5) — NASA POWER çekimi, önbellek, birim/boşluk işleme ve testleri — `engine/nobetsu/power.py`, `engine/tests/test_power.py`
@@ -39,6 +43,8 @@ Teslimde Muhammet bunu AI kullanım beyanına çevirir.
 - Claude Code (Opus 5.5) — omer birleştirmesi; E2 senaryo sözleşmesi ve verisi, E1 `smap_anomaly` sözleşmesi, IMERG devri, toprak kartı açıklama metinleri — `engine/nobetsu/{export,build,soilgrids,mock}.py`, `docs/contract/`, `web/src/lib/{types,contract.test}.ts`, `data/soilgrids/`
 - Claude Code (Opus 5.5) + 3 alt ajan — fiyat duyarlılığı (`priceRobustness`), repo denetimi (salt okuma), Rol B rehberi; ana oturum: smap.py ve testleri, toprak kartı AWC alternatifleri, denetim düzeltmeleri (README, ARAYUZLER, PLAN_MVP, PROJE_OZETI, AGENTS, .gitignore) — `web/src/lib/economics{,.test}.ts`, `engine/nobetsu/{smap,export}.py`, `docs/team/ROL_B_VERI.md`, `docs/`
 - Claude Code (Opus 5.5) — yerel çalıştırma testi; 3B haritanın yeni karar API'siyle uyumu (ilçe seçince çökme, yayın build'i), 13 ilçe metni; kullanıcı onayıyla Biar'ın `map/` dosyalarında — `map/src/{pilots,strings}.ts`, `map/README.md`, `.claude/launch.json`
+- Claude Code (Opus 5.5) + 2 araştırma alt ajanı (WebSearch/web-fetch) — gübre önerisi: ekip raporundaki sayılar kaynakta arandı, TAGEM Orta Anadolu çizelgeleri ana yöntem yapıldı; fertilizer.yaml, fertilizer.ts ve testleri, şema, İsmail için rehber — `engine/config/fertilizer.yaml`, `engine/nobetsu/export.py`, `engine/tests/test_{fertilizer,export}.py`, `docs/contract/fertilizer.schema.json`, `web/src/lib/{types,fertilizer,fertilizer.test,contract.test}.ts`, `web/public/data/fertilizer.json`, `docs/{GUBRE,ARAYUZLER,ISMAIL_BAKMALI}.md`
+- Claude Code (Opus 5.5) — gübre kartının siteye eklenmesi (Gümüş'ün isteğiyle İsmail'in `web/` dosyalarında): tarla sayfasında plan, toprak analizi formu, metinler, yardımcılar ve testi; tarayıcıda denendi — `web/src/sections/FertilizerPlan.tsx`, `web/src/utils/fertilizerView{,.test}.ts`, `web/src/{strings.ts,pages/FieldDetail.tsx,auth/accounts.ts}`, `.claude/launch.json`
 
 ## Ortak (plan ve görev dağılımı)
 - Claude — görev dağılımı, kişi rehberleri, arayüz sözleşmesi taslağı, proje özeti — `TASKS.md`, `AGENTS.md`, `docs/ARAYUZLER.md`, `docs/PROJE_OZETI.md`, `docs/team/*`

@@ -188,6 +188,7 @@ Biçim: PLAN_MVP §4. Dosyalar `web/public/data/` altında:
 | `results/{location_id}__{scenario_id}.json` | **E2 (15 Kas):** senaryo seçilince; aynı şema, `scenario_id` dolu. Senaryolar `site_index.scenarios` (`id, label, precip_factor, temp_shift_c`; baseline ilk). Ledger ve validation sadece baseline'dan. |
 | `defaults.json` | sayfa açılınca — karar parametreleri; **fiyat/destek asla ekranda gösterilmez** |
 | `validation.json` | sayfa açılınca |
+| `fertilizer.json` | **15 Kas:** gübre ekranı açılınca — gübre kuralları (TAGEM tabloları, ürünler, uyarılar); hesap tarayıcıda `fertilizer.ts` ile (§13) |
 | `smap/{location_id}.json` | lokasyon seçilince (**her zaman vardır**; veri yoksa `available: false`, `latest: null`, listeler boş). Mock'ta Karapınar `available: true`, Develi `false` (iki UI durumu da denenebilsin) |
 | `ledger/{location_id}.json` | Grafik B görünür olunca (lazy) |
 
@@ -303,3 +304,26 @@ Mock sayılar "makul ama belli ki sahte" olur (ör. tüm yıllar düzgün bir e�
 | T+9 | Muhammet → Gümüş / İsmail | Strateji metinleri → `rotations.yaml`; sözlük → `strings.ts` | "metin bekleniyor" yer tutucusu |
 | T+9 | Gümüş → İsmail | Gerçek JSON (`mock: false`) | mock kalır, bant görünür |
 | T+12–14 | Muhammet → İsmail | Kullanıcı testi notları | — |
+
+---
+
+## 13. Gübre API'si — `fertilizer.ts` (Gümüş) → web (İsmail) — SÖZLEŞME EKLENDİ 15 Kas
+
+Ek dosya, mevcut dosyalar değişmedi. Ayrıntı ve ekran akışı: `docs/GUBRE.md`.
+Kurallar `engine/config/fertilizer.yaml` → `web/public/data/fertilizer.json` (şema `docs/contract/fertilizer.schema.json`, tipler `types.ts` §4.6 `FertilizerFile`).
+Ana yöntem TAGEM Orta Anadolu toprak analizi çizelgeleri (N organik maddeye, P2O5 Olsen'e, K2O yarayışlı K'ye göre; Kuru = `rainfed`, Sulu = `limited`/`irrigated`).
+Sitede para yok; çıktı kg/da saf besin ve kg/da ürün.
+
+```ts
+// web/src/lib/fertilizer.ts
+export interface SoilTest { om_pct?; p2o5_kg_per_da?; k2o_kg_per_da?; olsen_p_ppm?; k_ppm?; total_n_pct?; ph?; lime_pct?; ec_ds_m?; zn_ppm? }
+export function soilFromResults(results: ResultsFile, f: FertilizerFile): { soil: SoilTest; badges; needs_lab: (keyof SoilTest)[] };
+export interface FertRequest { crop: FertCropId; water: WaterRegime; target_yield_kg_per_da?: number; soil: SoilTest;
+  inoculated?: boolean; drip?: boolean; banding?: boolean }
+export function recommend(f: FertilizerFile, req: FertRequest): FertPlan;   // atmaz; bilinmeyen besin = null + basis
+// FertPlan: nutrients[{nutrient, fertilizer_kg_per_da|null, basis, source, capped, need/soil_supply/balance (çapraz kontrol)}],
+//           doses[{product, timing, kg_per_da, supplies}], flags, advice, guide, missing, better_for_salinity, derived
+```
+
+Kurallar: bileşende gübre hesabı yok. `fertilizer_kg_per_da: null` → "toprak analizi gerekli" / "kaynak bekleniyor", asla 0. Her sayının rozeti `source.type`. Gübre planı rotasyon puanına girmez.
+

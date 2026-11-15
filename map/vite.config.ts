@@ -7,7 +7,7 @@ import { join, normalize, resolve } from 'node:path';
 // keeping a second copy in this folder.
 const DATA = resolve(import.meta.dirname, '../web/public/data');
 // ledger/ is ~2 MB per district and only fetched when the process simulation opens.
-const FILES = ['site_index.json', 'defaults.json', 'validation.json', 'results', 'smap', 'ledger'];
+const FILES = ['site_index.json', 'defaults.json', 'validation.json', 'results', 'smap', 'ledger', 'agent'];
 
 function nobetsuData(): Plugin {
   return {
@@ -24,7 +24,8 @@ function nobetsuData(): Plugin {
     writeBundle(options) {
       if (process.env.VITE_NOBETSU_DATA) return; // the host site serves the data (see pilots.ts)
       const out = join(options.dir ?? 'dist', 'data/nobetsu');
-      for (const f of FILES) cpSync(join(DATA, f), join(out, f), { recursive: true });
+      // agent/ exists only after `python -m nobetsu.agent`; skip any optional folder that is missing.
+      for (const f of FILES) if (existsSync(join(DATA, f))) cpSync(join(DATA, f), join(out, f), { recursive: true });
     },
   };
 }

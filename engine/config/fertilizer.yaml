@@ -1,0 +1,491 @@
+# Owner: Gümüş (Rol B). Fertilizer rules for the browser (web/src/lib/fertilizer.ts). docs/GUBRE.md, ARAYUZLER §13.
+# Exported as web/public/data/fertilizer.json (everything except keys starting with "_").
+#
+# MAIN METHOD (official, verified): TAGEM "Gübre Tavsiyeleri" (Toprak-Su gübre tavsiye verileri), Central Anatolia
+# ("Orta Anadolu") tables. A lab value picks a class; the class gives the PURE nutrient to apply, kg/da:
+#   N    by organic matter %             (Çizelge 1)
+#   P2O5 by Olsen P, kg P2O5/da           (Çizelge 22)
+#   K2O  by available K, kg K2O/da        (Çizelge 13)
+# Tables have "Sulu" (irrigated) and "Kuru" (rainfed) rows. Mapping: rainfed → Kuru; limited and irrigated → Sulu.
+# A regime with no TAGEM row is left out (the module then falls back, or says "pending"). "-" in TAGEM = 0.
+# Class bounds are written as the upper limit of each class (0–1.0 → max 1.0; "9+" → max null).
+#
+# CROSS-CHECK (team report, NOT verified): target yield × uptake − soil supply, divided by fertilizer efficiency.
+# The 15 Nov team report ("TerraShift İç Anadolu dijital gübreleme algoritması", AI-assisted summary) proposed it;
+# none of its coefficients (soil mass, 5 %, 40 %, 60/30/50 %) were found in a source, so they stay verified: false
+# and are used only where TAGEM has no row. Report claims that could not be found at all were removed
+# (potato drip schedule, 60–70 kg/da sulfur, sugar-beet soil-P table, 4–5 kg N/da beet removal) — docs/GUBRE.md §7.
+#
+# Every number is a V object (value, unit, source, source_url, type, verified). value: null = not yet sourced.
+# No money: kg/da only. No crop-specific code: a crop differs only by its entry below.
+# Wording: "önerilir / suggested", never "kesin", "mutlaka", "yasak".
+
+_sources:
+  report: &report
+    source: "Ekip raporu 'TerraShift İç Anadolu dijital gübreleme algoritması' (15 Kas 2026, yapay zekâ destekli literatür özeti); kaynakta bulunamadı"
+    source_url: ""
+    type: literature
+    verified: false
+  tagem: &tagem
+    source: "T.C. Tarım ve Orman Bakanlığı TAGEM, Gübre Tavsiyeleri (Toprak-Su gübre tavsiye verileri), Orta Anadolu çizelgeleri"
+    source_url: "https://www.tarimorman.gov.tr/TAGEM/Belgeler/yayin/TOPRAKSU%20G%C3%9CBRE%20TAVS%C4%B0YE%20%20Verileri.pdf"
+    type: official
+    verified: true
+  tagem_grade: &tagem_grade
+    source: "TAGEM Gübre Tavsiyeleri s. 2–3: saf maddeden gübreye çevirme katsayıları (AS ×5,0; CAN ×4,0; AN ×3,0; üre ×2,2; DAP ×2,2 P için; K2SO4 ×2,0) = ürün içeriği"
+    source_url: "https://www.tarimorman.gov.tr/TAGEM/Belgeler/yayin/TOPRAKSU%20G%C3%9CBRE%20TAVS%C4%B0YE%20%20Verileri.pdf"
+    type: official
+    verified: true
+  grade: &grade
+    source: "Gübre sınıfı adı = garanti edilen içerik (% N – % P2O5 – % K2O)"
+    source_url: ""
+    type: literature
+    verified: false
+  toros_wheat: &toros_wheat
+    source: "Toros Tarım, Çolakoğlu H., 'Buğday ve Arpa Gübrelemesi' (Çiftçi Dostu, Gübreleme Önerileri)"
+    source_url: "https://www.toros.com.tr/documents/TARIMSAL/%C3%87ift%C3%A7i%20Dostu/G%C3%BCbreleme%20%C3%96nerileri/bugday-arpa-dengeli.pdf"
+    type: literature
+    verified: true
+  toros_guide: &toros_guide
+    source: "Toros Tarım, Gübreleme Rehberi (2016)"
+    source_url: "https://www.toros.com.tr/documents/file/FlipBook/G%C3%BCbreleme%20Rehberi-2016-07-15-17-44-07/G%C3%BCbreleme%20Rehberi/files/assets/common/downloads/publication.pdf"
+    type: literature
+    verified: true
+  fao29: &fao29
+    source: "FAO Irrigation and Drainage Paper 29 Rev.1 (Ayers ve Westcot), Table 4: ürün verimi düşmeye başlamadan önceki toprak tuzluluğu ECe"
+    source_url: "https://www.fao.org/4/t0234e/T0234E03.htm"
+    type: literature
+    verified: true
+  gkgm_legume: &gkgm_legume
+    source: "T.C. Tarım Bakanlığı GKGM, 'Yemeklik Baklagil' üretici kitapçığı, Gübreleme"
+    source_url: "https://www.tarimorman.gov.tr/GKGM/Belgeler/Uretici_Bilgi_Kosesi/Dokumanlar/yemeklik_baklagil.pdf"
+    type: official
+    verified: true
+  cakmak: &cakmak
+    source: "Cakmak I. 2005, 'Identification and correction of widespread zinc deficiency problem in Central Anatolia, Turkey', IFA Annual Conference"
+    source_url: "https://www.fertilizer.org/wp-content/uploads/2023/01/2005_IFA_KL_cakmak.pdf"
+    type: literature
+    verified: true
+
+# Which soil value classifies each nutrient's TAGEM table (fertilizer.ts reads this).
+soil_table_by: { n: om_pct, p2o5: p2o5_kg_per_da, k2o: k2o_kg_per_da }
+
+# ---------------------------------------------------------------- cross-check method (team report)
+soil_layer:
+  mass_kg_per_da: { value: 250000, unit: "kg soil per da, 0–20 cm", <<: *report, type: assumption,
+    source: "Rapor kabulü: 1000 m² × 0,20 m × 1,25 g/cm³ = 250 000 kg; sadece ppm → kg/da çevirisinde ve çapraz kontrolde kullanılır" }
+conversions:
+  p_to_p2o5: { value: 2.29, unit: kg P2O5 per kg P, source: "Mol kütlesi oranı P2O5 / 2P = 141,94 / 61,95 = 2,291", source_url: "", type: literature, verified: true }
+  k_to_k2o:  { value: 1.205, unit: kg K2O per kg K, source: "Mol kütlesi oranı K2O / 2K = 94,20 / 78,20 = 1,205", source_url: "", type: literature, verified: true }
+  soc_to_om: { value: 1.724, unit: "% organic matter per % organic carbon", source: "Van Bemmelen faktörü (organik madde = 1,724 × organik karbon); SoilGrids organik karbonundan organik madde tahmini için", source_url: "", type: literature, verified: false }
+soil_supply:
+  n_available_fraction: { value: 0.05, unit: fraction of total N that is mineral, <<: *report }
+  n_uptake_fraction:    { value: 0.40, unit: fraction of mineral soil N taken up, <<: *report }
+  p_uptake_fraction:    { value: 0.30, unit: fraction of available soil P2O5 taken up, <<: *report }
+  k_uptake_fraction:    { value: 0.40, unit: fraction of available soil K2O taken up, <<: *report }
+fertilizer_efficiency:
+  n:    { value: 0.60, unit: fraction of applied N taken up, <<: *report }
+  p2o5: { value: 0.30, unit: fraction of applied P2O5 taken up, <<: *report }
+  k2o:  { value: 0.50, unit: fraction of applied K2O taken up, <<: *report }
+
+# ---------------------------------------------------------------- soil flags
+thresholds:
+  ph_alkaline:
+    value: 7.5
+    unit: pH
+    source: "OGM 'Toprakta analiz sonuçlarının değerlendirilmesinde kullanılan sınır değerler': 7,1–7,5 hafif alkali, 7,6–8,3 orta alkali; 7,5 üstü orta alkali sayılır"
+    source_url: "https://www.ogm.gov.tr/ekoloji/e-kutuphane-sitesi/Dokumanlar/Toprak%20analiz%20sonu%C3%A7lar%C4%B1n%C4%B1n%20de%C4%9Ferlendirilmesi.pdf"
+    type: official
+    verified: true
+  lime_high_pct:
+    value: 15
+    unit: "% CaCO3"
+    source: "OGM sınır değerleri (Ülgen ve Ateşalp 1974) ve Başar 2001: %15–25 yüksek kireçli, %25 üstü çok yüksek"
+    source_url: "https://www.ogm.gov.tr/ekoloji/e-kutuphane-sitesi/Dokumanlar/Toprak%20analiz%20sonu%C3%A7lar%C4%B1n%C4%B1n%20de%C4%9Ferlendirilmesi.pdf"
+    type: official
+    verified: true
+  om_low_pct:
+    value: 1.0
+    unit: "% organic matter"
+    source: "Başar H. 2001, Uludağ Üniv. Zir. Fak. Derg. 15:69–83: organik madde %1'in altı 'çok az'"
+    source_url: "https://dergipark.org.tr/tr/download/article-file/153940"
+    type: literature
+    verified: true
+  total_n_low_pct:
+    value: 0.09
+    unit: "% total N"
+    source: "OGM sınır değerleri (FAO 1990): toplam azot %0,045–0,09 az, altı çok az"
+    source_url: "https://www.ogm.gov.tr/ekoloji/e-kutuphane-sitesi/Dokumanlar/Toprak%20analiz%20sonu%C3%A7lar%C4%B1n%C4%B1n%20de%C4%9Ferlendirilmesi.pdf"
+    type: official
+    verified: true
+  zn_low_ppm:
+    value: 0.5
+    unit: mg/kg DTPA-Zn
+    source: "Cakmak vd. 1996, Plant and Soil 180:165–172 (Orta Anadolu): kireçli topraklarda 0,5 mg/kg DTPA-Zn kritik noksanlık düzeyi; toprakların %90'ından fazlası bunun altında"
+    source_url: "https://avesis.cu.edu.tr/yayin/d69ddf4e-8c58-4592-b3d5-d71440d8b1d5/zinc-deficiency-as-a-critical-problem-in-wheat-production-in-central-anatolia"
+    type: literature
+    verified: true
+
+banding:
+  <<: *toros_wheat
+  source: "Toros, Buğday ve Arpa Gübrelemesi: kombine mibzerle bant uygulamada kompoze gübre 2 kg/da, DAP 1 kg/da daha az verilir"
+min_dose_kg_per_da:
+  value: 1.0
+  unit: kg product/da
+  source: "Proje seçimi: 1 kg/da altındaki ürün dozu ayrıca serpilmez (tarlaya eşit dağıtılamaz)"
+  source_url: ""
+  type: assumption
+  verified: false
+
+products:
+  urea:              { label: { en: "Urea 46% N", tr: "Üre (%46 N)" }, n: 46, p2o5: 0, k2o: 0, <<: *tagem_grade }
+  can:               { label: { en: "CAN 26% N", tr: "CAN (%26 N)" }, n: 26, p2o5: 0, k2o: 0, <<: *tagem_grade }
+  ammonium_sulfate:  { label: { en: "Ammonium sulfate 21% N", tr: "Amonyum sülfat (%21 N)" }, n: 21, p2o5: 0, k2o: 0, <<: *tagem_grade }
+  ammonium_nitrate:  { label: { en: "Ammonium nitrate 33% N", tr: "Amonyum nitrat (%33 N)" }, n: 33, p2o5: 0, k2o: 0, <<: *tagem_grade }
+  dap:               { label: { en: "DAP 18-46-0", tr: "DAP (18-46-0)" }, n: 18, p2o5: 46, k2o: 0, band_minus_kg: 1, <<: *tagem_grade }
+  npk_20_20_0:       { label: { en: "Compound 20-20-0", tr: "Kompoze 20-20-0" }, n: 20, p2o5: 20, k2o: 0, band_minus_kg: 2, <<: *grade }
+  npk_20_20_0_zn:    { label: { en: "Compound 20-20-0 + Zn", tr: "Çinkolu kompoze 20-20-0 + Zn" }, n: 20, p2o5: 20, k2o: 0, zn: 1, band_minus_kg: 2, <<: *grade,
+                       source: "Gübre sınıfı adı; %1 Zn: Cakmak 2005 (Türkiye'de NP/NPK gübrelere %1 Zn katılıyor)", source_url: "https://www.fertilizer.org/wp-content/uploads/2023/01/2005_IFA_KL_cakmak.pdf" }
+  npk_15_15_15:      { label: { en: "Compound 15-15-15", tr: "Kompoze 15-15-15" }, n: 15, p2o5: 15, k2o: 15, band_minus_kg: 2, <<: *grade }
+  potassium_sulfate: { label: { en: "Potassium sulfate 0-0-50", tr: "Potasyum sülfat (0-0-50)" }, n: 0, p2o5: 0, k2o: 50, so3: 45, <<: *tagem_grade }
+
+# ---------------------------------------------------------------- crops
+# n_split: how the N still needed after the base fertilizer is split (fractions sum to 1).
+# Conditions (`when`): soil keys, water / inoculated / drip / banding, flags_any / flags_all.
+
+crops:
+  wheat:
+    label: { en: "Wheat", tr: "Buğday" }
+    in_rotations: true
+    default_target_yield_kg_per_da:
+      rainfed:   { value: 296, unit: kg/da, source: "Türkiye buğday verimi 2024/25 tahmini 296 kg/da (TÜİK), TEPGE Buğday Durum-Tahmin Raporu 2025 — ulusal ortalama (defaults.yaml ile aynı)", source_url: "https://arastirma.tarimorman.gov.tr/tepge/Belgeler/PDF%20Durum-Tahmin%20Raporlar%C4%B1/2025%20Durum-Tahmin%20Raporlar%C4%B1/Bu%C4%9Fday%20Durum%20Tahmin%20Raporu%202025-428%20TEPGE.pdf", type: statistic, verified: true }
+      limited:   { value: 450, unit: kg/da, <<: *toros_wheat, type: assumption, verified: false, source: "Toros tablosunun yağışı yeterli/sulu ilk sınıfı 400–500 kg/da (orta değer); kısıtlı sulu için kabul" }
+      irrigated: { value: 550, unit: kg/da, <<: *toros_wheat, type: assumption, verified: false, source: "Toros tablosu sulu 500–600 kg/da sınıfı (orta değer); kabul" }
+    soil_tables:
+      n:
+        rainfed:   { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Buğday Kuru (organik maddeye göre kg N/da)", rows: [ { max: 1.0, kg_per_da: 9 }, { max: 2.0, kg_per_da: 8 }, { max: 3.0, kg_per_da: 7 }, { max: null, kg_per_da: 5 } ] }
+        limited:   &wheat_n_sulu { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Buğday Sulu (organik maddeye göre kg N/da)", rows: [ { max: 1.0, kg_per_da: 16 }, { max: 2.0, kg_per_da: 15 }, { max: 3.0, kg_per_da: 14 }, { max: null, kg_per_da: 12 } ] }
+        irrigated: *wheat_n_sulu
+      p2o5:
+        rainfed:   { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Buğday Kuru (Olsen P2O5 kg/da'ya göre kg P2O5/da)", rows: [ { max: 1.0, kg_per_da: 9 }, { max: 2.0, kg_per_da: 8 }, { max: 3.0, kg_per_da: 7 }, { max: 4.0, kg_per_da: 6 }, { max: 5.0, kg_per_da: 5 }, { max: 6.0, kg_per_da: 4 }, { max: 7.0, kg_per_da: 3 }, { max: 8.0, kg_per_da: 2 }, { max: null, kg_per_da: 0 } ] }
+        limited:   &wheat_p_sulu { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Buğday Sulu", rows: [ { max: 1.0, kg_per_da: 11 }, { max: 2.0, kg_per_da: 10 }, { max: 3.0, kg_per_da: 8 }, { max: 4.0, kg_per_da: 7 }, { max: 5.0, kg_per_da: 6 }, { max: 6.0, kg_per_da: 5 }, { max: 7.0, kg_per_da: 4 }, { max: 8.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *wheat_p_sulu
+      k2o:
+        rainfed:   { <<: *tagem, source: "TAGEM Çizelge 13, Orta Anadolu, Buğday Kuru (yarayışlı K2O kg/da'ya göre kg K2O/da)", rows: [ { max: 10.0, kg_per_da: 8 }, { max: 20.0, kg_per_da: 6 }, { max: 25.0, kg_per_da: 4 }, { max: null, kg_per_da: 0 } ] }
+        limited:   &wheat_k_sulu { <<: *tagem, source: "TAGEM Çizelge 13, Orta Anadolu, Buğday Sulu", rows: [ { max: 10.0, kg_per_da: 11 }, { max: 20.0, kg_per_da: 8 }, { max: 25.0, kg_per_da: 6 }, { max: 30.0, kg_per_da: 4 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *wheat_k_sulu
+    uptake_kg_per_t:
+      n:    { value: 24, unit: kg N per t grain (grain + straw), source: "Akkaya A., 'Buğdayın Beslenme ve Gübrelenmesi', Atatürk Üniv., Tablo 1 (Laloux vd. 1980): 100 kg dane + saman için 2,4 kg N", source_url: "https://dergipark.org.tr/tr/download/article-file/35146", type: literature, verified: true }
+      p2o5: { value: 13, unit: kg P2O5 per t grain (grain + straw), source: "Akkaya, Tablo 1: 100 kg dane + saman için 1,3 kg P2O5", source_url: "https://dergipark.org.tr/tr/download/article-file/35146", type: literature, verified: true }
+      k2o:  { value: 17, unit: kg K2O per t grain (grain + straw), source: "Akkaya, Tablo 1: 100 kg dane + saman için 1,7 kg K2O", source_url: "https://dergipark.org.tr/tr/download/article-file/35146", type: literature, verified: true }
+    salinity_threshold_ec_ds_m: { value: 6.0, unit: dS/m ECe, <<: *fao29, source: "FAO 29 Table 4 ve FAO 61 Annex 1 Table A1.1: buğday 6,0 dS/m (çimlenmede üst toprakta 4–5 dS/m'yi geçmemeli)" }
+    n_split:
+      rainfed:   [ { timing: top_1, fraction: 1.0, label: { en: "Tillering (early spring)", tr: "Kardeşlenme (erken ilkbahar)" } } ]
+      limited:   &wheat_split_sulu [ { timing: top_1, fraction: 0.6, label: { en: "Tillering", tr: "Kardeşlenme" } }, { timing: top_2, fraction: 0.4, label: { en: "Stem elongation", tr: "Sapa kalkma" } } ]
+      irrigated: *wheat_split_sulu
+    base_products:
+      - { product: npk_20_20_0_zn, when: { flags_any: [zn_low, zn_likely_low] } }
+      - { product: npk_20_20_0, when: { flags_any: [low_total_n] } }
+      - { product: dap }
+    top_products:
+      - { product: can }
+    k_product: potassium_sulfate
+    guide_table:
+      by: target_yield_kg_per_da
+      <<: *toros_wheat
+      source: "Toros, Buğday ve Arpa Gübrelemesi: verim sınıfına göre ürün dozları (kg/da). Kuru: taban DAP (ya da çinkolu 20.20.0 22/26/30), kardeşlenmede CAN. Yağışı yeterli/sulu: taban çinkolu 20.20.0, kardeşlenme ve sapa kalkmada CAN"
+      rows:
+        - { min: 200, max: 250, water: [rainfed], doses: [ { product: dap, timing: base, min_kg_per_da: 10, max_kg_per_da: 10 }, { product: can, timing: top_1, min_kg_per_da: 12, max_kg_per_da: 12 } ], note: { en: "or 22 kg/da Zn 20-20-0 as base", tr: "ya da taban olarak 22 kg/da çinkolu 20-20-0" } }
+        - { min: 250, max: 300, water: [rainfed], doses: [ { product: dap, timing: base, min_kg_per_da: 12, max_kg_per_da: 12 }, { product: can, timing: top_1, min_kg_per_da: 14, max_kg_per_da: 14 } ], note: { en: "or 26 kg/da Zn 20-20-0 as base", tr: "ya da taban olarak 26 kg/da çinkolu 20-20-0" } }
+        - { min: 300, max: 400, water: [rainfed], doses: [ { product: dap, timing: base, min_kg_per_da: 14, max_kg_per_da: 14 }, { product: can, timing: top_1, min_kg_per_da: 16, max_kg_per_da: 16 } ], note: { en: "or 30 kg/da Zn 20-20-0 as base", tr: "ya da taban olarak 30 kg/da çinkolu 20-20-0" } }
+        - { min: 400, max: 500, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 35, max_kg_per_da: 35 }, { product: can, timing: top_1, min_kg_per_da: 12, max_kg_per_da: 12 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
+        - { min: 500, max: 600, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 40, max_kg_per_da: 40 }, { product: can, timing: top_1, min_kg_per_da: 14, max_kg_per_da: 14 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
+        - { min: 600, max: 700, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 45, max_kg_per_da: 45 }, { product: can, timing: top_1, min_kg_per_da: 16, max_kg_per_da: 16 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
+        - { min: 700, max: null, water: [limited, irrigated], doses: [ { product: npk_20_20_0_zn, timing: base, min_kg_per_da: 50, max_kg_per_da: 50 }, { product: can, timing: top_1, min_kg_per_da: 18, max_kg_per_da: 18 }, { product: can, timing: top_2, min_kg_per_da: 10, max_kg_per_da: 10 } ] }
+    advice:
+      - id: cereal_can_not_urea
+        text: { en: "CAN is used for top dressing: if no rain falls for 5–10 days after spreading and it is hot, urea loses much of its nitrogen to the air; CAN loses very little.", tr: "Üst gübrede CAN kullanılır: atıştan sonra 5–10 gün yağmur yağmaz ve hava sıcak olursa üre azotunun çoğunu havaya kaybeder; CAN'da kayıp çok azdır." }
+        <<: *toros_wheat
+      - id: cereal_zinc
+        when: { flags_any: [zn_low, zn_likely_low] }
+        text: { en: "Zinc is short in most Central Anatolian soils; a zinc-containing compound fertilizer is used. Foliar zinc sulfate at tillering and stem elongation is another option.", tr: "Orta Anadolu topraklarının çoğunda çinko eksiktir; çinkolu kompoze gübre kullanılır. Kardeşlenme ve sapa kalkmada yapraktan çinko sülfat da bir seçenektir." }
+        <<: *cakmak
+      - id: wheat_saline_barley
+        when: { flags_any: [saline] }
+        text: { en: "The soil is salty for wheat; barley tolerates salt better and is suggested for this field.", tr: "Toprak buğday için tuzlu; arpa tuza daha dayanıklıdır ve bu tarla için önerilir." }
+        <<: *toros_wheat
+
+  barley:
+    label: { en: "Barley", tr: "Arpa" }
+    in_rotations: false
+    default_target_yield_kg_per_da:
+      rainfed:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor (TÜİK arpa verimi); TAGEM tabloları hedef verim istemez" }
+      limited:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
+      irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
+    soil_tables:
+      n:
+        rainfed:   { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Arpa Kuru", rows: [ { max: 1.0, kg_per_da: 8 }, { max: 2.0, kg_per_da: 7 }, { max: 3.0, kg_per_da: 6 }, { max: null, kg_per_da: 5 } ] }
+        limited:   &barley_n_sulu { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Arpa Sulu", rows: [ { max: 1.0, kg_per_da: 15 }, { max: 2.0, kg_per_da: 14 }, { max: 3.0, kg_per_da: 13 }, { max: null, kg_per_da: 11 } ] }
+        irrigated: *barley_n_sulu
+      p2o5:
+        rainfed:   { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Arpa Kuru", rows: [ { max: 1.0, kg_per_da: 8 }, { max: 2.0, kg_per_da: 7 }, { max: 3.0, kg_per_da: 6 }, { max: 4.0, kg_per_da: 5 }, { max: 5.0, kg_per_da: 4 }, { max: 6.0, kg_per_da: 3 }, { max: 7.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        limited:   &barley_p_sulu { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Arpa Sulu", rows: [ { max: 1.0, kg_per_da: 10 }, { max: 2.0, kg_per_da: 9 }, { max: 3.0, kg_per_da: 8 }, { max: 4.0, kg_per_da: 7 }, { max: 5.0, kg_per_da: 6 }, { max: 6.0, kg_per_da: 5 }, { max: 7.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *barley_p_sulu
+      k2o: {}   # TAGEM Çizelge 13 has no barley row
+    uptake_kg_per_t:
+      n:    { value: 18.1, unit: kg N per t grain (grain only), source: "Montana State Univ., Soil Fertility, nutrient removal: arpa dane 0,87 lb N/bu (48 lb/bu) → 1,81 kg/100 kg; ABD kaynağı, sadece dane", source_url: "https://landresources.montana.edu/soilfertility/nutuptake.html", type: literature, verified: true }
+      p2o5: { value: 7.5, unit: kg P2O5 per t grain (grain only), source: "Montana State Univ.: 0,36 lb P2O5/bu → 0,75 kg/100 kg", source_url: "https://landresources.montana.edu/soilfertility/nutuptake.html", type: literature, verified: true }
+      k2o:  { value: 5.2, unit: kg K2O per t grain (grain only), source: "Montana State Univ.: 0,25 lb K2O/bu → 0,52 kg/100 kg", source_url: "https://landresources.montana.edu/soilfertility/nutuptake.html", type: literature, verified: true }
+    salinity_threshold_ec_ds_m: { value: 8.0, unit: dS/m ECe, <<: *fao29, source: "FAO 29 Table 4 ve FAO 61 Table A1.1: arpa 8,0 dS/m" }
+    n_split:
+      rainfed:   [ { timing: top_1, fraction: 1.0, label: { en: "Tillering (early spring)", tr: "Kardeşlenme (erken ilkbahar)" } } ]
+      limited:   &barley_split_sulu [ { timing: top_1, fraction: 0.6, label: { en: "Tillering", tr: "Kardeşlenme" } }, { timing: top_2, fraction: 0.4, label: { en: "Stem elongation", tr: "Sapa kalkma" } } ]
+      irrigated: *barley_split_sulu
+    base_products:
+      - { product: npk_20_20_0_zn, when: { flags_any: [zn_low, zn_likely_low] } }
+      - { product: npk_20_20_0, when: { flags_any: [low_total_n] } }
+      - { product: dap }
+    top_products:
+      - { product: can }
+    k_product: potassium_sulfate
+    advice:
+      - id: barley_vs_wheat_doses
+        text: { en: "Barley gets about 2 kg/da less base fertilizer and 3 kg/da less top dressing than wheat at the same yield.", tr: "Arpaya aynı verimde buğdaydan yaklaşık 2 kg/da daha az taban ve 3 kg/da daha az üst gübre verilir." }
+        <<: *toros_wheat
+      - id: cereal_can_not_urea
+        text: { en: "CAN is used for top dressing: if no rain falls for 5–10 days after spreading and it is hot, urea loses much of its nitrogen to the air.", tr: "Üst gübrede CAN kullanılır: atıştan sonra 5–10 gün yağmur yağmaz ve hava sıcak olursa üre azotunun çoğunu havaya kaybeder." }
+        <<: *toros_wheat
+
+  chickpea:
+    label: { en: "Chickpea", tr: "Nohut" }
+    in_rotations: true
+    default_target_yield_kg_per_da:
+      rainfed:   { value: 125, unit: kg/da, source: "2024/25 sezonu 4,6 milyon da alanda 575 bin ton nohut (TEPGE, Temmuz 2025) → 125 kg/da — ulusal ortalama (defaults.yaml ile aynı)", source_url: "https://arastirma.tarimorman.gov.tr/tepge/Belgeler/PDF%20Tar%C4%B1m%20%C3%9Cr%C3%BCnleri%20Piyasalar%C4%B1/2025-Temmuz%20Tar%C4%B1m%20%C3%9Cr%C3%BCnleri%20Raporu/Nohut%20Tar%C4%B1m%20%C3%9Cr%C3%BCnleri%20Piyasalar%C4%B1%20Raporu%20Temmuz-2025.pdf", type: statistic, verified: false }
+      limited:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
+      irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
+    soil_tables:
+      n:
+        rainfed: { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Nohut Kuru; dipnot: baklagillerde azotun gübre yerine bakteri aşısıyla sağlanması tavsiye edilir", rows: [ { max: 1.0, kg_per_da: 5 }, { max: 2.0, kg_per_da: 4 }, { max: 3.0, kg_per_da: 3 }, { max: null, kg_per_da: 3 } ] }
+      p2o5:
+        rainfed: { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Nohut Kuru", rows: [ { max: 1.0, kg_per_da: 8 }, { max: 2.0, kg_per_da: 7 }, { max: 3.0, kg_per_da: 5 }, { max: 4.0, kg_per_da: 4 }, { max: 5.0, kg_per_da: 4 }, { max: 6.0, kg_per_da: 3 }, { max: 7.0, kg_per_da: 2 }, { max: null, kg_per_da: 0 } ] }
+      k2o: {}   # no chickpea row in TAGEM Çizelge 13
+    fixed_n_kg_per_da:
+      inoculated: { value: 3, unit: kg N/da, <<: *gkgm_legume, source: "GKGM Yemeklik Baklagil: nohutta ekimden önce, nodüller oluşana kadar 2–4 kg/da saf azot (orta değer)" }
+    uptake_kg_per_t:
+      n:    { value: null, unit: kg N per t seed, <<: *report, source: "Baklagil: azotun çoğunu havadan bağlar; denge yöntemi kullanılmaz" }
+      p2o5: { value: null, unit: kg P2O5 per t seed, <<: *report, source: "Bekleniyor (GRDC değeri açılamadı)" }
+      k2o:  { value: null, unit: kg K2O per t seed, <<: *report, source: "Bekleniyor" }
+    salinity_threshold_ec_ds_m: { value: null, unit: dS/m ECe, <<: *fao29, verified: false, source: "FAO 61 Table A1.1: nohut 'orta hassas', eşik değeri verilmemiş" }
+    n_split:
+      rainfed:   &legume_split [ { timing: base, fraction: 1.0, label: { en: "At sowing", tr: "Ekimle" } } ]
+      limited:   *legume_split
+      irrigated: *legume_split
+    base_products:
+      - { product: dap }
+    top_products:
+      - { product: can }
+    k_product: potassium_sulfate
+    advice:
+      - id: legume_inoculate
+        when: { inoculated: { eq: false } }
+        text: { en: "Inoculate the seed with Rhizobium before sowing (needed where chickpea was not grown before); the crop then takes most of its nitrogen from the air and needs only a starter dose.", tr: "Ekimden önce tohumu Rhizobium bakterisiyle aşılayın (daha önce nohut ekilmemiş tarlada gerekir); bitki azotunun çoğunu havadan alır ve sadece başlangıç dozu gerekir." }
+        <<: *gkgm_legume
+      - id: legume_no_high_n
+        text: { en: "High nitrogen doses stop the root nodules from forming; keep nitrogen to the starter dose.", tr: "Yüksek azot dozu kök nodüllerinin oluşmasını durdurur; azotu başlangıç dozunda tutun." }
+        <<: *report
+      - id: chickpea_foliar_zn
+        when: { flags_any: [zn_low, zn_likely_low] }
+        text: { en: "A foliar zinc spray (chelated) at flowering may help on this limy, alkaline soil.", tr: "Bu kireçli, alkali toprakta çiçeklenmede yapraktan (şelatlı) çinko yardımcı olabilir." }
+        <<: *report
+
+  lentil:
+    label: { en: "Lentil", tr: "Mercimek" }
+    in_rotations: true
+    default_target_yield_kg_per_da:
+      rainfed:   { value: 169, unit: kg/da, source: "2024/25 sezonu 2,4 milyon da alanda 405 bin ton kırmızı mercimek (TEPGE, Temmuz 2025) → 169 kg/da — ulusal ortalama (defaults.yaml ile aynı)", source_url: "https://arastirma.tarimorman.gov.tr/tepge/Belgeler/PDF%20Tar%C4%B1m%20%C3%9Cr%C3%BCnleri%20Piyasalar%C4%B1/2025-Temmuz%20Tar%C4%B1m%20%C3%9Cr%C3%BCnleri%20Raporu/Mercimek%20Tar%C4%B1m%20%C3%9Cr%C3%BCnleri%20Piyasalar%C4%B1%20Raporu%20Temmuz-2025.pdf", type: statistic, verified: false }
+      limited:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
+      irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor" }
+    soil_tables:
+      n:
+        rainfed: { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Mercimek Kuru; dipnot: baklagillerde azotun bakteri aşısıyla sağlanması tavsiye edilir", rows: [ { max: 1.0, kg_per_da: 5 }, { max: 2.0, kg_per_da: 4 }, { max: 3.0, kg_per_da: 3 }, { max: null, kg_per_da: 3 } ] }
+      p2o5:
+        rainfed: { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Mercimek Kuru", rows: [ { max: 1.0, kg_per_da: 9 }, { max: 2.0, kg_per_da: 8 }, { max: 3.0, kg_per_da: 7 }, { max: 4.0, kg_per_da: 6 }, { max: 5.0, kg_per_da: 5 }, { max: 6.0, kg_per_da: 4 }, { max: 7.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+      k2o: {}   # no lentil row in TAGEM Çizelge 13
+    fixed_n_kg_per_da:
+      inoculated: { value: 2.3, unit: kg N/da, <<: *gkgm_legume, source: "GKGM Yemeklik Baklagil: mercimekte 12–14 kg/da DAP → %18 N ile 2,2–2,5 kg N/da (orta değer 13 kg DAP = 2,3 kg N)" }
+    uptake_kg_per_t:
+      n:    { value: 36.3, unit: kg N per t seed (grain only), source: "Montana State Univ.: mercimek 2,18 lb N/bu (60 lb/bu) → 3,63 kg/100 kg; satır bezelye ile aynı, zayıf kaynak", source_url: "https://landresources.montana.edu/soilfertility/nutuptake.html", type: literature, verified: true }
+      p2o5: { value: 11.2, unit: kg P2O5 per t seed (grain only), source: "Montana State Univ.: 0,67 lb P2O5/bu → 1,12 kg/100 kg", source_url: "https://landresources.montana.edu/soilfertility/nutuptake.html", type: literature, verified: true }
+      k2o:  { value: 14.5, unit: kg K2O per t seed (grain only), source: "Montana State Univ.: 0,87 lb K2O/bu → 1,45 kg/100 kg", source_url: "https://landresources.montana.edu/soilfertility/nutuptake.html", type: literature, verified: true }
+    salinity_threshold_ec_ds_m: { value: null, unit: dS/m ECe, <<: *fao29, verified: false, source: "FAO 29 Table 4 ve FAO 61 Table A1.1'de mercimek yok" }
+    n_split:
+      rainfed:   *legume_split
+      limited:   *legume_split
+      irrigated: *legume_split
+    base_products:
+      - { product: dap }
+    top_products:
+      - { product: can }
+    k_product: potassium_sulfate
+    advice:
+      - id: legume_inoculate
+        when: { inoculated: { eq: false } }
+        text: { en: "Inoculate the seed with Rhizobium before sowing; the crop then takes most of its nitrogen from the air.", tr: "Ekimden önce tohumu Rhizobium bakterisiyle aşılayın; bitki azotunun çoğunu havadan alır." }
+        <<: *tagem
+        source: "TAGEM Çizelge 1 dipnotu: baklagillerde azot ihtiyacının gübre yerine nodozite bakteri kültürüyle aşılayarak sağlanması tavsiye edilir"
+      - id: legume_no_high_n
+        text: { en: "High nitrogen doses stop the root nodules from forming; keep nitrogen to the starter dose.", tr: "Yüksek azot dozu kök nodüllerinin oluşmasını durdurur; azotu başlangıç dozunda tutun." }
+        <<: *report
+
+  sugar_beet:
+    label: { en: "Sugar beet", tr: "Şeker pancarı" }
+    in_rotations: false
+    default_target_yield_kg_per_da:
+      rainfed:   { value: null, unit: kg/da, <<: *report, source: "Kuru tarımda yetiştirilmez" }
+      limited:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor; TAGEM tabloları hedef verim istemez" }
+      irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor (TÜİK pancar verimi)" }
+    soil_tables:
+      n:
+        limited:   &beet_n { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Ş. Pancarı Sulu", rows: [ { max: 1.0, kg_per_da: 15 }, { max: 2.0, kg_per_da: 14 }, { max: 3.0, kg_per_da: 12 }, { max: null, kg_per_da: 10 } ] }
+        irrigated: *beet_n
+      p2o5:
+        limited:   &beet_p { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Ş. Pancarı Sulu", rows: [ { max: 1.0, kg_per_da: 12 }, { max: 2.0, kg_per_da: 10 }, { max: 3.0, kg_per_da: 8 }, { max: 4.0, kg_per_da: 7 }, { max: 5.0, kg_per_da: 6 }, { max: 6.0, kg_per_da: 5 }, { max: 7.0, kg_per_da: 4 }, { max: 8.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *beet_p
+      k2o:
+        limited:   &beet_k { <<: *tagem, source: "TAGEM Çizelge 13, Orta Anadolu, Ş. Pancarı Sulu", rows: [ { max: 10.0, kg_per_da: 15 }, { max: 20.0, kg_per_da: 13 }, { max: 25.0, kg_per_da: 9 }, { max: 30.0, kg_per_da: 6 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *beet_k
+    n_cap_kg_per_da: { value: 15, unit: kg N/da, <<: *tagem, source: "TAGEM Çizelge 1, Ş. Pancarı Sulu: en yüksek değer 15 kg N/da; fazla azot şeker randımanını düşürür (Toros Gübreleme Rehberi s. 61)" }
+    uptake_kg_per_t:
+      n:    { value: null, unit: kg N per t roots, <<: *report, source: "Bekleniyor (Türk kaynağı bulunamadı)" }
+      p2o5: { value: null, unit: kg P2O5 per t roots, <<: *report, source: "Bekleniyor" }
+      k2o:  { value: null, unit: kg K2O per t roots, <<: *report, source: "Bekleniyor" }
+    salinity_threshold_ec_ds_m: { value: 7.0, unit: dS/m ECe, <<: *fao29, source: "FAO 29 Table 4: şeker pancarı 7,0 dS/m (çimlenmede ECe 3'ü geçmemeli)" }
+    n_split:
+      rainfed:   &beet_split [ { timing: top_1, fraction: 0.5, label: { en: "At hoeing", tr: "Ara çapada" } }, { timing: top_2, fraction: 0.5, label: { en: "Before irrigation (by day 70–80)", tr: "Sulamadan önce (70–80. güne kadar)" } } ]
+      limited:   *beet_split
+      irrigated: *beet_split
+    base_products:
+      - { product: npk_15_15_15 }
+    top_products:
+      - { product: ammonium_sulfate }
+    k_product: potassium_sulfate
+    advice:
+      - id: beet_n_quality
+        text: { en: "More nitrogen than the plan gives lowers the sugar yield; the plan keeps N within the official table.", tr: "Plandan fazla azot şeker randımanını düşürür; plan azotu resmi tablo içinde tutar." }
+        <<: *toros_guide
+        source: "Toros Gübreleme Rehberi s. 61: fazla azotlu gübre kullanımı şeker randımanını azaltır; üst gübreleme çıkıştan 70–80 gün sonra bitirilir"
+
+  potato:
+    label: { en: "Potato", tr: "Patates" }
+    in_rotations: false
+    default_target_yield_kg_per_da:
+      rainfed:   { value: null, unit: kg/da, <<: *report, source: "Kuru tarımda yetiştirilmez" }
+      limited:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor; TAGEM tabloları hedef verim istemez" }
+      irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor (TÜİK patates verimi)" }
+    soil_tables:
+      n:
+        limited:   &potato_n { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Patates Sulu", rows: [ { max: 1.0, kg_per_da: 16 }, { max: 2.0, kg_per_da: 16 }, { max: 3.0, kg_per_da: 14 }, { max: null, kg_per_da: 12 } ] }
+        irrigated: *potato_n
+      p2o5:
+        limited:   &potato_p { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, Patates Sulu", rows: [ { max: 1.0, kg_per_da: 14 }, { max: 2.0, kg_per_da: 12 }, { max: 3.0, kg_per_da: 10 }, { max: 4.0, kg_per_da: 9 }, { max: 5.0, kg_per_da: 8 }, { max: 6.0, kg_per_da: 6 }, { max: 7.0, kg_per_da: 5 }, { max: 8.0, kg_per_da: 4 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *potato_p
+      k2o:
+        limited:   &potato_k { <<: *tagem, source: "TAGEM Çizelge 13, Orta Anadolu, Patates Sulu", rows: [ { max: 10.0, kg_per_da: 15 }, { max: 20.0, kg_per_da: 12 }, { max: 25.0, kg_per_da: 8 }, { max: 30.0, kg_per_da: 6 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *potato_k
+    uptake_kg_per_t:
+      n:    { value: null, unit: kg N per t tubers, <<: *report, source: "Bekleniyor (Türk kaynağı bulunamadı)" }
+      p2o5: { value: null, unit: kg P2O5 per t tubers, <<: *report, source: "Bekleniyor" }
+      k2o:  { value: null, unit: kg K2O per t tubers, <<: *report, source: "Bekleniyor" }
+    salinity_threshold_ec_ds_m: { value: 1.7, unit: dS/m ECe, <<: *fao29, source: "FAO 29 Table 4: patates 1,7 dS/m" }
+    n_split:
+      rainfed:   &potato_split [ { timing: top_1, fraction: 0.4, label: { en: "At hoeing", tr: "Çapada" } }, { timing: top_2, fraction: 0.6, label: { en: "With the irrigations", tr: "Sulamalarla" } } ]
+      limited:   *potato_split
+      irrigated: *potato_split
+    base_products:
+      - { product: npk_15_15_15 }
+    top_products:
+      - { product: can }
+    k_product: potassium_sulfate
+    advice:
+      - id: potato_sulfur
+        when: { ph: { gt: 7.7 } }
+        text: { en: "Soil pH is above 7.7: very finely ground sulfur about one month before planting is suggested to lower the pH.", tr: "Toprak pH'ı 7,7'nin üzerinde: pH'ı düşürmek için dikimden yaklaşık bir ay önce çok ince öğütülmüş toz kükürt önerilir." }
+        <<: *toros_guide
+        source: "Toros Gübreleme Rehberi s. 57: pH 7,7'den yüksekse dikimden bir ay kadar önce toz kükürt (doz verilmiyor)"
+      - id: potato_drip_program
+        when: { drip: { eq: true } }
+        text: { en: "For drip fertigation of potato no published schedule was found; ask a local agronomist for a drip programme.", tr: "Patateste damla sulamayla gübreleme için yayımlanmış bir takvim bulunamadı; damla programı için bölgedeki ziraat mühendisine danışın." }
+        <<: *toros_guide
+        source: "Toros Gübreleme Rehberi s. 57: damla sulamada program için uzmanlarına danışılmasını söylüyor"
+
+  onion:
+    label: { en: "Dry onion", tr: "Kuru soğan" }
+    in_rotations: false
+    default_target_yield_kg_per_da:
+      rainfed:   { value: null, unit: kg/da, <<: *report, source: "Kuru tarımda yetiştirilmez" }
+      limited:   { value: null, unit: kg/da, <<: *report, source: "Bekleniyor; TAGEM tabloları hedef verim istemez" }
+      irrigated: { value: null, unit: kg/da, <<: *report, source: "Bekleniyor (TÜİK kuru soğan verimi)" }
+    soil_tables:
+      n:
+        limited:   &onion_n { <<: *tagem, source: "TAGEM Çizelge 1, Orta Anadolu, Kuru soğan Sulu", rows: [ { max: 1.0, kg_per_da: 14 }, { max: 2.0, kg_per_da: 13 }, { max: 3.0, kg_per_da: 12 }, { max: null, kg_per_da: 10 } ] }
+        irrigated: *onion_n
+      p2o5:
+        limited:   &onion_p { <<: *tagem, source: "TAGEM Çizelge 22, Orta Anadolu, K. Soğan Sulu", rows: [ { max: 1.0, kg_per_da: 10 }, { max: 2.0, kg_per_da: 9 }, { max: 3.0, kg_per_da: 8 }, { max: 4.0, kg_per_da: 7 }, { max: 5.0, kg_per_da: 6 }, { max: 6.0, kg_per_da: 5 }, { max: 7.0, kg_per_da: 4 }, { max: 8.0, kg_per_da: 3 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *onion_p
+      k2o:
+        limited:   &onion_k { <<: *tagem, type: assumption, verified: false, source: "TAGEM Çizelge 13'te soğan satırı yok; 'Sebze Sulu' satırı kullanıldı (kabul)", rows: [ { max: 10.0, kg_per_da: 12 }, { max: 20.0, kg_per_da: 10 }, { max: 25.0, kg_per_da: 8 }, { max: 30.0, kg_per_da: 6 }, { max: null, kg_per_da: 0 } ] }
+        irrigated: *onion_k
+    # Used only where no TAGEM N row applies (rainfed). Yalova (Marmara) drip trial, not Central Anatolia.
+    n_response:
+      a: { value: 2449.54, unit: kg/da, source: "Albayrak ve Elmacı 2017, Bahçe 46(1):21–30 (Yalova, damla sulu, 2012–13): verim = 2449,54 + 215,40·N − 8,29·N², R² = 0,82", source_url: "https://dergipark.org.tr/en/download/article-file/506203", type: literature, verified: true }
+      b: { value: 215.40, unit: kg yield per kg N, source: "Albayrak ve Elmacı 2017, aynı denklem", source_url: "https://dergipark.org.tr/en/download/article-file/506203", type: literature, verified: true }
+      c: { value: -8.29, unit: kg yield per (kg N)², source: "Albayrak ve Elmacı 2017: eğrinin tepesi −b/2c = 12,99 ≈ 13 kg N/da (makale 13 diyor; 12,91 fiyatla hesaplanan ekonomik doz, kullanılmaz)", source_url: "https://dergipark.org.tr/en/download/article-file/506203", type: literature, verified: true }
+    uptake_kg_per_t:
+      n:    { value: null, unit: kg N per t bulbs, <<: *report, source: "Bekleniyor (Türk kaynağı bulunamadı)" }
+      p2o5: { value: null, unit: kg P2O5 per t bulbs, <<: *report, source: "Bekleniyor" }
+      k2o:  { value: null, unit: kg K2O per t bulbs, <<: *report, source: "Bekleniyor" }
+    salinity_threshold_ec_ds_m: { value: 1.2, unit: dS/m ECe, <<: *fao29, source: "FAO 29 Table 4: soğan 1,2 dS/m" }
+    n_split:
+      rainfed:   &onion_split [ { timing: top_1, fraction: 0.5, label: { en: "4–5 leaf stage", tr: "4–5 yaprak döneminde" } }, { timing: top_2, fraction: 0.5, label: { en: "Bulb start", tr: "Baş bağlama başında" } } ]
+      limited:   *onion_split
+      irrigated: *onion_split
+    base_products:
+      - { product: npk_15_15_15 }
+    top_products:
+      - { product: ammonium_sulfate }
+    k_product: potassium_sulfate
+    advice:
+      - id: onion_n_limit
+        text: { en: "More nitrogen than the plan gives causes split bulbs, thick necks and storage rot.", tr: "Plandan fazla azot ikiz baş, kalın boyun ve depoda çürümeye yol açar." }
+        <<: *report
+      - id: onion_sulfur
+        text: { en: "Ammonium sulfate is used for top dressing because it also brings sulfur, which onion needs.", tr: "Üst gübrede amonyum sülfat kullanılır; soğanın ihtiyaç duyduğu kükürdü de verir." }
+        <<: *report
+
+# ---------------------------------------------------------------- general advice (all crops)
+advice:
+  - id: soil_test
+    when: { p2o5_kg_per_da: { missing: true }, olsen_p_ppm: { missing: true } }
+    text: { en: "Satellites and SoilGrids cannot measure phosphorus, potassium, lime, salt or zinc. The official tables need a lab soil test (0–20 cm); until then the plan shows nitrogen only.", tr: "Uydular ve SoilGrids fosfor, potasyum, kireç, tuz ve çinkoyu ölçemez. Resmi tablolar laboratuvar toprak analizi (0–20 cm) ister; o zamana kadar plan sadece azotu gösterir." }
+    <<: *tagem
+    source: "TAGEM Gübre Tavsiyeleri s. 1: gübre miktarı önce toprak analizi, sonra bölge ve bitkiye göre tavsiye çizelgesinden belirlenir"
+  - id: zn_check
+    when: { flags_any: [zn_likely_low] }
+    text: { en: "Zinc is short in most alkaline, limy Central Anatolian soils; a zinc (DTPA) soil test is suggested. Until then the plan uses a zinc-containing fertilizer where the crop has one.", tr: "Orta Anadolu'nun alkali, kireçli topraklarının çoğunda çinko eksiktir; çinko (DTPA) analizi önerilir. O zamana kadar plan, ürün için varsa çinkolu gübre kullanır." }
+    <<: *cakmak
+  - id: banding
+    when: { banding: { eq: false } }
+    text: { en: "With a combined seed drill the base fertilizer goes in a band next to the seed; the guide then uses 2 kg/da less compound or 1 kg/da less DAP.", tr: "Kombine mibzerle taban gübre tohumun yanına bant halinde verilir; rehber bu durumda kompozeyi 2 kg/da, DAP'ı 1 kg/da azaltır." }
+    <<: *toros_wheat
+  - id: low_om_organic
+    when: { flags_any: [low_om] }
+    text: { en: "Organic matter is very low: farmyard manure or compost helps the soil hold water and nutrients.", tr: "Organik madde çok düşük: ahır gübresi ya da kompost toprağın suyu ve besini tutmasına yardım eder." }
+    <<: *report
+  - id: drip_no_ca_mix
+    when: { drip: { eq: true } }
+    text: { en: "In drip fertigation, do not put calcium nitrate in the same tank as phosphate or sulfate fertilizers; they settle and block the drippers.", tr: "Damla sulamada kalsiyum nitratı fosfatlı ya da sülfatlı gübrelerle aynı tanka koymayın; çöker ve damlatıcıları tıkar." }
+    <<: *toros_guide
+  - id: foliar_timing
+    when: { flags_any: [zn_low, zn_likely_low] }
+    text: { en: "Spray foliar fertilizers early in the morning or in the cool evening, not in heat or strong wind.", tr: "Yaprak gübrelerini sabah erken ya da akşam serinliğinde uygulayın; sıcakta ve kuvvetli rüzgârda uygulamayın." }
+    <<: *report

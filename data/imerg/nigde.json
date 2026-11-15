@@ -4,19 +4,19 @@
  "source_url": "https://gdex.ucar.edu/datasets/d736000/",
  "refs_url": "https://data.gdex.ucar.edu/d736000/kerchunk/GPM_3IMERGM_v07-remote-https.json",
  "point": {
-  "lat": 37.918,
-  "lon": 34.628
+  "lat": 37.876,
+  "lon": 34.6795
  },
  "cell_centre": {
-  "lat": 37.95,
+  "lat": 37.85,
   "lon": 34.65
  },
  "unit": "mm/month",
- "fetched_at": "2026-11-14T20:36:16Z",
+ "fetched_at": "2026-11-15T00:28:13Z",
  "months": [
   {
    "month": "2000-06",
-   "precip_mm": 28.8
+   "precip_mm": 27.36
   },
   {
    "month": "2000-07",
@@ -24,35 +24,35 @@
   },
   {
    "month": "2000-08",
-   "precip_mm": 11.9
+   "precip_mm": 12.65
   },
   {
    "month": "2000-09",
-   "precip_mm": 12.24
+   "precip_mm": 14.4
   },
   {
    "month": "2000-10",
-   "precip_mm": 32.74
+   "precip_mm": 34.22
   },
   {
    "month": "2000-11",
-   "precip_mm": 20.88
+   "precip_mm": 23.76
   },
   {
    "month": "2000-12",
-   "precip_mm": 35.71
+   "precip_mm": 34.22
   },
   {
    "month": "2001-01",
-   "precip_mm": 9.67
+   "precip_mm": 10.42
   },
   {
    "month": "2001-02",
-   "precip_mm": 66.53
+   "precip_mm": 68.54
   },
   {
    "month": "2001-03",
-   "precip_mm": 37.2
+   "precip_mm": 38.69
   },
   {
    "month": "2001-04",
@@ -60,15 +60,15 @@
   },
   {
    "month": "2001-05",
-   "precip_mm": 101.93
+   "precip_mm": 103.42
   },
   {
    "month": "2001-06",
-   "precip_mm": 5.04
+   "precip_mm": 5.76
   },
   {
    "month": "2001-07",
-   "precip_mm": 2.23
+   "precip_mm": 1.49
   },
   {
    "month": "2001-08",
@@ -80,23 +80,23 @@
   },
   {
    "month": "2001-10",
-   "precip_mm": 17.86
+   "precip_mm": 19.34
   },
   {
    "month": "2001-11",
-   "precip_mm": 66.96
+   "precip_mm": 72.0
   },
   {
    "month": "2001-12",
-   "precip_mm": 157.73
+   "precip_mm": 173.35
   },
   {
    "month": "2002-01",
-   "precip_mm": 72.17
+   "precip_mm": 75.14
   },
   {
    "month": "2002-02",
-   "precip_mm": 36.29
+   "precip_mm": 38.3
   },
   {
    "month": "2002-03",
@@ -104,11 +104,11 @@
   },
   {
    "month": "2002-04",
-   "precip_mm": 104.4
+   "precip_mm": 105.84
   },
   {
    "month": "2002-05",
-   "precip_mm": 39.43
+   "precip_mm": 41.66
   },
   {
    "month": "2002-06",
@@ -116,11 +116,11 @@
   },
   {
    "month": "2002-07",
-   "precip_mm": 26.04
+   "precip_mm": 23.81
   },
   {
    "month": "2002-08",
-   "precip_mm": 30.5
+   "precip_mm": 31.99
   },
   {
    "month": "2002-09",
@@ -128,15 +128,15 @@
   },
   {
    "month": "2002-10",
-   "precip_mm": 21.58
+   "precip_mm": 23.81
   },
   {
    "month": "2002-11",
-   "precip_mm": 34.56
+   "precip_mm": 35.28
   },
   {
    "month": "2002-12",
-   "precip_mm": 52.08
+   "precip_mm": 53.57
   },
   {
    "month": "2003-01",
@@ -144,23 +144,23 @@
   },
   {
    "month": "2003-02",
-   "precip_mm": 81.31
+   "precip_mm": 81.98
   },
   {
    "month": "2003-03",
-   "precip_mm": 63.98
+   "precip_mm": 66.96
   },
   {
    "month": "2003-04",
-   "precip_mm": 54.72
+   "precip_mm": 55.44
   },
   {
    "month": "2003-05",
-   "precip_mm": 54.31
+   "precip_mm": 55.8
   },
   {
    "month": "2003-06",
-   "precip_mm": 26.64
+   "precip_mm": 25.92
   },
   {
    "month": "2003-07",
@@ -172,11 +172,11 @@
   },
   {
    "month": "2003-09",
-   "precip_mm": 27.36
+   "precip_mm": 29.52
   },
   {
    "month": "2003-10",
-   "precip_mm": 34.97
+   "precip_mm": 33.48
   },
   {
    "month": "2003-11",
@@ -184,79 +184,79 @@
   },
   {
    "month": "2003-12",
-   "precip_mm": 59.52
+   "precip_mm": 61.75
   },
   {
    "month": "2004-01",
-   "precip_mm": 104.9
+   "precip_mm": 113.83
   },
   {
    "month": "2004-02",
-   "precip_mm": 41.06
+   "precip_mm": 42.46
   },
   {
    "month": "2004-03",
-   "precip_mm": 22.32
+   "precip_mm": 20.83
   },
   {
    "month": "2004-04",
-   "precip_mm": 56.16
+   "precip_mm": 54.72
   },
   {
    "month": "2004-05",
-   "precip_mm": 37.2
+   "precip_mm": 37.94
   },
   {
    "month": "2004-06",
-   "precip_mm": 18.72
+   "precip_mm": 16.56
   },
   {
    "month": "2004-07",
-   "precip_mm": 10.42
+   "precip_mm": 9.67
   },
   {
    "month": "2004-08",
-   "precip_mm": 2.98
+   "precip_mm": 2.23
   },
   {
    "month": "2004-09",
-   "precip_mm": 3.6
+   "precip_mm": 2.88
   },
   {
    "month": "2004-10",
-   "precip_mm": 13.39
+   "precip_mm": 14.14
   },
   {
    "month": "2004-11",
-   "precip_mm": 79.92
+   "precip_mm": 77.04
   },
   {
    "month": "2004-12",
-   "precip_mm": 26.78
+   "precip_mm": 25.3
   },
   {
    "month": "2005-01",
-   "precip_mm": 46.87
+   "precip_mm": 46.13
   },
   {
    "month": "2005-02",
-   "precip_mm": 45.02
+   "precip_mm": 43.68
   },
   {
    "month": "2005-03",
-   "precip_mm": 59.52
+   "precip_mm": 57.29
   },
   {
    "month": "2005-04",
-   "precip_mm": 43.2
+   "precip_mm": 41.76
   },
   {
    "month": "2005-05",
-   "precip_mm": 38.69
+   "precip_mm": 37.94
   },
   {
    "month": "2005-06",
-   "precip_mm": 20.16
+   "precip_mm": 20.88
   },
   {
    "month": "2005-07",
@@ -272,39 +272,39 @@
   },
   {
    "month": "2005-10",
-   "precip_mm": 29.76
+   "precip_mm": 29.02
   },
   {
    "month": "2005-11",
-   "precip_mm": 51.12
+   "precip_mm": 54.0
   },
   {
    "month": "2005-12",
-   "precip_mm": 36.46
+   "precip_mm": 39.43
   },
   {
    "month": "2006-01",
-   "precip_mm": 48.36
+   "precip_mm": 46.87
   },
   {
    "month": "2006-02",
-   "precip_mm": 49.73
+   "precip_mm": 51.74
   },
   {
    "month": "2006-03",
-   "precip_mm": 44.64
+   "precip_mm": 46.13
   },
   {
    "month": "2006-04",
-   "precip_mm": 51.12
+   "precip_mm": 48.24
   },
   {
    "month": "2006-05",
-   "precip_mm": 31.25
+   "precip_mm": 29.02
   },
   {
    "month": "2006-06",
-   "precip_mm": 18.72
+   "precip_mm": 17.28
   },
   {
    "month": "2006-07",
@@ -320,23 +320,23 @@
   },
   {
    "month": "2006-10",
-   "precip_mm": 75.89
+   "precip_mm": 78.12
   },
   {
    "month": "2006-11",
-   "precip_mm": 54.72
+   "precip_mm": 58.32
   },
   {
    "month": "2006-12",
-   "precip_mm": 13.39
+   "precip_mm": 14.14
   },
   {
    "month": "2007-01",
-   "precip_mm": 37.2
+   "precip_mm": 36.46
   },
   {
    "month": "2007-02",
-   "precip_mm": 55.78
+   "precip_mm": 57.79
   },
   {
    "month": "2007-03",
@@ -348,11 +348,11 @@
   },
   {
    "month": "2007-05",
-   "precip_mm": 44.64
+   "precip_mm": 47.62
   },
   {
    "month": "2007-06",
-   "precip_mm": 26.64
+   "precip_mm": 23.76
   },
   {
    "month": "2007-07",
@@ -368,15 +368,15 @@
   },
   {
    "month": "2007-10",
-   "precip_mm": 24.55
+   "precip_mm": 22.32
   },
   {
    "month": "2007-11",
-   "precip_mm": 87.84
+   "precip_mm": 84.96
   },
   {
    "month": "2007-12",
-   "precip_mm": 74.4
+   "precip_mm": 77.38
   },
   {
    "month": "2008-01",
@@ -384,23 +384,23 @@
   },
   {
    "month": "2008-02",
-   "precip_mm": 36.19
+   "precip_mm": 35.5
   },
   {
    "month": "2008-03",
-   "precip_mm": 38.69
-  },
-  {
-   "month": "2008-04",
-   "precip_mm": 25.2
-  },
-  {
-   "month": "2008-05",
    "precip_mm": 40.92
   },
   {
+   "month": "2008-04",
+   "precip_mm": 22.32
+  },
+  {
+   "month": "2008-05",
+   "precip_mm": 41.66
+  },
+  {
    "month": "2008-06",
-   "precip_mm": 23.04
+   "precip_mm": 21.6
   },
   {
    "month": "2008-07",
@@ -412,19 +412,19 @@
   },
   {
    "month": "2008-09",
-   "precip_mm": 34.56
+   "precip_mm": 32.4
   },
   {
    "month": "2008-10",
-   "precip_mm": 37.94
+   "precip_mm": 35.71
   },
   {
    "month": "2008-11",
-   "precip_mm": 52.56
+   "precip_mm": 53.28
   },
   {
    "month": "2008-12",
-   "precip_mm": 50.59
+   "precip_mm": 49.1
   },
   {
    "month": "2009-01",
@@ -432,51 +432,51 @@
   },
   {
    "month": "2009-02",
-   "precip_mm": 85.34
+   "precip_mm": 81.98
   },
   {
    "month": "2009-03",
-   "precip_mm": 80.35
+   "precip_mm": 77.38
   },
   {
    "month": "2009-04",
-   "precip_mm": 48.96
+   "precip_mm": 46.8
   },
   {
    "month": "2009-05",
-   "precip_mm": 47.62
+   "precip_mm": 46.87
   },
   {
    "month": "2009-06",
-   "precip_mm": 15.12
+   "precip_mm": 14.4
   },
   {
    "month": "2009-07",
-   "precip_mm": 45.38
+   "precip_mm": 42.41
   },
   {
    "month": "2009-08",
-   "precip_mm": 3.72
+   "precip_mm": 1.49
   },
   {
    "month": "2009-09",
-   "precip_mm": 21.6
+   "precip_mm": 23.04
   },
   {
    "month": "2009-10",
-   "precip_mm": 18.6
+   "precip_mm": 21.58
   },
   {
    "month": "2009-11",
-   "precip_mm": 85.68
+   "precip_mm": 79.2
   },
   {
    "month": "2009-12",
-   "precip_mm": 75.89
+   "precip_mm": 79.61
   },
   {
    "month": "2010-01",
-   "precip_mm": 92.26
+   "precip_mm": 93.0
   },
   {
    "month": "2010-02",
@@ -484,7 +484,7 @@
   },
   {
    "month": "2010-03",
-   "precip_mm": 44.64
+   "precip_mm": 43.15
   },
   {
    "month": "2010-04",
@@ -496,15 +496,15 @@
   },
   {
    "month": "2010-06",
-   "precip_mm": 53.28
+   "precip_mm": 46.08
   },
   {
    "month": "2010-07",
-   "precip_mm": 5.21
+   "precip_mm": 4.46
   },
   {
    "month": "2010-08",
-   "precip_mm": 3.72
+   "precip_mm": 4.46
   },
   {
    "month": "2010-09",
@@ -512,7 +512,7 @@
   },
   {
    "month": "2010-10",
-   "precip_mm": 83.33
+   "precip_mm": 81.84
   },
   {
    "month": "2010-11",
@@ -520,51 +520,51 @@
   },
   {
    "month": "2010-12",
-   "precip_mm": 110.86
+   "precip_mm": 107.88
   },
   {
    "month": "2011-01",
-   "precip_mm": 66.22
+   "precip_mm": 62.5
   },
   {
    "month": "2011-02",
-   "precip_mm": 61.15
+   "precip_mm": 63.84
   },
   {
    "month": "2011-03",
-   "precip_mm": 56.54
+   "precip_mm": 58.03
   },
   {
    "month": "2011-04",
-   "precip_mm": 63.36
+   "precip_mm": 64.8
   },
   {
    "month": "2011-05",
-   "precip_mm": 60.26
+   "precip_mm": 59.52
   },
   {
    "month": "2011-06",
-   "precip_mm": 66.24
+   "precip_mm": 64.8
   },
   {
    "month": "2011-07",
-   "precip_mm": 3.72
+   "precip_mm": 2.98
   },
   {
    "month": "2011-08",
-   "precip_mm": 3.72
+   "precip_mm": 5.21
   },
   {
    "month": "2011-09",
-   "precip_mm": 22.32
+   "precip_mm": 20.88
   },
   {
    "month": "2011-10",
-   "precip_mm": 40.18
+   "precip_mm": 33.48
   },
   {
    "month": "2011-11",
-   "precip_mm": 23.76
+   "precip_mm": 25.2
   },
   {
    "month": "2011-12",
@@ -572,27 +572,27 @@
   },
   {
    "month": "2012-01",
-   "precip_mm": 89.28
+   "precip_mm": 95.23
   },
   {
    "month": "2012-02",
-   "precip_mm": 87.7
+   "precip_mm": 94.66
   },
   {
    "month": "2012-03",
-   "precip_mm": 56.54
+   "precip_mm": 55.8
   },
   {
    "month": "2012-04",
-   "precip_mm": 20.88
+   "precip_mm": 20.16
   },
   {
    "month": "2012-05",
-   "precip_mm": 75.89
+   "precip_mm": 76.63
   },
   {
    "month": "2012-06",
-   "precip_mm": 26.64
+   "precip_mm": 25.92
   },
   {
    "month": "2012-07",
@@ -600,7 +600,7 @@
   },
   {
    "month": "2012-08",
-   "precip_mm": 6.7
+   "precip_mm": 5.95
   },
   {
    "month": "2012-09",
@@ -608,19 +608,19 @@
   },
   {
    "month": "2012-10",
-   "precip_mm": 43.9
+   "precip_mm": 46.87
   },
   {
    "month": "2012-11",
-   "precip_mm": 69.84
+   "precip_mm": 73.44
   },
   {
    "month": "2012-12",
-   "precip_mm": 119.04
+   "precip_mm": 122.02
   },
   {
    "month": "2013-01",
-   "precip_mm": 51.34
+   "precip_mm": 49.85
   },
   {
    "month": "2013-02",
@@ -628,23 +628,23 @@
   },
   {
    "month": "2013-03",
-   "precip_mm": 45.38
+   "precip_mm": 47.62
   },
   {
    "month": "2013-04",
-   "precip_mm": 54.72
+   "precip_mm": 57.6
   },
   {
    "month": "2013-05",
-   "precip_mm": 39.43
+   "precip_mm": 37.94
   },
   {
    "month": "2013-06",
-   "precip_mm": 20.16
+   "precip_mm": 21.6
   },
   {
    "month": "2013-07",
-   "precip_mm": 5.21
+   "precip_mm": 5.95
   },
   {
    "month": "2013-08",
@@ -656,7 +656,7 @@
   },
   {
    "month": "2013-10",
-   "precip_mm": 35.71
+   "precip_mm": 36.46
   },
   {
    "month": "2013-11",
@@ -664,7 +664,7 @@
   },
   {
    "month": "2013-12",
-   "precip_mm": 23.06
+   "precip_mm": 22.32
   },
   {
    "month": "2014-01",
@@ -672,7 +672,7 @@
   },
   {
    "month": "2014-02",
-   "precip_mm": 26.88
+   "precip_mm": 27.55
   },
   {
    "month": "2014-03",
@@ -680,11 +680,11 @@
   },
   {
    "month": "2014-04",
-   "precip_mm": 12.24
+   "precip_mm": 12.96
   },
   {
    "month": "2014-05",
-   "precip_mm": 37.94
+   "precip_mm": 41.66
   },
   {
    "month": "2014-06",
@@ -692,83 +692,83 @@
   },
   {
    "month": "2014-07",
-   "precip_mm": 6.7
+   "precip_mm": 5.95
   },
   {
    "month": "2014-08",
-   "precip_mm": 11.16
+   "precip_mm": 13.39
   },
   {
    "month": "2014-09",
-   "precip_mm": 72.0
+   "precip_mm": 74.88
   },
   {
    "month": "2014-10",
-   "precip_mm": 40.92
+   "precip_mm": 40.18
   },
   {
    "month": "2014-11",
-   "precip_mm": 56.88
+   "precip_mm": 57.6
   },
   {
    "month": "2014-12",
-   "precip_mm": 46.13
+   "precip_mm": 46.87
   },
   {
    "month": "2015-01",
-   "precip_mm": 57.29
+   "precip_mm": 60.26
   },
   {
    "month": "2015-02",
-   "precip_mm": 76.61
+   "precip_mm": 79.3
   },
   {
    "month": "2015-03",
-   "precip_mm": 110.86
+   "precip_mm": 112.34
   },
   {
    "month": "2015-04",
-   "precip_mm": 32.4
+   "precip_mm": 33.84
   },
   {
    "month": "2015-05",
-   "precip_mm": 54.31
+   "precip_mm": 55.06
   },
   {
    "month": "2015-06",
-   "precip_mm": 82.08
+   "precip_mm": 77.76
   },
   {
    "month": "2015-07",
-   "precip_mm": 3.72
+   "precip_mm": 5.21
   },
   {
    "month": "2015-08",
-   "precip_mm": 20.09
+   "precip_mm": 20.83
   },
   {
    "month": "2015-09",
-   "precip_mm": 13.68
+   "precip_mm": 15.12
   },
   {
    "month": "2015-10",
-   "precip_mm": 48.36
+   "precip_mm": 51.34
   },
   {
    "month": "2015-11",
-   "precip_mm": 12.24
+   "precip_mm": 12.96
   },
   {
    "month": "2015-12",
-   "precip_mm": 12.65
+   "precip_mm": 11.9
   },
   {
    "month": "2016-01",
-   "precip_mm": 95.98
+   "precip_mm": 98.95
   },
   {
    "month": "2016-02",
-   "precip_mm": 48.02
+   "precip_mm": 48.72
   },
   {
    "month": "2016-03",
@@ -776,43 +776,43 @@
   },
   {
    "month": "2016-04",
-   "precip_mm": 20.88
-  },
-  {
-   "month": "2016-05",
-   "precip_mm": 75.14
-  },
-  {
-   "month": "2016-06",
-   "precip_mm": 24.48
-  },
-  {
-   "month": "2016-07",
-   "precip_mm": 3.72
-  },
-  {
-   "month": "2016-08",
-   "precip_mm": 6.7
-  },
-  {
-   "month": "2016-09",
-   "precip_mm": 28.08
-  },
-  {
-   "month": "2016-10",
-   "precip_mm": 9.67
-  },
-  {
-   "month": "2016-11",
    "precip_mm": 21.6
   },
   {
+   "month": "2016-05",
+   "precip_mm": 83.33
+  },
+  {
+   "month": "2016-06",
+   "precip_mm": 25.2
+  },
+  {
+   "month": "2016-07",
+   "precip_mm": 6.7
+  },
+  {
+   "month": "2016-08",
+   "precip_mm": 5.21
+  },
+  {
+   "month": "2016-09",
+   "precip_mm": 27.36
+  },
+  {
+   "month": "2016-10",
+   "precip_mm": 12.65
+  },
+  {
+   "month": "2016-11",
+   "precip_mm": 23.04
+  },
+  {
    "month": "2016-12",
-   "precip_mm": 108.62
+   "precip_mm": 115.32
   },
   {
    "month": "2017-01",
-   "precip_mm": 41.66
+   "precip_mm": 43.9
   },
   {
    "month": "2017-02",
@@ -820,15 +820,15 @@
   },
   {
    "month": "2017-03",
-   "precip_mm": 63.24
+   "precip_mm": 66.96
   },
   {
    "month": "2017-04",
-   "precip_mm": 52.56
+   "precip_mm": 48.96
   },
   {
    "month": "2017-05",
-   "precip_mm": 46.13
+   "precip_mm": 49.1
   },
   {
    "month": "2017-06",
@@ -840,7 +840,7 @@
   },
   {
    "month": "2017-08",
-   "precip_mm": 14.88
+   "precip_mm": 14.14
   },
   {
    "month": "2017-09",
@@ -848,31 +848,31 @@
   },
   {
    "month": "2017-10",
-   "precip_mm": 22.32
+   "precip_mm": 23.81
   },
   {
    "month": "2017-11",
-   "precip_mm": 60.48
+   "precip_mm": 62.64
   },
   {
    "month": "2017-12",
-   "precip_mm": 46.13
+   "precip_mm": 45.38
   },
   {
    "month": "2018-01",
-   "precip_mm": 112.34
+   "precip_mm": 118.3
   },
   {
    "month": "2018-02",
-   "precip_mm": 32.93
+   "precip_mm": 32.26
   },
   {
    "month": "2018-03",
-   "precip_mm": 58.03
+   "precip_mm": 52.82
   },
   {
    "month": "2018-04",
-   "precip_mm": 24.48
+   "precip_mm": 25.2
   },
   {
    "month": "2018-05",
@@ -880,7 +880,7 @@
   },
   {
    "month": "2018-06",
-   "precip_mm": 41.76
+   "precip_mm": 41.04
   },
   {
    "month": "2018-07",
@@ -892,47 +892,47 @@
   },
   {
    "month": "2018-09",
-   "precip_mm": 7.92
+   "precip_mm": 8.64
   },
   {
    "month": "2018-10",
-   "precip_mm": 52.08
+   "precip_mm": 56.54
   },
   {
    "month": "2018-11",
-   "precip_mm": 25.92
+   "precip_mm": 28.08
   },
   {
    "month": "2018-12",
-   "precip_mm": 151.03
+   "precip_mm": 159.96
   },
   {
    "month": "2019-01",
-   "precip_mm": 105.65
+   "precip_mm": 113.09
   },
   {
    "month": "2019-02",
-   "precip_mm": 56.45
+   "precip_mm": 57.12
   },
   {
    "month": "2019-03",
-   "precip_mm": 43.15
+   "precip_mm": 45.38
   },
   {
    "month": "2019-04",
-   "precip_mm": 44.64
+   "precip_mm": 45.36
   },
   {
    "month": "2019-05",
-   "precip_mm": 20.83
+   "precip_mm": 19.34
   },
   {
    "month": "2019-06",
-   "precip_mm": 52.56
+   "precip_mm": 54.0
   },
   {
    "month": "2019-07",
-   "precip_mm": 13.39
+   "precip_mm": 12.65
   },
   {
    "month": "2019-08",
@@ -944,43 +944,43 @@
   },
   {
    "month": "2019-10",
-   "precip_mm": 18.6
+   "precip_mm": 17.86
   },
   {
    "month": "2019-11",
-   "precip_mm": 23.76
+   "precip_mm": 23.04
   },
   {
    "month": "2019-12",
-   "precip_mm": 110.86
+   "precip_mm": 119.04
   },
   {
    "month": "2020-01",
-   "precip_mm": 71.42
+   "precip_mm": 73.66
   },
   {
    "month": "2020-02",
-   "precip_mm": 70.3
+   "precip_mm": 68.9
   },
   {
    "month": "2020-03",
-   "precip_mm": 60.26
+   "precip_mm": 64.73
   },
   {
    "month": "2020-04",
-   "precip_mm": 36.72
+   "precip_mm": 37.44
   },
   {
    "month": "2020-05",
-   "precip_mm": 53.57
+   "precip_mm": 54.31
   },
   {
    "month": "2020-06",
-   "precip_mm": 33.84
+   "precip_mm": 28.8
   },
   {
    "month": "2020-07",
-   "precip_mm": 5.21
+   "precip_mm": 4.46
   },
   {
    "month": "2020-08",
@@ -988,43 +988,43 @@
   },
   {
    "month": "2020-09",
-   "precip_mm": 5.76
+   "precip_mm": 6.48
   },
   {
    "month": "2020-10",
-   "precip_mm": 5.21
+   "precip_mm": 4.46
   },
   {
    "month": "2020-11",
-   "precip_mm": 35.28
+   "precip_mm": 36.0
   },
   {
    "month": "2020-12",
-   "precip_mm": 29.76
+   "precip_mm": 30.5
   },
   {
    "month": "2021-01",
-   "precip_mm": 83.33
+   "precip_mm": 87.05
   },
   {
    "month": "2021-02",
-   "precip_mm": 24.19
+   "precip_mm": 22.85
   },
   {
    "month": "2021-03",
-   "precip_mm": 63.24
+   "precip_mm": 61.01
   },
   {
    "month": "2021-04",
-   "precip_mm": 32.4
+   "precip_mm": 34.56
   },
   {
    "month": "2021-05",
-   "precip_mm": 10.42
+   "precip_mm": 11.16
   },
   {
    "month": "2021-06",
-   "precip_mm": 37.44
+   "precip_mm": 35.28
   },
   {
    "month": "2021-07",
@@ -1032,7 +1032,7 @@
   },
   {
    "month": "2021-08",
-   "precip_mm": 22.32
+   "precip_mm": 20.09
   },
   {
    "month": "2021-09",
@@ -1040,39 +1040,39 @@
   },
   {
    "month": "2021-10",
-   "precip_mm": 2.98
+   "precip_mm": 3.72
   },
   {
    "month": "2021-11",
-   "precip_mm": 40.32
+   "precip_mm": 41.04
   },
   {
    "month": "2021-12",
-   "precip_mm": 83.33
+   "precip_mm": 86.3
   },
   {
    "month": "2022-01",
-   "precip_mm": 95.98
+   "precip_mm": 96.72
   },
   {
    "month": "2022-02",
-   "precip_mm": 51.74
+   "precip_mm": 53.76
   },
   {
    "month": "2022-03",
-   "precip_mm": 61.75
+   "precip_mm": 63.24
   },
   {
    "month": "2022-04",
-   "precip_mm": 23.04
+   "precip_mm": 23.76
   },
   {
    "month": "2022-05",
-   "precip_mm": 43.9
+   "precip_mm": 45.38
   },
   {
    "month": "2022-06",
-   "precip_mm": 47.52
+   "precip_mm": 45.36
   },
   {
    "month": "2022-07",
@@ -1080,47 +1080,47 @@
   },
   {
    "month": "2022-08",
-   "precip_mm": 1.49
+   "precip_mm": 2.23
   },
   {
    "month": "2022-09",
-   "precip_mm": 22.32
+   "precip_mm": 18.72
   },
   {
    "month": "2022-10",
-   "precip_mm": 18.6
+   "precip_mm": 19.34
   },
   {
    "month": "2022-11",
-   "precip_mm": 33.84
+   "precip_mm": 36.0
   },
   {
    "month": "2022-12",
-   "precip_mm": 24.55
+   "precip_mm": 23.81
   },
   {
    "month": "2023-01",
-   "precip_mm": 18.6
+   "precip_mm": 17.11
   },
   {
    "month": "2023-02",
-   "precip_mm": 29.57
+   "precip_mm": 30.24
   },
   {
    "month": "2023-03",
-   "precip_mm": 72.17
+   "precip_mm": 69.94
   },
   {
    "month": "2023-04",
-   "precip_mm": 66.96
+   "precip_mm": 69.12
   },
   {
    "month": "2023-05",
-   "precip_mm": 42.41
+   "precip_mm": 44.64
   },
   {
    "month": "2023-06",
-   "precip_mm": 66.24
+   "precip_mm": 62.64
   },
   {
    "month": "2023-07",
@@ -1132,35 +1132,35 @@
   },
   {
    "month": "2023-09",
-   "precip_mm": 12.24
+   "precip_mm": 10.8
   },
   {
    "month": "2023-10",
-   "precip_mm": 28.27
+   "precip_mm": 29.02
   },
   {
    "month": "2023-11",
-   "precip_mm": 46.8
+   "precip_mm": 49.68
   },
   {
    "month": "2023-12",
-   "precip_mm": 48.36
+   "precip_mm": 52.08
   },
   {
    "month": "2024-01",
-   "precip_mm": 64.73
+   "precip_mm": 65.47
   },
   {
    "month": "2024-02",
-   "precip_mm": 20.18
+   "precip_mm": 22.97
   },
   {
    "month": "2024-03",
-   "precip_mm": 61.01
+   "precip_mm": 57.29
   },
   {
    "month": "2024-04",
-   "precip_mm": 33.12
+   "precip_mm": 33.84
   },
   {
    "month": "2024-05",
@@ -1172,55 +1172,55 @@
   },
   {
    "month": "2024-07",
-   "precip_mm": 15.62
+   "precip_mm": 16.37
   },
   {
    "month": "2024-08",
-   "precip_mm": 14.88
+   "precip_mm": 11.9
   },
   {
    "month": "2024-09",
-   "precip_mm": 24.48
+   "precip_mm": 23.04
   },
   {
    "month": "2024-10",
-   "precip_mm": 6.7
+   "precip_mm": 7.44
   },
   {
    "month": "2024-11",
-   "precip_mm": 43.2
+   "precip_mm": 48.24
   },
   {
    "month": "2024-12",
-   "precip_mm": 63.98
+   "precip_mm": 66.22
   },
   {
    "month": "2025-01",
-   "precip_mm": 9.67
+   "precip_mm": 11.16
   },
   {
    "month": "2025-02",
-   "precip_mm": 43.01
+   "precip_mm": 39.65
   },
   {
    "month": "2025-03",
-   "precip_mm": 27.53
+   "precip_mm": 26.78
   },
   {
    "month": "2025-04",
-   "precip_mm": 47.52
+   "precip_mm": 46.08
   },
   {
    "month": "2025-05",
-   "precip_mm": 43.9
+   "precip_mm": 43.15
   },
   {
    "month": "2025-06",
-   "precip_mm": 15.12
+   "precip_mm": 13.68
   },
   {
    "month": "2025-07",
-   "precip_mm": 6.7
+   "precip_mm": 5.95
   },
   {
    "month": "2025-08",
@@ -1228,7 +1228,7 @@
   },
   {
    "month": "2025-09",
-   "precip_mm": 8.64
+   "precip_mm": 7.2
   }
  ]
 }

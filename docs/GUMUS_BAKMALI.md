@@ -185,3 +185,80 @@ Senin notuna göre: çekme kodu (`modis.py`) bende kalıyor; JSON alanı ve şem
   ```
   Değerleri `validate.ndvi_comparison(...)` sözlüğünden ve iki aylık klimatolojiden (ben yardımcı fonksiyon yazarım, istersen) üretebilirsin. Etiket: `measured` (NDVI) ve `model` (model_cover).
 - **Durum:** Karapınar, Develi, Polatlı tamam; diğerleri iniyor (ORNL API yavaş, 502 verince kaldığı yerden devam ediyor).
+
+## 20. POWER yağışına istasyon düzeltmesi açıldı (15 Kas, `omer` 2ad2478) — `make data` gerekiyor
+
+OMER_BAKMALI §6'daki (b) seçeneği. Motor girdisi değişti; senden yalnız **yeniden üretim** lazım, sözleşme ve `build.py` değişmiyor.
+- **Yöntem:** günlük POWER yağışı × (MGM/WMO 1991–2020 yıllık normali ÷ POWER yıllık ortalaması). Doğrusal ölçekleme (Teutschbein & Seibert 2012, J. Hydrol., doi:10.1016/j.jhydrol.2012.05.052); yağışlı günler aynı. Anahtar: `scenarios.yaml → precip_correction.enabled` (assumption, açık). Normalleri senin `references.yaml`'dan okuyor.
+- **Nerede:** `run_location`, `run_landscape`, `run_scenarios` (düzeltme senaryo çarpanından **önce**; `dry20` yine baseline × 0,8). `EngineOutput`'a `precip_correction` anahtarı eklendi (factor, normal, istasyon); export onu yazmıyor, sözleşmeye girmesi gerekmiyor.
+- **Kanıt paneli:** `precip_vs_mgm` ham POWER–MGM karşılaştırmasını aynen tutuyor, sonuna "engine uses POWER × f" ve bir not ekliyor.
+- **Etki (orta derinlik, 24 yıl ortancası, scratch koşu):** faktörler Karaman 0,55 · Eskişehir 0,72 · Karapınar 0,73 · Boğazlıyan 0,88 … Nevşehir/Kaman 1,16. Karapınar nadas sonrası ekimde su 104 → 45 mm, buğday Ya/Ym 0,54 → 0,42; Kaman 62 → 95 mm. **Konya denemesine yaklaştı:** nohut/nadas 0,89 → 0,85 (deneme 0,80), mercimek/nadas 0,90 → 0,86 (deneme 0,87). Kütle dengesi geçiyor.
+- **Dikkat:** Karaman nadas su biriktirme verimi %30 çıktı, literatür aralığı %11–29'un hemen üstünde (`pse_literature`, info). Develi'nin istasyonu ~29 km uzakta (Kayseri Bölge); nokta taşıma turunda istasyon da değişecekse normal güncellenmeli.
+- [x] `make data` (senaryolar dahil) — Ömer çalıştırdı (§23); taşımadan sonra tekrar gerekecek.
+
+## 21. NDVI sulu nokta listesi — 13/13 ilçe (15 Kas)
+
+Senin ölçütün (OMER_BAKMALI §11): aylık ortalama NDVI zirvesi Temmuz–Eylül **ya da** Temmuz ortalaması > 0,35. MOD13Q1, 2013–2024, noktanın 250 m pikseli. "Kuruma" = zirveden sonra NDVI'nin zirve–dip ortasının altına indiği ilk ay.
+
+| İlçe | Rakım (POWER) | Zirve ayı | Zirve | Tem | Ağu | Kuruma | Karar |
+|---|---|---|---|---|---|---|---|
+| **Karaman** | 1394 | 7 | 0,79 | 0,79 | 0,71 | 9 | **taşı** — Haziran'da 0,25'ten Temmuz'da 0,79'a: yaz ürünü, açıkça sulu |
+| **Karapınar** | 1236 | 7 | 0,62 | 0,62 | 0,55 | 10 | **taşı** — bütün yaz yeşil (§18) |
+| **Eskişehir** | 878 | 7 | 0,57 | 0,57 | 0,55 | 10 | **taşı** |
+| **Niğde** | 1420 | 8 | 0,49 | 0,44 | 0,49 | 11 | **taşı** — zirve Ağustos |
+| **Gemerek** | 1620 | 7 | 0,53 | 0,53 | 0,49 | 10 | **taşı** (sınırda: yüksek rakımda buğday geç olgunlaşır ama Ağustos 0,49 hasat edilmiş tarla için çok yüksek) |
+| **Boğazlıyan** | 1166 | 6 | 0,59 | 0,53 | 0,49 | 9 | **taşı** (sınırda: zirve Haziran ama Temmuz–Ağustos yeşil kalıyor) |
+| Develi | 1577 | 5 | 0,39 | 0,32 | 0,23 | 8 | kalsın — kuru tarım deseni |
+| Polatlı | 1037 | 4 | 0,52 | 0,17 | 0,16 | 6 | kalsın |
+| Kaman | 1055 | 5 | 0,60 | 0,25 | 0,19 | 7 | kalsın |
+| Kırıkkale | 959 | 5 | 0,52 | 0,19 | 0,16 | 7 | kalsın |
+| Çankırı | 959 | 5 | 0,48 | 0,19 | 0,17 | 7 | kalsın |
+| **Nevşehir** | 1259 | 7 | 0,47 | 0,47 | 0,39 | 9 | **taşı** — zirve Temmuz |
+| **Aksaray** | 993 | 6 | 0,60 | 0,51 | 0,35 | 8 | **taşı** (sınırda: zirve Haziran, Temmuz 0,51 > 0,35; Ağustos'ta düşüyor) |
+
+- [ ] **8 ilçe taşınacak:** Karaman, Karapınar, Eskişehir, Niğde, Nevşehir, Gemerek, Boğazlıyan, Aksaray. Kalan 5 (Develi, Polatlı, Kaman, Kırıkkale, Çankırı) kuru tarım deseni. Yeni koordinatları yazınca NDVI'lerini çekip aynı tabloyla kontrol ederim (beklenen: zirve Nisan–Mayıs, Temmuz < 0,30).
+- **Takvim notu (bende):** temiz kuru tarım noktalarında zirve Nisan–Mayıs; en yüksek temiz nokta Develi (1577 m) Mayıs zirvesi ama kuruma Ağustos, alçak ilçelerde Haziran–Temmuz. Yani yükseklikte ~1 ay gecikme işareti var, ama tek nokta. Gemerek ve Boğazlıyan taşınınca 3 soğuk nokta olur; ikinci takvime o zaman karar veririm.
+
+## 22. SMAP yerine NASA MERRA-2 toprak ıslaklığı (15 Kas, ekip kararı: mock yok)
+
+AppEEARS SMAP isteği gelmediği için E1 kontrolü artık **SMAP yoksa MERRA-2'ye düşüyor**. SMAP gelirse kendiliğinden SMAP kullanılır.
+- **Veri:** `engine/nobetsu/merra2.py` (yeni) POWER aylık API'sinden `GWETROOT` (kök bölgesi ıslaklığı, ~1 m, 0–1) ve `GWETTOP` çeker; yanıt başlığı `sources: ["MERRA2"]`; girişsiz. Önbellek `data/merra2/{id}.json`, 13 ilçe, 2000-01 → 2026-09, 364 KB. `monthly_series` biçimi `smap/{id}.json` ile aynı. Sahiplik: IMERG'deki gibi sende olsun istersen.
+- **Kontrol:** `check_smap_anomaly(lands, smaps, fallback=None)` → `None` ise `data/merra2/` önbelleğini okur. **`build.py` değişikliği gerekmiyor**; `make data` sonrası 6. kontrol `pending` → `info` olur. Her ilçe satırında kaynak yazıyor (`Karapınar [MERRA-2]: …`). Not metni MERRA-2'nin model olduğunu ve **motorla bağımsız olmadığını** (POWER havası da MERRA-2) söylüyor.
+- **Sonuç (scratch, 2013-10 → 2026-09, 147 ay):** mevsim döngüsü ρ 0,88–0,99; aylık anomali ρ 0,25–0,57; en ıslak/kuru ay model ile MERRA-2 arasında en çok 1 ay fark (en kuru hep Ağustos).
+- [ ] **Sözleşme önerisi:** kontrol id'si `smap_anomaly` olarak kaldı (sözleşme bozulmasın diye). İstersen `soil_wetness_anomaly`'ye çevir; ben fonksiyon adını ona göre değiştiririm.
+- [ ] **Harita nem kutusu (isteğe bağlı):** kutu şu an "SMAP gelmedi, MERRA-2 ile karşılaştırılıyor, kanıt bölümüne bak" diyor. Kutuda grafik istersen `smap/{id}.json`'u MERRA-2'den üretebilirsin (`product` alanına MERRA-2 adını yaz, `cell_km` yerine 0,5° × 0,625°); `map` metnini ben güncelledim.
+
+## 23. `make data` Ömer tarafından çalıştırıldı (15 Kas, Gümüş'ün onayıyla)
+
+- `omer`'de, mevcut 13 noktayla (taşıma öncesi), senaryolar dahil; ~11 dk. 107 dosya, hepsi `web/public/data/` altında; `mock: false`.
+- Kapsadığı değişiklikler: yağış istasyon düzeltmesi (§20), ilçe adları, IMERG sütunu (§17), 6. kontrol MERRA-2 ile `info` (§22). 6 kontrol: 2 pass, 4 info.
+- Testler: motor 229, web 37 geçti; harita derleniyor.
+- [ ] Noktaları taşıdıktan sonra `make data` yine gerekecek (bu koşu taşıma öncesi noktalarla).
+
+## 24. 8 nokta taşındı, SMAP kaldırıldı, `make data` yapıldı (15 Kas, Ömer — senin onayınla)
+
+**Nokta seçimi:** her ilçede eski noktanın ±8 km çevresi tarandı. Piksel iki ölçütü birden geçmeli:
+1. ESA WorldCover 2021 v200 (AWS'deki açık COG): 300 m yarıçapta ≥ %60 cropland (≥ %80 olanlar öncelikli);
+2. MODIS MOD13Q1 NDVI 2020–2023: **hiçbir yıl** yazın yeşil değil (Tem ≤ 0,30, Ağu ≤ 0,28, Tem–Eyl zirvesi yok) ve en az bir yıl ilkbahar ürünü; 3×3 komşuluğun ≥ 5'i geçiyor.
+NDVI tek başına yetmedi (adayların çoğu WorldCover'a göre bozkır/mera çıktı); WorldCover tek başına sulu/kuru ayırmıyor; ikisi birlikte kullanıldı. En yakın uygun piksel seçildi.
+
+| İlçe | Eski | Yeni | km | Cropland | NDVI zirve ay / zirve / Tem |
+|---|---|---|---|---|---|
+| karapinar | 37.72, 33.48 | 37.6698, 33.4801 | 5.58 | %80 | 4 / 0.321 / 0.221 |
+| eskisehir | 39.806, 30.568 | 39.8427, 30.5945 | 4.67 | %91 | 5 / 0.476 / 0.218 |
+| aksaray | 38.371, 33.964 | 38.4031, 33.9765 | 3.74 | %88 | 5 / 0.58 / 0.27 |
+| karaman | 37.234, 33.22 | 37.1698, 33.1109 | 12.01 | %100 | 5 / 0.379 / 0.203 |
+| nigde | 37.918, 34.628 | 37.876, 34.6795 | 6.5 | %89 | 4 / 0.327 / 0.174 |
+| nevsehir | 38.576, 34.616 | 38.5385, 34.6477 | 4.99 | %85 | 5 / 0.318 / 0.254 |
+| gemerek | 39.172, 36.115 | 39.1573, 36.1379 | 2.56 | %86 | 5 / 0.398 / 0.26 |
+| bogazliyan | 39.217, 35.253 | 39.2219, 35.2406 | 1.19 | %100 | 5 / 0.46 / 0.179 |
+
+- `locations.yaml`: lat/lon, `coord_check` (yöntem + sayılar), başa yöntem notu. `coord_verified: true` kaldı (artık iki ölçütle).
+- `references.yaml`: 8 istasyon metninde "noktaya ~X km" yeniden hesaplandı (3,7–10,0 km; Karaman 10,0 km — ovanın çoğu sulu).
+- Yeniden çekildi: POWER (hücreler aynı kaldı, ~50 km), SoilGrids, IMERG, MERRA-2 (+ nem yuvası), NDVI (2020–2023 taramadan; 2013–2019 ve 2024 iniyor).
+- **Sonuç etkisi küçük** (hava aynı hücre): örn. Karapınar AWC 154,7 → 157,1; sıralamalar hemen hemen aynı. Kütle dengesi 1,3e-12 mm.
+- `locations.yaml` notlarındaki yön ifadeleri ("ilçe merkezinin batısında" vb.) eski noktaya göre yazılmıştı; yeni noktalar 1–12 km kaydı, metinleri kontrol etmek isteyebilirsin.
+
+**SMAP kaldırıldı:** nem yuvası (`data/smap/`, `smap/{id}.json`, kontrol `smap_anomaly`) NASA MERRA-2 ile dolu; şemada `latest.rootzone_m3m3` boş olabilir, `types.ts` de öyle; `export.py` varsayılan ürünü MERRA-2; harita ve web'de "SMAP" yazısı yok, rozet "model". Dosya ve id adları sözleşme bozulmasın diye aynı; istersen sonra `soil_wetness` adına çevir. `smap.py` (AppEEARS işleyicisi) ve `data/smap/appeears_*` dokunulmadı, artık kullanılmıyor.
+
+**Toprak işleme (`rotations.yaml`):** nohut 3 (TTAE Babaoğlu), mercimek 2 (TTAE Süzer), `literature`.

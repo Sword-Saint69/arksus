@@ -4,8 +4,9 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { SiteIndex, ResultsFile, LedgerFile, SmapFile, DefaultsFile, ValidationFile } from './types';
+import type { SiteIndex, ResultsFile, LedgerFile, SmapFile, DefaultsFile, ValidationFile, FertilizerFile, FertCropId, WaterRegime } from './types';
 import { inputsFromDefaults, summarize, flipTable, decide } from './economics';
+import { recommend, soilFromResults } from './fertilizer';
 
 const DATA = resolve(__dirname, '../../public/data');
 const read = <T>(rel: string): T => JSON.parse(readFileSync(resolve(DATA, rel), 'utf-8')) as T;
@@ -13,6 +14,7 @@ const read = <T>(rel: string): T => JSON.parse(readFileSync(resolve(DATA, rel), 
 const site = read<SiteIndex>('site_index.json');
 const defaults = read<DefaultsFile>('defaults.json');
 const validation = read<ValidationFile>('validation.json');
+const fertilizer = read<FertilizerFile>('fertilizer.json');
 
 describe('contract', () => {
   it('site_index has baseline first and fixed ids', () => {
@@ -64,6 +66,18 @@ describe('contract', () => {
       expect(d.ranking).toHaveLength(3);
       if (d.recommended) expect(d.ranking.find((r) => r.rotation_id === d.recommended)!.eligible).toBe(true);
       expect(flipTable(results, site, inp)).toHaveLength(9);
+
+      // fertilizer: SoilGrids prefill → a plan for every crop and water regime, never a TL amount
+      const pre = soilFromResults(results, fertilizer);
+      expect(pre.soil.ph).toBeTypeOf('number');
+      for (const crop of Object.keys(fertilizer.crops) as FertCropId[]) {
+        for (const water of ['rainfed', 'limited', 'irrigated'] as WaterRegime[]) {
+          const plan = recommend(fertilizer, { crop, water, soil: pre.soil });
+          expect(plan.nutrients).toHaveLength(3);
+          for (const d of plan.doses) expect(d.kg_per_da).toBeGreaterThan(0);
+          expect(JSON.stringify(plan)).not.toMatch(/TL|₺/);
+        }
+      }
     });
   }
 });

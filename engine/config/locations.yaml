@@ -1,15 +1,17 @@
 # Owner: Gümüş (Rol B). ARAYUZLER §4. 13 Central Anatolia points, one per province (14 Nov: location list opened).
 # Each point: rainfed-farming district, cropland checked with ESA WorldCover 2021 (does NOT separate irrigated from rainfed),
 # 3–10 km from the WMO 1991–2020 normals station used for precip_vs_mgm. Elevation comes from the NASA POWER header.
+# 15 Nov (Ömer, with Gümüş's OK): 9 points (Develi added later the same day) that MODIS NDVI showed as irrigated were moved to pixels that are both
+# ≥ 60 % WorldCover cropland within 300 m AND never summer-green in MODIS NDVI 2020–2023 (rainfed). See coord_check.
 locations:
 - id: karapinar
   name: Karapınar
   district: Karapınar
   province: Konya
-  lat: 37.72
-  lon: 33.48
+  lat: 37.6698
+  lon: 33.4801
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %69 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Karapınar 17902'
+  coord_check: '15 Kas, Ömer: eski nokta 37.72, 33.48 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (5.58 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %80 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 4 (0.321), Temmuz 0.221. Yakın WMO istasyonu: Karapınar 17902 (~6.4 km)'
   note:
     en: Rainfed cropland west of Karapınar town (Konya closed basin), the 1960s wind-erosion area. Representative of the district, not a specific field.
     tr: Karapınar ilçe merkezinin batısında kuru tarım alanı (Konya kapalı havzası), 1960'ların rüzgâr erozyonu bölgesi. İlçeyi temsil eder, belirli bir tarla değildir.
@@ -17,10 +19,10 @@ locations:
   name: Develi
   district: Develi
   province: Kayseri
-  lat: 38.43
-  lon: 35.47
+  lat: 38.4302
+  lon: 35.444
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %89 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Kayseri Bölge 17196 (~29 km)'
+  coord_check: '15 Kas, Ömer: eski nokta 38.43, 35.47 MODIS NDVI''de 12 yılın 7''sinde yazın yeşildi (sulu görünüyordu), taşındı (2.26 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %90 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.337), Temmuz 0.228. Yakın WMO istasyonu: Kayseri Bölge 17196 (~29 km)'
   note:
     en: Cropland north of Develi town (Develi plain). Representative of the district, not a specific field.
     tr: Develi ilçe merkezinin kuzeyinde tarım alanı (Develi ovası). İlçeyi temsil eder, belirli bir tarla değildir.
@@ -39,10 +41,10 @@ locations:
   name: Eskişehir
   district: Merkez
   province: Eskişehir
-  lat: 39.806
-  lon: 30.568
+  lat: 39.8427
+  lon: 30.5945
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Eskişehir Bölge 17126'
+  coord_check: '15 Kas, Ömer: eski nokta 39.806, 30.568 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (4.67 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %91 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 4 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.476), Temmuz 0.218. Yakın WMO istasyonu: Eskişehir Bölge 17126 (~9.4 km)'
   note:
     en: Cropland north of Eskişehir city. Representative of the district, not a specific field.
     tr: Eskişehir şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
@@ -50,10 +52,10 @@ locations:
   name: Aksaray
   district: Merkez
   province: Aksaray
-  lat: 38.371
-  lon: 33.964
+  lat: 38.4031
+  lon: 33.9765
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Aksaray 17192'
+  coord_check: '15 Kas, Ömer: eski nokta 38.371, 33.964 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (3.74 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %88 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 4 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.58), Temmuz 0.27. Yakın WMO istasyonu: Aksaray 17192 (~4.1 km)'
   note:
     en: Cropland west of Aksaray city (Tuz Gölü basin). Representative of the district, not a specific field.
     tr: Aksaray şehir merkezinin batısında tarım alanı (Tuz Gölü havzası). İlçeyi temsil eder, belirli bir tarla değildir.
@@ -61,10 +63,10 @@ locations:
   name: Karaman
   district: Merkez
   province: Karaman
-  lat: 37.234
-  lon: 33.22
+  lat: 37.1698
+  lon: 33.1109
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Karaman 17246'
+  coord_check: '15 Kas, Ömer: eski nokta 37.234, 33.22 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (12.01 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %100 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.379), Temmuz 0.203. Yakın WMO istasyonu: Karaman 17246 (~10.0 km)'
   note:
     en: Cropland north of Karaman city. Representative of the district, not a specific field.
     tr: Karaman şehir merkezinin kuzeyinde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
@@ -72,10 +74,10 @@ locations:
   name: Niğde
   district: Merkez–Bor
   province: Niğde
-  lat: 37.918
-  lon: 34.628
+  lat: 37.876
+  lon: 34.6795
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %90 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Niğde 17250'
+  coord_check: '15 Kas, Ömer: eski nokta 37.918, 34.628 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (6.5 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %89 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 4 (0.327), Temmuz 0.174. Yakın WMO istasyonu: Niğde 17250 (~9.2 km)'
   note:
     en: Cropland south-west of Niğde city, towards Bor. Representative of the district, not a specific field.
     tr: Niğde şehir merkezinin güneybatısında, Bor yönünde tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
@@ -83,10 +85,10 @@ locations:
   name: Nevşehir
   district: Merkez
   province: Nevşehir
-  lat: 38.576
-  lon: 34.616
+  lat: 38.5385
+  lon: 34.6477
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %97 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Nevşehir 17193'
+  coord_check: '15 Kas, Ömer: eski nokta 38.576, 34.616 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (4.99 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %85 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 2 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.318), Temmuz 0.254. Yakın WMO istasyonu: Nevşehir 17193 (~9.9 km)'
   note:
     en: Cropland south-west of Nevşehir city. Representative of the district, not a specific field.
     tr: Nevşehir şehir merkezinin güneybatısında tarım alanı. İlçeyi temsil eder, belirli bir tarla değildir.
@@ -127,10 +129,10 @@ locations:
   name: Gemerek
   district: Gemerek
   province: Sivas
-  lat: 39.172
-  lon: 36.115
+  lat: 39.1573
+  lon: 36.1379
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Gemerek 17162'
+  coord_check: '15 Kas, Ömer: eski nokta 39.172, 36.115 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (2.56 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %86 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 4 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.398), Temmuz 0.26. Yakın WMO istasyonu: Gemerek 17162 (~5.8 km)'
   note:
     en: Cropland near Gemerek (Sivas); high, cold eastern edge of the region. Representative of the district, not a specific field.
     tr: Gemerek (Sivas) yakınında tarım alanı; bölgenin yüksek ve soğuk doğu ucu. İlçeyi temsil eder, belirli bir tarla değildir.
@@ -138,10 +140,10 @@ locations:
   name: Boğazlıyan
   district: Boğazlıyan
   province: Yozgat
-  lat: 39.217
-  lon: 35.253
+  lat: 39.2219
+  lon: 35.2406
   coord_verified: true
-  coord_check: 'ESA WorldCover 2021 v200 (10 m): 300 m içinde %100 cropland (2026-11-14); sulu/kuru ayrımı yapılmadı. Yakın WMO istasyonu: Boğazlıyan 17760'
+  coord_check: '15 Kas, Ömer: eski nokta 39.217, 35.253 MODIS NDVI''ye göre sulu görünüyordu (GUMUS_BAKMALI §21), taşındı (1.19 km). Yeni nokta: ESA WorldCover 2021 v200 (10 m) 300 m içinde %100 cropland; MODIS MOD13Q1 NDVI 2020–2023 hiçbir yıl yazın yeşil değil (sulu değil), 4 yıl ilkbahar ürünü, ortalama zirve ay 5 (0.46), Temmuz 0.179. Yakın WMO istasyonu: Boğazlıyan 17760 (~3.7 km)'
   note:
     en: Cropland near Boğazlıyan, a major wheat district of Yozgat. Representative of the district, not a specific field.
     tr: Boğazlıyan yakınında tarım alanı; Yozgat'ın büyük buğday ilçelerinden. İlçeyi temsil eder, belirli bir tarla değildir.

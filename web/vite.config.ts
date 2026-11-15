@@ -1,18 +1,23 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
 
+// NöbetSu farmer site. The contract data lives in public/data (written by the
+// engine: `make data`), so the build needs no extra copy step.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
+  build: {
+    // MapLibre is one large, rarely changing chunk; keep it apart from the app code.
+    chunkSizeWarningLimit: 1200,
+  },
   test: {
-    // src/lib/*.test.ts read the JSON contract with node:fs, so the default
-    // environment is node. Component tests that need a DOM go in *.dom.test.tsx.
+    // The tests are pure logic and read the JSON contract with node:fs.
     environment: 'node',
-    environmentMatchGlobs: [['src/**/*.dom.test.tsx', 'jsdom']],
+    include: ['src/**/*.test.ts'],
   },
 });

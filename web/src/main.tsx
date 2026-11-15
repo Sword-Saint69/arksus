@@ -1,10 +1,7 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import '@fontsource-variable/atkinson-hyperlegible-next';
 import './index.css';
+import App from './App';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+// No StrictMode: its double mount would build the WebGL map twice in development.
+createRoot(document.getElementById('root')!).render(<App />);

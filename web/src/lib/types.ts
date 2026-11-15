@@ -104,7 +104,8 @@ export interface SmapFile extends FileHeader {
   available: boolean;
   product: string;
   cell_km: number;
-  latest: { date: string; rootzone_wetness: number; rootzone_m3m3: number; percentile_for_month: number } | null;
+  // 15 Nov: SMAP dropped; the slot holds NASA MERRA-2 (degree of saturation only, so rootzone_m3m3 is null).
+  latest: { date: string; rootzone_wetness: number; rootzone_m3m3: number | null; percentile_for_month: number } | null;
   monthly_climatology: { month: number; p10: number; p50: number; p90: number }[];
   monthly_series: { month_start: string; rootzone_wetness: number; surface_wetness: number }[];
 }
@@ -126,3 +127,86 @@ export interface DefaultsFile extends FileHeader {
 export type CheckId = 'mass_balance' | 'et0_fao56_ex18' | 'pse_literature' | 'trial_ratio' | 'precip_vs_mgm' | 'smap_anomaly';
 export interface Check { id: CheckId; status: 'pass' | 'fail' | 'info' | 'pending'; value: string; reference: string; note: Text }
 export interface ValidationFile extends FileHeader { checks: Check[] }
+
+// agent/{location_id}.json — AI district commentary from a local model (15 Nov). Show `report` only when guards.passed.
+export interface AgentReport {
+  headline: Text;
+  rotations: { rotation_id: string; strengths: Text[]; risks: Text[] }[];
+  soil_health: Text[];
+  satellites: Text[];
+  climate_scenarios: Text[];
+  uncertainties: Text[];
+  ask_local_expert: Text[];
+}
+export interface AgentFile extends FileHeader {
+  location_id: LocationId;
+  depth_id: DepthId;
+  model: string;
+  type: 'model';
+  report: AgentReport | null;
+  tools_used: { tool: string; args: Record<string, unknown>; forced?: boolean }[];
+  guards: { passed: boolean; problems: string[]; rewrites: number };
+  disclaimer: Text;
+}
+
+// §4.6 fertilizer.json — fertilizer rules (15 Nov, docs/GUBRE.md). National (Central Anatolia tables), same for every location.
+// The browser computes the plan with fertilizer.ts; amounts are kg/da of pure nutrient or of product. No money.
+export type FertCropId = 'wheat' | 'barley' | 'chickpea' | 'lentil' | 'sugar_beet' | 'potato' | 'onion';
+export type WaterRegime = 'rainfed' | 'limited' | 'irrigated';
+export type Nutrient = 'n' | 'p2o5' | 'k2o';
+export type Timing = 'pre_plant' | 'base' | 'top_1' | 'top_2' | 'foliar';
+export type SoilFlag = 'alkaline' | 'high_lime' | 'low_om' | 'low_total_n' | 'saline' | 'zn_low' | 'zn_likely_low';
+
+/** A comparison predicate. A missing input never matches, unless `missing: true` is asked. */
+export interface Pred { gt?: number; gte?: number; lt?: number; lte?: number; eq?: string | number | boolean; in?: (string | number)[]; missing?: boolean }
+/** All listed keys must match. Keys: SoilTest fields, request fields (water, inoculated, drip, banding), flags_any, flags_all. */
+export interface When { [key: string]: Pred | SoilFlag[] | undefined; flags_any?: SoilFlag[]; flags_all?: SoilFlag[] }
+
+export interface Sourced { source: string; source_url?: string; type: Badge; verified: boolean }
+export interface FertProduct extends Sourced {
+  label: Text;
+  n: number; p2o5: number; k2o: number;        // % by weight (product grade)
+  so3?: number; zn?: number;
+  band_minus_kg?: number;                      // kg/da less of this product when placed in a band (combined seed drill)
+}
+export interface ProductChoice { product: string; when?: When }
+export interface SplitPart { timing: Timing; fraction: number; label: Text }
+export interface Advice extends Sourced { id: string; when?: When; text: Text }
+/** Official soil-test table: the class the soil value falls in gives the pure nutrient to apply (kg/da). */
+export interface ClassRow { max: number | null; kg_per_da: number }   // value ≤ max (null = above the last bound)
+export interface SoilTable extends Sourced { rows: ClassRow[] }
+export type SoilTableBy = 'om_pct' | 'p2o5_kg_per_da' | 'k2o_kg_per_da';
+export interface GuideDose { product: string; timing: Timing; min_kg_per_da: number; max_kg_per_da: number }
+export interface GuideRow { min: number | null; max: number | null; water?: WaterRegime[]; doses: GuideDose[]; note?: Text }
+export interface GuideTable extends Sourced { by: 'target_yield_kg_per_da'; rows: GuideRow[] }
+export interface FertCrop {
+  label: Text;
+  in_rotations: boolean;                       // true = also in the water-balance engine (wheat, chickpea, lentil)
+  default_target_yield_kg_per_da: Record<WaterRegime, V>;
+  /** Main method: TAGEM Central Anatolia tables per nutrient and water regime (a regime may be absent). */
+  soil_tables: Record<Nutrient, Partial<Record<WaterRegime, SoilTable>>>;
+  fixed_n_kg_per_da?: { inoculated: V };       // legumes with Rhizobium-inoculated seed: starter N only
+  n_response?: { a: V; b: V; c: V };           // yield = a + b·N + c·N² → N at the top of the curve (used only without a table)
+  n_cap_kg_per_da?: V;                         // applied N never above this
+  uptake_kg_per_t: Record<Nutrient, V>;        // cross-check / fallback balance: nutrient taken up per 1000 kg product
+  salinity_threshold_ec_ds_m: V;               // ECe above which yield starts to fall
+  n_split: Record<WaterRegime, SplitPart[]>;   // how the N left after the base fertilizer is split (fractions sum to 1)
+  base_products: ProductChoice[];              // first match supplies P (and its N, K)
+  top_products: ProductChoice[];               // first match supplies the remaining N
+  k_product: string;
+  guide_table?: GuideTable;                    // a Turkish guide's product doses by target yield (shown for comparison)
+  advice: Advice[];
+}
+export interface FertilizerFile extends FileHeader {
+  soil_table_by: Record<Nutrient, SoilTableBy>; // which soil value classifies each nutrient's table
+  soil_layer: { mass_kg_per_da: V };
+  conversions: { p_to_p2o5: V; k_to_k2o: V; soc_to_om: V };
+  soil_supply: { n_available_fraction: V; n_uptake_fraction: V; p_uptake_fraction: V; k_uptake_fraction: V };
+  fertilizer_efficiency: Record<Nutrient, V>;
+  thresholds: { ph_alkaline: V; lime_high_pct: V; om_low_pct: V; total_n_low_pct: V; zn_low_ppm: V };
+  banding: Sourced;                            // provenance of products' band_minus_kg
+  min_dose_kg_per_da: V;                       // product doses below this are dropped (too small to spread evenly)
+  products: Record<string, FertProduct>;
+  crops: Record<FertCropId, FertCrop>;
+  advice: Advice[];                            // general advice (all crops)
+}

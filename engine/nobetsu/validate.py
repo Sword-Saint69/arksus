@@ -202,10 +202,12 @@ def precip_common_years(weather: pd.DataFrame, imerg_monthly: pd.Series) -> tupl
     return years, power_mm, imerg_mm
 
 
-def check_precip(weathers, refs, imerg=None):
-    """POWER (and, when cached, NASA GPM IMERG) annual precipitation vs MGM station normals."""
+def check_precip(weathers, refs, imerg=None, factors=None):
+    """POWER (and, when cached, NASA GPM IMERG) annual precipitation vs MGM station normals.
+    `factors`: {loc: runner.precip_correction_factor(...)} when the engine uses station-scaled rain."""
     mgm = refs.get("mgm_annual_precip_mm", {})
     imerg = imerg or {}
+    factors = factors or {}
     parts, ref_parts = [], []
     for loc, w in weathers.items():
         node = mgm.get(loc)
@@ -223,6 +225,8 @@ def check_precip(weathers, refs, imerg=None):
             if years:
                 text += (f"; IMERG {imerg_c:.0f} mm/yr ({(imerg_c - normal) / normal * 100:+.0f} %), "
                          f"POWER {power_c:.0f} mm/yr over the same {years[0]}–{years[-1]} ({len(years)} yr)")
+        if factors.get(loc):
+            text += f"; engine uses POWER × {factors[loc]['factor']:.2f}"
         parts.append(text)
         ref_parts.append(f"{_name(loc)}: {station}, 1991–2020 normal")
     if not parts:
@@ -239,12 +243,27 @@ def check_precip(weathers, refs, imerg=None):
     tr = ("NASA POWER uydu ve model kaynaklıdır (~50 km); MGM istasyonu yerde tek bir noktayı ölçer. "
           "İkisi farklı yılları kapsar. Bu kontrol aradaki farkı gösterir; POWER'ı istasyon verisiyle düzeltmek "
           "etkinlik sonrası listesinde.")
+    if any(factors.values()):
+        en += (" The engine scales daily POWER rain so that its mean annual total matches the station normal "
+               "(linear scaling, Teutschbein & Seibert 2012); wet days stay as in POWER. The station normal covers "
+               "1991–2020, POWER 2000 onward.")
+        tr += (" Motor, günlük POWER yağışını yıllık ortalaması istasyon normaline eşit olacak şekilde ölçekler "
+               "(doğrusal ölçekleme, Teutschbein ve Seibert 2012); yağışlı günler POWER'daki gibi kalır. İstasyon "
+               "normali 1991–2020, POWER 2000 sonrasıdır.")
     if has_imerg:
         en += (" NASA GPM IMERG (~10 km) is a second satellite estimate. Its monthly product is adjusted with rain "
                "gauges, so it is not fully independent of station data. The engine still uses POWER.")
         tr += (" NASA GPM IMERG (~10 km) ikinci bir uydu tahminidir. Aylık ürünü yağış ölçerlerle düzeltildiği için "
                "istasyon verisinden tam bağımsız değildir. Motor hâlâ POWER kullanır.")
     return _check("precip_vs_mgm", "info", "; ".join(parts), "; ".join(ref_parts), en, tr)
+
+
+def _engine_factors(weather, refs) -> dict:
+    """Station factors the engine applies (empty when scenarios.yaml precip_correction is off)."""
+    from nobetsu import runner
+    if not runner._precip_correction_enabled():
+        return {}
+    return {loc: runner.precip_correction_factor(loc, w, refs) for loc, w in weather.items()}
 
 
 def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs: dict,
@@ -262,13 +281,13 @@ def run_checks(outputs: dict[str, dict], weather: dict[str, pd.DataFrame], refs:
         check_et0(),
         check_pse(outputs, refs),
         check_trial(outputs, refs),
-        check_precip(weather, refs, imerg),
+        check_precip(weather, refs, imerg, _engine_factors(weather, refs)),
     ]
     assert [c["id"] for c in checks] == list(CHECK_IDS)
     return checks
 
 
-# --- E1: SMAP L4 root-zone anomaly comparison (PLAN_EXPANSION E1) ---------------------------
+# --- E1: model soil water vs NASA MERRA-2 root-zone wetness (SMAP dropped 15 Nov) -------------
 # Not yet part of run_checks(): the contract has exactly five checks. A sixth id
 # (`smap_anomaly`) needs Gümüş to extend validation.schema.json first.
 
@@ -300,11 +319,11 @@ def _smap_monthly(smap: dict) -> pd.Series:
 
 
 def smap_comparison(landscape: pd.DataFrame, smap: dict) -> dict:
-    """Compare monthly model fullness (landscape run) with SMAP root-zone wetness.
+    """Compare monthly model fullness (landscape run) with root-zone wetness from the soil-wetness slot (MERRA-2).
 
     Both are reduced to standardised monthly anomalies over the overlapping months, so the
-    different definitions (fullness = share of available water capacity; SMAP wetness =
-    degree of saturation of a 9 km model cell) do not matter for the correlation.
+    different definitions (fullness = share of available water capacity; MERRA-2 wetness =
+    degree of saturation of a ~55 km reanalysis cell) do not matter for the correlation.
     """
     days = landscape["fullness_pct"].groupby(landscape.index.to_period("M")).size()
     model = landscape["fullness_pct"].resample("MS").mean() / 100.0
@@ -330,36 +349,44 @@ def smap_comparison(landscape: pd.DataFrame, smap: dict) -> dict:
 
 
 def check_smap_anomaly(landscapes: dict[str, pd.DataFrame], smaps: dict[str, dict]) -> dict:
-    """Sixth check (E1) in the validation.json item format; `info` or `pending`."""
+    """Sixth check (E1): model soil-water fullness vs NASA MERRA-2 root-zone soil wetness.
+
+    `smaps` are the soil-wetness slot files (data/smap/{id}.json, contract name kept). Since 15 Nov
+    they hold NASA MERRA-2 (via POWER, nobetsu.merra2); SMAP L4 was dropped. Check id unchanged.
+    """
     parts = []
     for loc, land in landscapes.items():
-        smap = smaps.get(loc) or {}
-        if not smap.get("available"):
+        data = smaps.get(loc) or {}
+        if not data.get("available"):
             continue
-        s = smap_comparison(land, smap)
+        s = smap_comparison(land, data)
         if s["n_months"] < SMAP_MIN_MONTHS:
             continue
         parts.append(
-            f"{_name(loc)}: ρ = {s['spearman_anomaly']:.2f} for monthly anomalies "
+            f"{_name(loc)}: ρ = {s['spearman_anomaly']:.2f} for monthly anomalies, "
+            f"{s['spearman_seasonal']:.2f} for the seasonal cycle "
             f"({s['n_months']} months, {s['first_month'][:7]} → {s['last_month'][:7]}); "
-            f"wettest month model {s['model_wettest_month']} / SMAP {s['smap_wettest_month']}, "
-            f"driest model {s['model_driest_month']} / SMAP {s['smap_driest_month']}"
+            f"wettest month model {s['model_wettest_month']} / MERRA-2 {s['smap_wettest_month']}, "
+            f"driest model {s['model_driest_month']} / MERRA-2 {s['smap_driest_month']}"
         )
     if not parts:
         return _check("smap_anomaly", "pending", "", "",
-                      "Waiting for NASA SMAP L4 root-zone data for the points.",
-                      "Noktalar için NASA SMAP L4 kök bölgesi verisi bekleniyor.")
+                      "Waiting for NASA MERRA-2 soil wetness at the points (python -m nobetsu.merra2).",
+                      "Noktalar için NASA MERRA-2 toprak ıslaklığı bekleniyor (python -m nobetsu.merra2).")
+    from nobetsu import merra2
     return _check(
-        "smap_anomaly", "info", "; ".join(parts),
-        "NASA SMAP L4 SPL4SMGP v8 root-zone wetness, 9 km cell, monthly means",
-        "Spearman correlation of month-by-month anomalies between the model's soil-water fullness "
-        "(a landscape where half the land is fallow and half is wheat each year, medium soil) and SMAP. "
-        "It checks timing of wet and dry spells, not absolute agreement: SMAP is a satellite-assisted "
-        "model of a 9 km mixed cell and knows nothing about our rotations.",
-        "Modelin toprak suyu doluluğu (her yıl arazinin yarısı nadas, yarısı buğday; orta derinlik) ile "
-        "SMAP'in aylık anomalileri arasındaki Spearman korelasyonu. Islak ve kuru dönemlerin zamanlamasını "
-        "kontrol eder, mutlak uyumu değil: SMAP 9 km'lik karışık bir hücrenin uydu destekli modelidir ve "
-        "bizim rotasyonlarımızı bilmez.",
+        "smap_anomaly", "info", "; ".join(parts), f"{merra2.PRODUCT} ({merra2.CELL}), monthly means",
+        "Spearman correlation between the model's soil-water fullness (a landscape where half the land is fallow "
+        "and half is wheat each year, medium soil) and NASA MERRA-2 root-zone soil wetness, month by month "
+        "(anomalies) and over the average year (seasonal cycle). It checks the timing of wet and dry spells, not "
+        "absolute agreement. MERRA-2 is a NASA reanalysis model, not a satellite measurement, and POWER's weather "
+        "that drives our engine also comes from MERRA-2, so the two are not independent: agreement partly reflects "
+        "the shared weather.",
+        "Modelin toprak suyu doluluğu (her yıl arazinin yarısı nadas, yarısı buğday; orta derinlik) ile NASA MERRA-2 "
+        "kök bölgesi toprak ıslaklığı arasındaki Spearman korelasyonu: ay ay (anomali) ve ortalama yıl boyunca "
+        "(mevsim döngüsü). Islak ve kuru dönemlerin zamanlamasını kontrol eder, mutlak uyumu değil. MERRA-2 bir NASA "
+        "yeniden analiz modelidir, uydu ölçümü değildir; motorumuzu çalıştıran POWER havası da MERRA-2'den gelir. Bu "
+        "yüzden ikisi bağımsız değildir, uyumun bir kısmı ortak havadan gelir.",
     )
 
 
