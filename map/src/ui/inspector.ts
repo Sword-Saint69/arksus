@@ -45,6 +45,7 @@ export type InspectorActions = {
   setWeight: (k: keyof Weights, v: number) => void;
   resetWeights: () => void;
   simulate: (f: Feature) => void;
+  terrain: (f: Feature) => void;
 };
 
 const icon = (id: string) => `<svg class="icon" aria-hidden="true"><use href="#${id}"/></svg>`;
@@ -120,6 +121,7 @@ function featurePanel(f: Feature, ctx: InspectorContext) {
     ${near ? `<div class="pilot-link">${icon('i-drop')}<span>${t('nearPilot', { name: esc(near.feature.name), km: fmtNum(near.km, near.km < 10 ? 1 : 0) })}</span><button class="btn primary" data-goto-pilot="${esc(near.feature.id)}">${t('seePilot', { name: esc(near.feature.name) })}${icon('i-arrow')}</button></div>` : ''}
     ${f.kind === 'parcel' ? `<div class="note">${icon('i-info')}<span>${t('tkgmNote')}</span></div>` : ''}
     ${props.length ? `<table class="props"><tbody>${props.map(([k, v]) => `<tr><th>${esc(propKey(k))}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table>` : ''}
+    ${f.kind === 'field' || f.kind === 'parcel' || (f.kind === 'island' && f.bbox.maxX - f.bbox.minX < 8000) ? `<button class="btn primary sim-cta fv-cta" data-act="terrain">⛰ ${t('fvOpen')}<small>${t('fvOpenSub')}</small></button>` : ''}
     <div class="actions">
       <button class="btn primary" data-act="toggle">${icon(inSel ? 'i-check' : 'i-plus-sq')}${inSel ? t('inList') : t('addToList')}</button>
       <button class="btn" data-act="focus">${icon('i-target')}${t('focus')}</button>
@@ -200,6 +202,7 @@ function pilotPanel(f: Feature, ctx: InspectorContext) {
     <ol class="crumbs"><li>${esc(loc.province)}</li><li>${esc(loc.district)}</li></ol>
     <p class="pilot-note">${esc(tx(loc.note))}</p>
     <button class="btn primary sim-cta" data-act="simulate">▶ ${t('simOpen')}<small>${t('simCtaSub')}</small></button>
+    <button class="btn sim-cta fv-cta" data-act="terrain">⛰ ${t('fvAround')}<small>${t('fvOpenSub')}</small></button>
     <dl class="metrics">
       <div class="metric"><dt>${t('elevation')} ${badge('model')}</dt><dd>${fmtNum(loc.elevation_m)}<small>m</small></dd></div>
       <div class="metric"><dt>${t('center')}</dt><dd style="font-size:13px">${loc.lat.toFixed(2)}, ${loc.lon.toFixed(2)}</dd></div>
@@ -371,6 +374,7 @@ function wire(root: HTMLElement, ctx: InspectorContext, act: InspectorActions) {
       case 'clear': act.clear(); break;
       case 'reset-weights': act.resetWeights(); break;
       case 'simulate': act.simulate(f!); break;
+      case 'terrain': act.terrain(f!); break;
     }
   }));
   root.querySelectorAll<HTMLSelectElement>('[data-scenario]').forEach((s) => s.addEventListener('change', () => act.setScenario(s.value)));

@@ -150,8 +150,8 @@ export const S = {
   seeOnMap: { en: 'See on the map', tr: 'Haritada gör' },
   mapTitle: { en: 'Map of Turkey: districts, fields and the 3D process', tr: 'Türkiye haritası: ilçeler, tarlalar ve 3B süreç' },
   mapHint: {
-    en: 'Pick a district on the map, then “Watch the process in 3D” to see two years of water in the three fields.',
-    tr: 'Haritada bir ilçe seçin, sonra “Süreci 3B izle” ile üç tarlada iki yılın suyunu izleyin.',
+    en: 'Pick a district for “Watch the process in 3D”, or use the frame button at the bottom right to select any area and see its terrain and where the rain runs.',
+    tr: 'Bir ilçe seçip “Süreci 3B izle”ye basın ya da sağ alttaki çerçeve düğmesiyle herhangi bir alanı seçip arazisini ve yağmur suyunun nereye aktığını görün.',
   },
   mapOpenFull: { en: 'Full screen', tr: 'Tam ekran' },
   exitFull: { en: 'Exit full screen (Esc)', tr: 'Tam ekrandan çık (Esc)' },

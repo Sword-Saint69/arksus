@@ -430,3 +430,47 @@ input[type=range] { width: 100%; accent-color: var(--primary); height: 28px; }
 /* "Back to the site" when the map is opened on its own from the farmer site. */
 .back-to-site { display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: var(--radius); text-decoration: none; color: var(--primary); font-weight: 600; white-space: nowrap; }
 .back-to-site .icon { transform: rotate(180deg); }
+
+/* Field terrain & runoff view ------------------------------------------------------ */
+.fv-cta { background: #eef4f7; color: #24495c; border-color: #cfe0e8; }
+.fv-cta:hover { background: #e2edf2; }
+.fv .sim-stage { overflow: hidden; }
+.fv-status { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--muted); font-size: 14px; pointer-events: none; }
+.fv-side { position: absolute; top: 12px; left: 12px; bottom: 12px; width: 268px; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 12px; border-radius: 12px; background: rgba(251, 250, 246, 0.94); border: 1px solid var(--line-2); box-shadow: 0 6px 20px rgba(0,0,0,.12); font-size: 12.5px; }
+.fv-side h3 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.fv-side section + section { border-top: 1px solid var(--line); padding-top: 10px; }
+.fv-stats, .fv-results { display: grid; gap: 3px; margin: 0; }
+.fv-stats div, .fv-results div { display: flex; justify-content: space-between; gap: 8px; }
+.fv-stats dt, .fv-results dt { color: var(--muted); }
+.fv-stats dd, .fv-results dd { margin: 0; font-family: var(--mono); font-weight: 500; text-align: right; }
+.fv-results { margin-top: 8px; }
+.fv-side .seg { margin: 0 0 8px; }
+.fv-range { display: grid; gap: 2px; margin-top: 8px; color: var(--muted); }
+.fv-range output { float: right; font-family: var(--mono); color: var(--text); }
+.fv-range input { width: 100%; accent-color: var(--primary); }
+.fv-check { display: flex; align-items: center; gap: 6px; margin-top: 4px; min-height: 28px; }
+.fv-check input { accent-color: var(--primary); width: 16px; height: 16px; }
+.fv-ci { color: var(--faint); font-family: var(--mono); }
+.fv-preset { width: 100%; min-height: 34px; margin-top: 6px; font-size: 12px; text-align: left; justify-content: flex-start; }
+.fv-buttons { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-top: 10px; }
+.fv-ramp { display: block; height: 10px; border-radius: 4px; background: linear-gradient(90deg, #440154, #3b528b, #21918c, #5ec962, #fde725); }
+.fv-ends { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--muted); margin: 2px 0 4px; }
+.fv-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.fv-legend:empty { display: none; }
+.fv-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; }
+.fv-chip i { width: 10px; height: 10px; border-radius: 2px; border: 1px solid rgba(0,0,0,.15); }
+.fv-note { margin: 0; color: var(--faint); font-size: 11px; line-height: 1.4; }
+.fv-profile { position: absolute; top: 12px; right: 12px; margin: 0; padding: 8px 10px; border-radius: 12px; background: rgba(251, 250, 246, 0.94); border: 1px solid var(--line-2); }
+.fv-profile figcaption { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+.fv-profile canvas { display: block; width: 300px; height: 96px; }
+
+/* Area drawing on the map */
+#map.drawing { cursor: crosshair; }
+.draw-box { position: absolute; z-index: 6; pointer-events: none; border: 2px solid #f3c45c; background: rgba(243, 196, 92, 0.18); border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.25); }
+.draw-btn[aria-pressed="true"] { background: var(--primary); color: #fff; }
+
+@media (max-width: 760px) {
+  .fv-side { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 40%; }
+  .fv-profile { left: 8px; right: 8px; top: 8px; }
+  .fv-profile canvas { width: 100%; }
+}
