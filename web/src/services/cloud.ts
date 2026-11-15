@@ -5,6 +5,7 @@
 
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
 import { CONSENT_VERSION, NOTICE_VERSION, type ConsentKind, type ConsentRow, type Intent } from '@/domain/consent';
+import type { TotalRow } from '@/domain/districtPlan';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -88,6 +89,13 @@ export async function loadIntent(year: number): Promise<Intent | null> {
 export async function saveIntent(userId: string, i: Intent): Promise<void> {
   const { error } = await need().from('planting_intents').upsert({ user_id: userId, ...i, updated_at: new Date().toISOString() });
   if (error) throw error;
+}
+
+/** Public district totals for a harvest year: only districts with >= 5 records, no user ids (works signed out). */
+export async function loadDistrictTotals(year: number): Promise<TotalRow[]> {
+  const { data, error } = await need().rpc('district_totals', { year });
+  if (error) throw error;
+  return (data ?? []) as TotalRow[];
 }
 
 /** Deletes the account; every row above goes with it (on delete cascade). */
